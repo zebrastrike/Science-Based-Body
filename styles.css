@@ -7,19 +7,19 @@
   --card: #ffffff;
   --line: #e2d8cc;
   --shadow: 0 24px 50px rgba(31, 42, 54, 0.12);
-  --glass-bg: rgba(255, 255, 255, 0.26);
-  --glass-bg-strong: rgba(255, 255, 255, 0.4);
-  --glass-border: rgba(255, 255, 255, 0.55);
+  --glass-bg: rgba(255, 255, 255, 0.12);
+  --glass-bg-strong: rgba(255, 255, 255, 0.22);
+  --glass-border: rgba(255, 255, 255, 0.34);
   --glass-shadow: 0 22px 60px rgba(31, 42, 54, 0.12);
   --glass-surface: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.55),
-    rgba(255, 255, 255, 0.08)
+    rgba(255, 255, 255, 0.35),
+    rgba(255, 255, 255, 0.05)
   );
   --glass-surface-strong: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.65),
-    rgba(255, 255, 255, 0.14)
+    rgba(255, 255, 255, 0.45),
+    rgba(255, 255, 255, 0.1)
   );
   --glass-shine: inset 0 1px 0 rgba(255, 255, 255, 0.7),
     inset 0 -1px 0 rgba(31, 42, 54, 0.08);
@@ -48,6 +48,7 @@ body {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><circle cx='20' cy='20' r='1.5' fill='%23d9cfc4' fill-opacity='0.35'/><circle cx='80' cy='70' r='1.5' fill='%23d9cfc4' fill-opacity='0.35'/><circle cx='100' cy='30' r='1.5' fill='%23d9cfc4' fill-opacity='0.35'/></svg>");
   background-size: 120px 120px;
   line-height: 1.7;
+  font-weight: 500;
 }
 
 img {
@@ -83,6 +84,7 @@ h3 {
 
 p {
   margin: 0 0 16px;
+  font-weight: 500;
 }
 
 .container {
@@ -160,7 +162,7 @@ button.btn {
 }
 
 .logo img {
-  height: 36px;
+  height: 64px;
   width: auto;
   display: block;
 }
@@ -428,6 +430,19 @@ button.btn {
   grid-template-columns: 1.2fr 0.8fr;
   gap: 32px;
   align-items: center;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.footer-logo img {
+  height: 52px;
+  width: auto;
+  display: block;
 }
 
 .footer-links {
@@ -829,5 +844,9 @@ body.is-ready .reveal {
 
   .product-hero-copy {
     padding: 28px;
+  }
+
+  .logo img {
+    height: 56px;
   }
 }

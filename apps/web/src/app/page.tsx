@@ -3,54 +3,95 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { api, Product, Category } from '@/lib/api';
+import { api, Product } from '@/lib/api';
 
-// Trust badges data
+// Trust badges - simple, factual
 const trustBadges = [
-  { icon: '🧪', text: '99%+ Purity Verified' },
-  { icon: '✓', text: 'Independent Lab Tested' },
-  { icon: '🇺🇸', text: 'Made in America' },
-  { icon: '📦', text: 'Ships Same Day' },
+  { icon: '🧪', text: '99%+ Purity' },
+  { icon: '📋', text: 'COA Included' },
+  { icon: '🇺🇸', text: 'Made in USA' },
+  { icon: '📦', text: 'Same-Day Shipping' },
 ];
 
-// Value propositions
-const valueProps = [
+// Research categories with icons - real peptide categories
+const researchCategories = [
   {
-    title: 'Verified Purity',
-    description: 'Every batch is tested by independent laboratories like Janoshik and Colmaric to verify 99%+ purity.',
+    name: 'Metabolic Research',
+    slug: 'metabolic-peptides',
+    description: 'GLP-1 agonists and metabolic compounds',
+    icon: '⚡',
+    featured: ['Semaglutide', 'Retatrutide'],
+  },
+  {
+    name: 'Recovery Research',
+    slug: 'recovery-peptides',
+    description: 'Tissue repair and regeneration',
+    icon: '🔄',
+    featured: ['BPC-157', 'TB-500'],
+  },
+  {
+    name: 'Cognitive Research',
+    slug: 'nootropic-peptides',
+    description: 'Nootropic and neuroprotective',
+    icon: '🧠',
+    featured: ['Semax', 'Selank'],
+  },
+  {
+    name: 'Longevity Research',
+    slug: 'longevity-peptides',
+    description: 'Cellular health and anti-aging',
+    icon: '⏳',
+    featured: ['Epithalon', 'NAD+'],
+  },
+  {
+    name: 'Growth Hormone',
+    slug: 'growth-hormone',
+    description: 'GHRH and secretagogues',
+    icon: '📈',
+    featured: ['Ipamorelin', 'CJC-1295'],
+  },
+  {
+    name: 'Peptide Blends',
+    slug: 'peptide-blends',
+    description: 'Synergistic combinations',
+    icon: '🧬',
+    featured: ['BPC+TB500', 'CJC+Ipamorelin'],
+  },
+];
+
+// Why us - factual, not fluffy
+const whyUs = [
+  {
+    title: 'Independent Testing',
+    description: 'Every batch tested by Janoshik or Colmaric labs. COA included with your order.',
     icon: '🔬',
   },
   {
-    title: 'Research Grade',
-    description: 'Our peptides are manufactured to exacting standards for laboratory and analytical research applications.',
-    icon: '📊',
+    title: 'Real Peptides',
+    description: 'No made-up names or mystery blends. Just verified research compounds.',
+    icon: '✓',
   },
   {
-    title: 'Fast & Reliable',
-    description: 'Orders placed before 2PM EST ship the same day. Free shipping on orders over $99.',
+    title: 'Fast Shipping',
+    description: 'Orders before 2PM EST ship same day. Free over $99.',
     icon: '🚀',
   },
   {
-    title: 'Here to Help',
-    description: 'Have questions? Our knowledgeable team is happy to assist with your research needs.',
+    title: 'Actual Support',
+    description: 'Questions about a compound? We actually answer.',
     icon: '💬',
   },
 ];
 
 export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       try {
-        const [products, cats] = await Promise.all([
-          api.getFeaturedProducts(),
-          api.getCategories(),
-        ]);
+        const products = await api.getFeaturedProducts();
         setFeaturedProducts(products);
-        setCategories(cats);
       } catch (error) {
         console.error('Failed to load homepage data:', error);
       } finally {
@@ -136,97 +177,127 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Categories Section */}
+      {/* Research Categories - Real categories, real peptides */}
       <section className="section bg-background-secondary">
         <div className="container-default">
           <div className="section-header">
-            <h2 className="section-title">Explore Our Categories</h2>
+            <h2 className="section-title">Research Categories</h2>
             <p className="section-subtitle">
-              Browse our complete selection of research-grade peptides
+              Real peptides for real research. No made-up names.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {categories.map((category) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {researchCategories.map((category) => (
               <Link
-                key={category.id}
+                key={category.slug}
                 href={`/shop/${category.slug}`}
-                className="card-hover p-6 text-center group"
+                className="card p-6 group hover:border-brand-primary/50 transition-all"
               >
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-brand-primary/10 flex items-center justify-center group-hover:bg-brand-primary/20 transition-colors">
-                  <span className="text-2xl">🧬</span>
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 rounded-xl bg-brand-primary/10 flex items-center justify-center group-hover:bg-brand-primary/20 transition-colors flex-shrink-0">
+                    <span className="text-2xl">{category.icon}</span>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-white text-lg group-hover:text-brand-primary transition-colors">
+                      {category.name}
+                    </h3>
+                    <p className="text-sm text-zinc-500 mt-1">
+                      {category.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {category.featured.map((peptide) => (
+                        <span
+                          key={peptide}
+                          className="text-xs px-2 py-1 bg-background-tertiary rounded text-zinc-400"
+                        >
+                          {peptide}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <h3 className="font-semibold text-white group-hover:text-brand-primary transition-colors">
-                  {category.name}
-                </h3>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Featured Products Section */}
+      {/* Featured Products - Real peptides with real images */}
       <section className="section">
         <div className="container-default">
           <div className="section-header">
-            <h2 className="section-title">Popular Peptides</h2>
+            <h2 className="section-title">Featured Peptides</h2>
             <p className="section-subtitle">
-              Our most requested research compounds, each with verified purity documentation
+              Most requested compounds. COA included with every order.
             </p>
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(4)].map((_, i) => (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {[...Array(8)].map((_, i) => (
                 <div key={i} className="card animate-pulse">
-                  <div className="aspect-square bg-zinc-800" />
+                  <div className="aspect-square bg-zinc-800 rounded-lg" />
                   <div className="p-4 space-y-3">
-                    <div className="h-4 bg-zinc-800 rounded w-3/4" />
+                    <div className="h-5 bg-zinc-800 rounded w-3/4" />
                     <div className="h-4 bg-zinc-800 rounded w-1/2" />
+                    <div className="h-6 bg-zinc-800 rounded w-1/3" />
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {featuredProducts.map((product) => (
                 <Link
                   key={product.id}
                   href={`/products/${product.slug}`}
-                  className="product-card"
+                  className="card group hover:border-brand-primary/50 transition-all overflow-hidden"
                 >
-                  <div className="product-card-image">
+                  {/* Product Image - Large, prominent */}
+                  <div className="aspect-square relative bg-gradient-to-br from-zinc-800 to-zinc-900 overflow-hidden">
                     <Image
                       src={product.images?.[0]?.url || '/products/sample-vial.svg'}
                       alt={product.name}
                       fill
-                      className="object-cover"
+                      className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
                     />
-                    {product.tags?.includes('bestseller') && (
-                      <span className="absolute top-3 left-3 badge-brand">
-                        Bestseller
-                      </span>
-                    )}
-                    {product.tags?.includes('new') && (
-                      <span className="absolute top-3 left-3 badge-info">
-                        New
-                      </span>
-                    )}
-                  </div>
-                  <div className="product-card-body">
-                    <h3 className="product-card-title">{product.name}</h3>
-                    <p className="text-sm text-zinc-500 line-clamp-2">
-                      {product.shortDescription}
-                    </p>
-                    <div className="product-card-price">
-                      <span className="product-card-price-current">
-                        ${product.basePrice.toFixed(2)}
-                      </span>
-                      {product.compareAtPrice && (
-                        <span className="product-card-price-compare">
-                          ${product.compareAtPrice.toFixed(2)}
+                    {/* Badges */}
+                    <div className="absolute top-3 left-3 flex flex-col gap-2">
+                      {product.tags?.includes('bestseller') && (
+                        <span className="text-xs px-2 py-1 bg-brand-primary text-black font-medium rounded">
+                          Popular
                         </span>
                       )}
+                      {product.tags?.includes('new') && (
+                        <span className="text-xs px-2 py-1 bg-blue-500 text-white font-medium rounded">
+                          New
+                        </span>
+                      )}
+                    </div>
+                    {/* Purity badge */}
+                    <div className="absolute bottom-3 right-3">
+                      <span className="text-xs px-2 py-1 bg-black/70 text-green-400 font-medium rounded">
+                        99%+ Pure
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Product Info */}
+                  <div className="p-4">
+                    <h3 className="font-semibold text-white text-lg group-hover:text-brand-primary transition-colors">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-zinc-500 mt-1 line-clamp-1">
+                      {product.shortDescription}
+                    </p>
+                    <div className="flex items-center justify-between mt-3">
+                      <span className="text-xl font-bold text-white">
+                        ${product.basePrice.toFixed(2)}
+                      </span>
+                      <span className="text-xs text-zinc-500">
+                        COA included
+                      </span>
                     </div>
                   </div>
                 </Link>
@@ -235,47 +306,55 @@ export default function HomePage() {
           )}
 
           <div className="text-center mt-12">
-            <Link href="/shop" className="btn-secondary btn-lg">
-              View All Products
+            <Link href="/shop" className="btn-primary btn-lg">
+              View All Peptides
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Value Props Section */}
+      {/* Why Science Based Body */}
       <section className="section bg-gradient-premium">
         <div className="container-default">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-white mb-3">Why Science Based Body</h2>
+            <p className="text-zinc-400">No gimmicks. Just quality research compounds.</p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {valueProps.map((prop) => (
-              <div key={prop.title} className="text-center">
-                <div className="text-4xl mb-4">{prop.icon}</div>
+            {whyUs.map((item) => (
+              <div key={item.title} className="text-center">
+                <div className="text-4xl mb-4">{item.icon}</div>
                 <h3 className="text-xl font-semibold text-white mb-2">
-                  {prop.title}
+                  {item.title}
                 </h3>
-                <p className="text-zinc-400">{prop.description}</p>
+                <p className="text-zinc-400 text-sm">{item.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Simple CTA */}
       <section className="section">
         <div className="container-default">
-          <div className="card-glass p-12 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Questions? We&apos;re Here to Help
-            </h2>
-            <p className="text-xl text-zinc-300 mb-8 max-w-2xl mx-auto">
-              Whether you&apos;re looking for a specific compound or need help understanding our documentation, our team is happy to assist.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/shop" className="btn-primary btn-lg">
-                Browse Products
-              </Link>
-              <Link href="/contact" className="btn-ghost btn-lg">
-                Get in Touch
-              </Link>
+          <div className="card-glass p-8 md:p-12">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                  Have Questions?
+                </h2>
+                <p className="text-zinc-400">
+                  Need help finding a compound or understanding COA documentation? We respond.
+                </p>
+              </div>
+              <div className="flex gap-4 flex-shrink-0">
+                <Link href="/contact" className="btn-primary">
+                  Contact Us
+                </Link>
+                <Link href="/coa" className="btn-secondary">
+                  View COAs
+                </Link>
+              </div>
             </div>
           </div>
         </div>
