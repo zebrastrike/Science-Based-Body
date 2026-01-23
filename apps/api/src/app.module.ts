@@ -24,6 +24,8 @@ import { CartModule } from './modules/cart/cart.module';
 import { PoliciesModule } from './modules/policies/policies.module';
 import { LoyaltyModule } from './modules/loyalty/loyalty.module';
 import { ContentModule } from './modules/content/content.module';
+import { SupportModule } from './modules/support/support.module';
+import { SeoModule } from './modules/seo/seo.module';
 
 @Module({
   imports: [
@@ -66,6 +68,8 @@ import { ContentModule } from './modules/content/content.module';
     PoliciesModule,
     LoyaltyModule,
     ContentModule,
+    SupportModule,
+    SeoModule,
   ],
   providers: [
     // Global rate limiting guard

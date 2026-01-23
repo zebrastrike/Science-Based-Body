@@ -78,7 +78,7 @@ export class CheckoutService {
     private mailgunService: MailgunService,
     private config: ConfigService,
   ) {
-    this.minimumAge = this.config.get('MINIMUM_AGE', 21);
+    this.minimumAge = this.config.get('MINIMUM_AGE', 18);
   }
 
   /**
@@ -273,22 +273,33 @@ export class CheckoutService {
       email,
     );
 
-    // 8. Send order confirmation email
-    try {
-      await this.mailgunService.sendOrderConfirmation(
-        email,
-        orderNumber,
-        {
-          items: cart.items,
-          subtotal: cart.subtotal,
-          shipping: shippingCost,
-          discount: cart.discountAmount,
-          total: totalAmount,
-        },
-      );
-    } catch (err) {
-      console.error('Failed to send order confirmation email:', err);
-    }
+    // 8. Send order confirmation email to customer
+    const orderDetails = {
+      orderNumber,
+      items: cart.items.map((item) => ({
+        name: item.product!.name,
+        quantity: item.quantity,
+        price: item.unitPrice,
+        variant: item.variant?.name,
+      })),
+      subtotal: cart.subtotal,
+      shipping: shippingCost,
+      discount: cart.discountAmount,
+      total: totalAmount,
+      shippingAddress: dto.shippingAddress,
+    };
+
+    const firstName = dto.shippingAddress.firstName;
+
+    // Send customer confirmation (non-blocking)
+    this.mailgunService
+      .sendOrderConfirmation(email, firstName, orderDetails)
+      .catch((err) => console.error('Failed to send order confirmation email:', err));
+
+    // 9. Notify admin of new order (non-blocking)
+    this.mailgunService
+      .notifyAdminNewOrder(orderDetails, email)
+      .catch((err) => console.error('Failed to send admin notification:', err));
 
     return {
       order: {

@@ -3,20 +3,25 @@ import {
   UnauthorizedException,
   ConflictException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../prisma/prisma.service';
+import { MailgunService } from '../notifications/mailgun.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
     private config: ConfigService,
+    private mailgunService: MailgunService,
   ) {}
 
   async register(dto: RegisterDto, ipAddress: string) {
@@ -66,6 +71,11 @@ export class AuthService {
         metadata: { event: 'user_registered' },
       },
     });
+
+    // Send welcome email (non-blocking)
+    this.mailgunService
+      .sendWelcomeEmail(user.email, user.firstName)
+      .catch((err) => this.logger.error(`Failed to send welcome email: ${err.message}`));
 
     return {
       user,

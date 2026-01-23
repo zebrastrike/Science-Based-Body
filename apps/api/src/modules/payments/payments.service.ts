@@ -95,14 +95,6 @@ export class PaymentsService {
           tag: fallback.cashapp.tag,
           instructions: `Send $[amount] via CashApp to ${fallback.cashapp.tag}. Include order number ${orderNumber} in the note.`,
         };
-      case 'WIRE_TRANSFER':
-        return {
-          method: 'Wire Transfer',
-          bankName: fallback.wire.bankName,
-          routingNumber: fallback.wire.routingNumber,
-          accountNumber: fallback.wire.accountNumber,
-          instructions: `Send wire transfer with order number ${orderNumber} as reference.`,
-        };
       default:
         return null;
     }
@@ -361,15 +353,6 @@ export class PaymentsService {
       methods.push({
         id: 'CASHAPP',
         name: 'CashApp',
-        type: 'manual',
-        enabled: true,
-      });
-    }
-
-    if (fallback.wire.enabled) {
-      methods.push({
-        id: 'WIRE_TRANSFER',
-        name: 'Wire Transfer',
         type: 'manual',
         enabled: true,
       });

@@ -1,0 +1,427 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   SCIENCE BASED BODY - GLOBAL STYLES
+   Premium Dark Theme with Scientific Aesthetic
+   ============================================================================ */
+
+@layer base {
+  /* Root Variables */
+  :root {
+    --brand-primary: #4ade80;
+    --brand-primary-dark: #22c55e;
+    --background-primary: #0a0a0a;
+    --background-secondary: #111111;
+    --background-card: #171717;
+    --text-primary: #ffffff;
+    --text-secondary: #a1a1aa;
+    --border-default: #27272a;
+  }
+
+  /* Base HTML */
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background-primary text-white font-sans;
+    min-height: 100vh;
+  }
+
+  /* Selection */
+  ::selection {
+    background-color: rgba(74, 222, 128, 0.3);
+    color: #ffffff;
+  }
+
+  /* Focus States */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-brand-primary ring-offset-2 ring-offset-background-primary;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background-secondary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-zinc-700 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-zinc-600;
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight text-white;
+  }
+
+  h1 { @apply text-4xl md:text-5xl lg:text-6xl; }
+  h2 { @apply text-3xl md:text-4xl; }
+  h3 { @apply text-2xl md:text-3xl; }
+  h4 { @apply text-xl md:text-2xl; }
+  h5 { @apply text-lg md:text-xl; }
+  h6 { @apply text-base md:text-lg; }
+
+  /* Links */
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  /* Images */
+  img {
+    @apply max-w-full h-auto;
+  }
+}
+
+@layer components {
+  /* ============================================================================
+     BUTTONS
+     ============================================================================ */
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2
+           font-semibold rounded-xl
+           transition-all duration-200
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand-primary text-black
+           hover:bg-brand-primary-dark hover:shadow-glow
+           active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply btn bg-transparent text-white border border-border
+           hover:bg-background-elevated hover:border-zinc-600
+           active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-zinc-400
+           hover:text-white hover:bg-background-tertiary
+           active:scale-[0.98];
+  }
+
+  .btn-sm { @apply px-4 py-2 text-sm; }
+  .btn-md { @apply px-6 py-3 text-base; }
+  .btn-lg { @apply px-8 py-4 text-lg; }
+
+  /* ============================================================================
+     CARDS
+     ============================================================================ */
+
+  .card {
+    @apply bg-background-card border border-border-subtle
+           rounded-2xl overflow-hidden
+           transition-all duration-300;
+  }
+
+  .card-hover {
+    @apply card hover:border-zinc-700 hover:shadow-card-hover
+           hover:-translate-y-1;
+  }
+
+  .card-glass {
+    @apply bg-white/5 backdrop-blur-lg border border-white/10
+           rounded-2xl;
+  }
+
+  /* ============================================================================
+     INPUTS
+     ============================================================================ */
+
+  .input {
+    @apply w-full px-4 py-3
+           bg-background-secondary border border-border
+           rounded-xl text-white placeholder:text-zinc-500
+           transition-all duration-200
+           focus:border-brand-primary focus:ring-1 focus:ring-brand-primary;
+  }
+
+  .input-error {
+    @apply input border-red-500 focus:border-red-500 focus:ring-red-500;
+  }
+
+  .input-label {
+    @apply block text-sm font-medium text-zinc-300 mb-2;
+  }
+
+  .input-helper {
+    @apply text-sm text-zinc-500 mt-1;
+  }
+
+  .input-error-text {
+    @apply text-sm text-red-400 mt-1;
+  }
+
+  /* ============================================================================
+     BADGES
+     ============================================================================ */
+
+  .badge {
+    @apply inline-flex items-center gap-1
+           px-3 py-1 text-xs font-medium rounded-full;
+  }
+
+  .badge-success {
+    @apply badge bg-green-500/10 text-green-400;
+  }
+
+  .badge-warning {
+    @apply badge bg-yellow-500/10 text-yellow-400;
+  }
+
+  .badge-error {
+    @apply badge bg-red-500/10 text-red-400;
+  }
+
+  .badge-info {
+    @apply badge bg-blue-500/10 text-blue-400;
+  }
+
+  .badge-brand {
+    @apply badge bg-brand-primary/10 text-brand-primary;
+  }
+
+  /* ============================================================================
+     PRODUCT CARD
+     ============================================================================ */
+
+  .product-card {
+    @apply card-hover group cursor-pointer;
+  }
+
+  .product-card-image {
+    @apply relative aspect-square bg-background-secondary overflow-hidden;
+  }
+
+  .product-card-image img {
+    @apply w-full h-full object-cover
+           transition-transform duration-500
+           group-hover:scale-105;
+  }
+
+  .product-card-body {
+    @apply p-4 space-y-2;
+  }
+
+  .product-card-title {
+    @apply font-semibold text-white group-hover:text-brand-primary
+           transition-colors;
+  }
+
+  .product-card-price {
+    @apply flex items-center gap-2;
+  }
+
+  .product-card-price-current {
+    @apply text-lg font-bold text-brand-primary;
+  }
+
+  .product-card-price-compare {
+    @apply text-sm text-zinc-500 line-through;
+  }
+
+  /* ============================================================================
+     CONTAINER
+     ============================================================================ */
+
+  .container-narrow {
+    @apply max-w-3xl mx-auto px-4;
+  }
+
+  .container-default {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .container-wide {
+    @apply max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* ============================================================================
+     SECTIONS
+     ============================================================================ */
+
+  .section {
+    @apply py-16 md:py-24;
+  }
+
+  .section-header {
+    @apply text-center mb-12;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-4xl font-bold mb-4;
+  }
+
+  .section-subtitle {
+    @apply text-lg text-zinc-400 max-w-2xl mx-auto;
+  }
+
+  /* ============================================================================
+     HERO
+     ============================================================================ */
+
+  .hero {
+    @apply relative min-h-[80vh] flex items-center
+           bg-gradient-hero overflow-hidden;
+  }
+
+  .hero-glow {
+    @apply absolute inset-0 bg-gradient-glow opacity-50;
+  }
+
+  .hero-content {
+    @apply relative z-10 container-default;
+  }
+
+  /* ============================================================================
+     NAVIGATION
+     ============================================================================ */
+
+  .nav-link {
+    @apply text-zinc-400 hover:text-white transition-colors
+           text-sm font-medium;
+  }
+
+  .nav-link-active {
+    @apply text-brand-primary;
+  }
+
+  /* ============================================================================
+     UTILITIES
+     ============================================================================ */
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-cta;
+  }
+
+  .bg-glow {
+    @apply bg-gradient-glow;
+  }
+
+  .border-gradient {
+    border-image: linear-gradient(135deg, #4ade80, #22c55e) 1;
+  }
+
+  /* Divider */
+  .divider {
+    @apply border-t border-border;
+  }
+
+  /* Skeleton Loading */
+  .skeleton {
+    @apply bg-zinc-800 animate-pulse rounded;
+  }
+
+  /* Trust Badge */
+  .trust-badge {
+    @apply inline-flex items-center gap-2 px-4 py-2
+           bg-background-tertiary border border-border-subtle rounded-full
+           text-sm text-zinc-300;
+  }
+
+  /* Price Display */
+  .price {
+    @apply text-brand-primary font-bold;
+  }
+
+  .price-compare {
+    @apply text-zinc-500 line-through text-sm;
+  }
+
+  /* Notification Dot */
+  .notification-dot {
+    @apply absolute -top-1 -right-1 w-2 h-2 bg-brand-primary rounded-full;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar but allow scroll */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Text balance for better headlines */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Safe area padding for mobile */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Glow effect */
+  .glow {
+    box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+  }
+
+  .glow-strong {
+    box-shadow: 0 0 40px rgba(74, 222, 128, 0.5);
+  }
+
+  /* Glass effect */
+  .glass {
+    @apply bg-white/5 backdrop-blur-lg;
+  }
+}
+
+/* ============================================================================
+   ANIMATIONS
+   ============================================================================ */
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ============================================================================
+   PRINT STYLES
+   ============================================================================ */
+
+@media print {
+  body {
+    @apply bg-white text-black;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}

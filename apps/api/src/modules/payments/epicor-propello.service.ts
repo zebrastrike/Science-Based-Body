@@ -269,14 +269,6 @@ export class EpicorPropelloService {
         instructions:
           'Send payment via CashApp to the tag provided. Include your order number in the note.',
       },
-      wire: {
-        enabled: true,
-        bankName: this.config.get('PAYMENT_WIRE_BANK_NAME'),
-        routingNumber: this.config.get('PAYMENT_WIRE_ROUTING'),
-        accountNumber: this.config.get('PAYMENT_WIRE_ACCOUNT'),
-        instructions:
-          'Send wire transfer to the bank details provided. Include your order number as reference.',
-      },
     };
   }
 }
