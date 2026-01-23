@@ -19,6 +19,73 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  const library = document.querySelector(".peptide-library");
+  if (library) {
+    const items = Array.from(library.querySelectorAll("[data-peptide]"));
+    const panels = Array.from(library.querySelectorAll("[data-peptide-panel]"));
+    const searchInput = library.querySelector("[data-library-search]");
+
+    const setActive = (id) => {
+      items.forEach((item) => {
+        const isActive = item.dataset.peptide === id;
+        item.classList.toggle("is-active", isActive);
+        item.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      panels.forEach((panel) => {
+        const isActive = panel.dataset.peptidePanel === id;
+        panel.classList.toggle("is-active", isActive);
+        panel.hidden = !isActive;
+      });
+    };
+
+    const filterItems = (query) => {
+      const normalized = query.trim().toLowerCase();
+      let firstVisible = null;
+      items.forEach((item) => {
+        const haystack = `${item.dataset.keywords || ""} ${item.textContent || ""}`.toLowerCase();
+        const matches = normalized === "" || haystack.includes(normalized);
+        item.classList.toggle("is-hidden", !matches);
+        item.setAttribute("aria-hidden", matches ? "false" : "true");
+        if (matches && !firstVisible) {
+          firstVisible = item.dataset.peptide || null;
+        }
+      });
+
+      const activeVisible = items.some(
+        (item) => item.classList.contains("is-active") && !item.classList.contains("is-hidden")
+      );
+      if (!activeVisible && firstVisible) {
+        setActive(firstVisible);
+      }
+      if (!firstVisible) {
+        panels.forEach((panel) => {
+          panel.classList.remove("is-active");
+          panel.hidden = true;
+        });
+      }
+    };
+
+    items.forEach((item) => {
+      item.addEventListener("click", () => {
+        if (item.dataset.peptide) {
+          setActive(item.dataset.peptide);
+        }
+      });
+    });
+
+    if (searchInput) {
+      searchInput.addEventListener("input", (event) => {
+        const value = event.target && "value" in event.target ? event.target.value : "";
+        filterItems(String(value));
+      });
+    }
+
+    const defaultItem = items.find((item) => item.classList.contains("is-active")) || items[0];
+    if (defaultItem && defaultItem.dataset.peptide) {
+      setActive(defaultItem.dataset.peptide);
+    }
+  }
+
   const prefersReducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
   ).matches;
@@ -173,27 +240,27 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const modal = document.getElementById("coa-modal");
-  if (!modal) return;
+  if (modal) {
+    const openButtons = document.querySelectorAll(".modal-open");
+    const closeButtons = modal.querySelectorAll("[data-modal-close], .modal-close");
 
-  const openButtons = document.querySelectorAll(".modal-open");
-  const closeButtons = modal.querySelectorAll("[data-modal-close], .modal-close");
+    const openModal = () => {
+      modal.classList.add("is-open");
+      modal.setAttribute("aria-hidden", "false");
+    };
 
-  const openModal = () => {
-    modal.classList.add("is-open");
-    modal.setAttribute("aria-hidden", "false");
-  };
+    const closeModal = () => {
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+    };
 
-  const closeModal = () => {
-    modal.classList.remove("is-open");
-    modal.setAttribute("aria-hidden", "true");
-  };
+    openButtons.forEach((btn) => btn.addEventListener("click", openModal));
+    closeButtons.forEach((btn) => btn.addEventListener("click", closeModal));
 
-  openButtons.forEach((btn) => btn.addEventListener("click", openModal));
-  closeButtons.forEach((btn) => btn.addEventListener("click", closeModal));
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && modal.classList.contains("is-open")) {
-      closeModal();
-    }
-  });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && modal.classList.contains("is-open")) {
+        closeModal();
+      }
+    });
+  }
 });

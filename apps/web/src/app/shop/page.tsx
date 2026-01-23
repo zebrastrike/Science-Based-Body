@@ -246,10 +246,10 @@ export default function ShopPage() {
                     {/* Product Image */}
                     <div className="aspect-square relative bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 overflow-hidden">
                       <Image
-                        src="/logo.png"
+                        src="/images/products/vial.png"
                         alt={product.name}
                         fill
-                        className="object-contain p-6 group-hover:scale-105 transition-transform duration-300"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       {/* Badges */}
                       <div className="absolute top-2 left-2 flex flex-col gap-1">

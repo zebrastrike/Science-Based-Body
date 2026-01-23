@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import FloatingMolecules from '../components/decorative/FloatingMolecules';
 
 // Trust badges - simple, factual
 const trustBadges = [
@@ -60,9 +59,6 @@ export default function HomePage() {
 
   return (
     <main id="main-content">
-      {/* Floating Molecules - decorative background */}
-      <FloatingMolecules count={6} />
-
       {/* Hero Section */}
       <section className="hero relative min-h-[90vh] flex items-center">
         {/* Video Background */}
@@ -89,19 +85,18 @@ export default function HomePage() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-primary/10 border border-brand-primary/20 rounded-full text-brand-primary text-sm font-medium animate-fade-in">
               <span className="w-2 h-2 bg-brand-primary rounded-full animate-pulse" />
-              Trusted by Researchers Across America
+              #1 Fastest Growing Brand In America
             </div>
 
             {/* Headline */}
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight animate-fade-in-up">
-              Premium Research
-              <span className="block text-gradient">Peptides</span>
+              The Science
+              <span className="block text-gradient">Based Body</span>
             </h1>
 
             {/* Subheadline */}
             <p className="text-xl md:text-2xl text-zinc-300 max-w-2xl mx-auto animate-fade-in-up">
-              Independently tested. 99%+ purity verified.
-              <br />Quality you can trust, shipped same day.
+              Believe the Science
             </p>
 
             {/* CTA Buttons */}
@@ -179,12 +174,12 @@ export default function HomePage() {
                 className="group backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:bg-white/10 hover:border-brand-primary/30 transition-all"
               >
                 {/* Product Image */}
-                <div className="aspect-square relative bg-gradient-to-br from-zinc-800/30 to-zinc-900/30 overflow-hidden">
+                <div className="aspect-square relative bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 overflow-hidden">
                   <Image
-                    src="/products/sample-vial.svg"
+                    src="/images/products/vial.png"
                     alt={product.name}
                     fill
-                    className="object-contain p-8 group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   {/* Category tag */}
                   <div className="absolute top-3 left-3">
@@ -234,8 +229,17 @@ export default function HomePage() {
       </section>
 
       {/* Our Standards */}
-      <section className="section bg-background-secondary/30">
-        <div className="container-default">
+      <section className="section bg-background-secondary/30 relative overflow-hidden">
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <Image
+            src="/images/site/molecules.jpg"
+            alt=""
+            fill
+            className="object-cover opacity-10"
+          />
+        </div>
+        <div className="container-default relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {whyUs.map((item) => (
               <div
@@ -254,8 +258,18 @@ export default function HomePage() {
       {/* Simple CTA */}
       <section className="section">
         <div className="container-default">
-          <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8 md:p-10">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8 md:p-10 relative overflow-hidden">
+            {/* Accent image */}
+            <div className="absolute right-0 top-0 bottom-0 w-1/3 hidden lg:block">
+              <Image
+                src="/images/site/lab-flasks.png"
+                alt=""
+                fill
+                className="object-cover opacity-30"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-zinc-900 to-transparent" />
+            </div>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
               <div>
                 <h2 className="text-2xl font-bold text-white mb-2">Have Questions?</h2>
                 <p className="text-zinc-400 text-sm">

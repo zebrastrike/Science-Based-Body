@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Product | Science Based Body</title>
+    <title>Peptide Library | Science Based Body</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400&family=Sora:wght@300;400;500&display=swap"
       rel="stylesheet"
@@ -29,103 +29,480 @@
           <img src="/logo.png" alt="Science Based Body" />
         </a>
         <nav class="site-nav">
-          <a href="shop.html" class="nav-link">Shop</a>
-          <a href="index.html#standards" class="nav-link">Standards</a>
-          <a href="index.html#programs" class="nav-link">Programs</a>
           <a href="index.html" class="nav-link">Home</a>
-          <a href="#" class="nav-link">Cart</a>
+          <a href="shop.html" class="nav-link">Shop</a>
+          <a href="product.html" class="nav-link">Peptide Library</a>
+          <a href="branded-for-science.html" class="nav-link">Branded for Science</a>
+          <a href="brand-partnerships.html" class="nav-link">Brand Partners &amp; Affiliates</a>
         </nav>
       </div>
     </header>
 
     <main>
-      <section class="section product-hero">
-        <div class="container product-hero-grid">
-          <div class="image-placeholder product">CLEAN STUDIO PRODUCT</div>
-          <div class="product-hero-copy">
-            <span class="label">FORMULATION 02</span>
-            <h1>Clarity Bloom</h1>
-            <p class="subtitle">Research peptide for daily protocols.</p>
+      <section class="section library-hero">
+        <div class="container">
+          <div class="section-heading reveal">
+            <span class="label">PEPTIDE LIBRARY</span>
+            <h1>Peptide Research Library</h1>
             <p>
-              Batch-tracked formulation with COA transparency and consistent
-              supply options.
+              Structured profiles for research peptides with clear documentation fields,
+              composition notes, and research context. This library is for educational and
+              research reference only.
             </p>
-            <div class="toggle-row">
-              <span class="meta">SUBSCRIPTION</span>
-              <label class="toggle">
-                <input type="checkbox" checked />
-                <span class="toggle-track"></span>
-              </label>
-              <span class="meta">ONE-TIME</span>
-            </div>
-            <button class="btn btn-primary">ADD TO BAG</button>
-            <a class="text-link" href="index.html#programs">VIEW PROTOCOL</a>
+          </div>
+          <div class="card reveal library-note">
+            <span class="label">RESEARCH USE ONLY</span>
+            <p>
+              Products and information are intended for research and educational purposes only.
+              This content is not medical advice and does not describe treatment outcomes.
+            </p>
           </div>
         </div>
       </section>
 
-      <section class="section product-accordion">
+      <section class="section peptide-library" id="library">
         <div class="container">
-          <div class="section-heading">
-            <span class="label">DETAILS</span>
-            <h2>Everything, clearly organized.</h2>
+          <div class="section-heading reveal">
+            <span class="label">LIBRARY TOOL</span>
+            <h2>Select a peptide to view its research profile.</h2>
+            <p>
+              Profiles include composition, structure, testing, and documentation fields. Replace
+              the placeholder data with your verified dossiers when ready.
+            </p>
+          </div>
+
+          <div class="library-grid">
+            <div class="library-panel">
+              <div class="card library-search-card">
+                <span class="label">SEARCH</span>
+                <input
+                  class="library-search"
+                  type="search"
+                  placeholder="Search peptides, categories, or notes"
+                  aria-label="Search peptides"
+                  data-library-search
+                />
+                <span class="meta">Filter by name, category, or research context.</span>
+              </div>
+
+              <div class="library-list">
+                <button
+                  class="library-item is-active"
+                  type="button"
+                  data-peptide="bpc-157"
+                  data-keywords="bpc-157 recovery gastric pentadecapeptide"
+                >
+                  <span class="label">RECOVERY</span>
+                  <h3>BPC-157</h3>
+                  <p>Body protection compound. Research profile pending.</p>
+                  <span class="meta">Profile in progress</span>
+                </button>
+                <button
+                  class="library-item"
+                  type="button"
+                  data-peptide="semaglutide"
+                  data-keywords="semaglutide metabolic glp-1 analog"
+                >
+                  <span class="label">METABOLIC</span>
+                  <h3>Semaglutide</h3>
+                  <p>GLP-1 analog. Research profile pending.</p>
+                  <span class="meta">Profile in progress</span>
+                </button>
+                <button
+                  class="library-item"
+                  type="button"
+                  data-peptide="tb-500"
+                  data-keywords="tb-500 recovery thymosin beta-4"
+                >
+                  <span class="label">RECOVERY</span>
+                  <h3>TB-500</h3>
+                  <p>Thymosin beta-4 fragment. Research profile pending.</p>
+                  <span class="meta">Profile in progress</span>
+                </button>
+                <button
+                  class="library-item"
+                  type="button"
+                  data-peptide="selank"
+                  data-keywords="selank nootropic tuftsin analog"
+                >
+                  <span class="label">NOOTROPIC</span>
+                  <h3>Selank</h3>
+                  <p>Tuftsin analog. Research profile pending.</p>
+                  <span class="meta">Profile in progress</span>
+                </button>
+                <button
+                  class="library-item"
+                  type="button"
+                  data-peptide="epithalon"
+                  data-keywords="epithalon longevity bioregulator"
+                >
+                  <span class="label">LONGEVITY</span>
+                  <h3>Epithalon</h3>
+                  <p>Bioregulator peptide. Research profile pending.</p>
+                  <span class="meta">Profile in progress</span>
+                </button>
+                <button
+                  class="library-item"
+                  type="button"
+                  data-peptide="ipamorelin"
+                  data-keywords="ipamorelin growth hormone ghrp"
+                >
+                  <span class="label">GROWTH HORMONE</span>
+                  <h3>Ipamorelin</h3>
+                  <p>GHRP analog. Research profile pending.</p>
+                  <span class="meta">Profile in progress</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="library-detail">
+              <div class="library-detail-panel is-active" data-peptide-panel="bpc-157">
+                <span class="label">PEPTIDE PROFILE</span>
+                <h2>BPC-157</h2>
+                <p class="library-subtitle">
+                  Placeholder overview. Replace with validated research summary and composition.
+                </p>
+                <div class="library-detail-grid">
+                  <div class="library-detail-block">
+                    <span class="meta">Origin / Source</span>
+                    <p>Peptide origin and sourcing notes to be provided.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Composition</span>
+                    <p>Sequence length and amino acid profile pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Format</span>
+                    <p>Lyophilized format and batch reference pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Documentation</span>
+                    <p>COA, HPLC, and MS data to be attached.</p>
+                  </div>
+                </div>
+                <div class="library-detail-section">
+                  <span class="label">Research Notes</span>
+                  <ul class="library-detail-list">
+                    <li>Summary to be aligned with published research only.</li>
+                    <li>No therapeutic or outcome-based statements will be added.</li>
+                    <li>Use for research and educational reference only.</li>
+                  </ul>
+                </div>
+                <div class="library-detail-section">
+                  <span class="label">Storage and Handling</span>
+                  <ul class="library-detail-list">
+                    <li>Storage guidance to be provided with verified dossier.</li>
+                    <li>Handling and reconstitution notes to follow COA.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="library-detail-panel" data-peptide-panel="semaglutide">
+                <span class="label">PEPTIDE PROFILE</span>
+                <h2>Semaglutide</h2>
+                <p class="library-subtitle">
+                  Placeholder overview. Replace with validated research summary and composition.
+                </p>
+                <div class="library-detail-grid">
+                  <div class="library-detail-block">
+                    <span class="meta">Origin / Source</span>
+                    <p>Source and synthesis details pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Composition</span>
+                    <p>Sequence and molecular data pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Format</span>
+                    <p>Presentation, vial size, and batch notes pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Documentation</span>
+                    <p>COA and analytical reports to be linked.</p>
+                  </div>
+                </div>
+                <div class="library-detail-section">
+                  <span class="label">Research Notes</span>
+                  <ul class="library-detail-list">
+                    <li>Research context to be summarized from peer-reviewed sources.</li>
+                    <li>Any limitations and uncertainties will be explicit.</li>
+                    <li>Not for human consumption or medical use.</li>
+                  </ul>
+                </div>
+                <div class="library-detail-section">
+                  <span class="label">Storage and Handling</span>
+                  <ul class="library-detail-list">
+                    <li>Storage guidance to follow lab documentation.</li>
+                    <li>Handling protocols to be included in dossier.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="library-detail-panel" data-peptide-panel="tb-500">
+                <span class="label">PEPTIDE PROFILE</span>
+                <h2>TB-500</h2>
+                <p class="library-subtitle">
+                  Placeholder overview. Replace with validated research summary and composition.
+                </p>
+                <div class="library-detail-grid">
+                  <div class="library-detail-block">
+                    <span class="meta">Origin / Source</span>
+                    <p>Origin and source details pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Composition</span>
+                    <p>Sequence profile pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Format</span>
+                    <p>Lyophilized format and batch reference pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Documentation</span>
+                    <p>COA and analytical documentation pending.</p>
+                  </div>
+                </div>
+                <div class="library-detail-section">
+                  <span class="label">Research Notes</span>
+                  <ul class="library-detail-list">
+                    <li>Research summary to be based on published data.</li>
+                    <li>No outcome or clinical claims will be included.</li>
+                    <li>For research use only.</li>
+                  </ul>
+                </div>
+                <div class="library-detail-section">
+                  <span class="label">Storage and Handling</span>
+                  <ul class="library-detail-list">
+                    <li>Storage and handling notes to be provided.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="library-detail-panel" data-peptide-panel="selank">
+                <span class="label">PEPTIDE PROFILE</span>
+                <h2>Selank</h2>
+                <p class="library-subtitle">
+                  Placeholder overview. Replace with validated research summary and composition.
+                </p>
+                <div class="library-detail-grid">
+                  <div class="library-detail-block">
+                    <span class="meta">Origin / Source</span>
+                    <p>Origin and synthesis notes pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Composition</span>
+                    <p>Sequence details pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Format</span>
+                    <p>Format and batch details pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Documentation</span>
+                    <p>COA and purity data pending.</p>
+                  </div>
+                </div>
+                <div class="library-detail-section">
+                  <span class="label">Research Notes</span>
+                  <ul class="library-detail-list">
+                    <li>Educational summary to reference public literature.</li>
+                    <li>No medical claims or outcomes will be added.</li>
+                  </ul>
+                </div>
+                <div class="library-detail-section">
+                  <span class="label">Storage and Handling</span>
+                  <ul class="library-detail-list">
+                    <li>Storage guidance to be provided with lab data.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="library-detail-panel" data-peptide-panel="epithalon">
+                <span class="label">PEPTIDE PROFILE</span>
+                <h2>Epithalon</h2>
+                <p class="library-subtitle">
+                  Placeholder overview. Replace with validated research summary and composition.
+                </p>
+                <div class="library-detail-grid">
+                  <div class="library-detail-block">
+                    <span class="meta">Origin / Source</span>
+                    <p>Origin and source notes pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Composition</span>
+                    <p>Sequence and molecular data pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Format</span>
+                    <p>Format and batch notes pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Documentation</span>
+                    <p>COA and analytical reports pending.</p>
+                  </div>
+                </div>
+                <div class="library-detail-section">
+                  <span class="label">Research Notes</span>
+                  <ul class="library-detail-list">
+                    <li>Summary will reflect published research only.</li>
+                    <li>Limits and uncertainty will be explicit.</li>
+                  </ul>
+                </div>
+                <div class="library-detail-section">
+                  <span class="label">Storage and Handling</span>
+                  <ul class="library-detail-list">
+                    <li>Storage and handling notes pending.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="library-detail-panel" data-peptide-panel="ipamorelin">
+                <span class="label">PEPTIDE PROFILE</span>
+                <h2>Ipamorelin</h2>
+                <p class="library-subtitle">
+                  Placeholder overview. Replace with validated research summary and composition.
+                </p>
+                <div class="library-detail-grid">
+                  <div class="library-detail-block">
+                    <span class="meta">Origin / Source</span>
+                    <p>Origin and synthesis notes pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Composition</span>
+                    <p>Sequence and molecular data pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Format</span>
+                    <p>Format and batch references pending.</p>
+                  </div>
+                  <div class="library-detail-block">
+                    <span class="meta">Documentation</span>
+                    <p>COA and analytical reports pending.</p>
+                  </div>
+                </div>
+                <div class="library-detail-section">
+                  <span class="label">Research Notes</span>
+                  <ul class="library-detail-list">
+                    <li>Research summary will use public literature sources.</li>
+                    <li>No medical or outcome claims will be added.</li>
+                  </ul>
+                </div>
+                <div class="library-detail-section">
+                  <span class="label">Storage and Handling</span>
+                  <ul class="library-detail-list">
+                    <li>Storage and handling guidance pending.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="section-heading reveal">
+            <span class="label">PEPTIDE FAQ</span>
+            <h2>Research-focused questions and answers.</h2>
+            <p>
+              Clear, compliance-aware answers intended for research education,
+              not medical guidance.
+            </p>
           </div>
           <div class="accordion">
             <div class="accordion-item">
               <button class="accordion-trigger" type="button">
-                WHAT IT SUPPORTS
-              </button>
-              <div class="accordion-panel">
-                <p>Protocol focus: daily structure and consistency.</p>
-              </div>
-            </div>
-            <div class="accordion-item">
-              <button class="accordion-trigger" type="button">
-                WHO IT IS FOR / WHO IT IS NOT FOR
+                WHAT ARE RESEARCH PEPTIDES
               </button>
               <div class="accordion-panel">
                 <p>
-                  For customers who want structured, repeatable protocols. Not
-                  for those seeking high-stimulus products.
+                  Research peptides are short chains of amino acids used in laboratory
+                  and preclinical research. They are not approved drugs and are supplied
+                  for research and educational use only.
                 </p>
               </div>
             </div>
             <div class="accordion-item">
               <button class="accordion-trigger" type="button">
-                BATCH &amp; COA
+                HOW ARE RESEARCH PEPTIDES MANUFACTURED
               </button>
               <div class="accordion-panel">
                 <p>
-                  Each batch includes a third-party certificate of analysis for
-                  transparency and traceability.
+                  Most are produced using solid-phase peptide synthesis, then purified
+                  and tested with analytical methods such as HPLC and mass spectrometry.
+                  Methods vary by manufacturer and compound.
                 </p>
-                <button class="btn btn-secondary modal-open">
-                  VIEW COA
-                </button>
               </div>
             </div>
             <div class="accordion-item">
               <button class="accordion-trigger" type="button">
-                STORAGE &amp; HANDLING
+                WHAT DOES 99 PERCENT PURITY MEAN
               </button>
               <div class="accordion-panel">
-                <p>Store in a cool, dry place away from direct light.</p>
+                <p>
+                  Purity is typically reported as the percentage of the target compound
+                  measured by analytical testing. It describes lab measurements, not
+                  clinical outcomes.
+                </p>
               </div>
             </div>
             <div class="accordion-item">
               <button class="accordion-trigger" type="button">
-                SHIPPING &amp; RETURNS
+                WHAT IS A CERTIFICATE OF ANALYSIS
               </button>
               <div class="accordion-panel">
-                <p>Standard shipping with straightforward returns.</p>
+                <p>
+                  A COA is a lab document that summarizes identity and purity testing,
+                  often including chromatograms or mass spec data, batch references,
+                  and measured purity.
+                </p>
               </div>
             </div>
             <div class="accordion-item">
               <button class="accordion-trigger" type="button">
-                COMPLIANCE DISCLAIMER
+                HOW SHOULD RESEARCH PEPTIDES BE STORED
               </button>
               <div class="accordion-panel">
-                <p>Compliance disclaimer (unchanged copy).</p>
+                <p>
+                  Storage guidance varies by compound and should follow the lab
+                  documentation. Common guidance is cool, dry, and light-protected
+                  storage, but always reference the COA or dossier.
+                </p>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger" type="button">
+                WHAT DOES FOR RESEARCH USE ONLY MEAN
+              </button>
+              <div class="accordion-panel">
+                <p>
+                  It means the material is not intended to diagnose, treat, cure, or
+                  prevent any disease and is not for human consumption or medical use.
+                </p>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger" type="button">
+                ARE PEPTIDE STUDIES CONCLUSIVE IN HUMANS
+              </button>
+              <div class="accordion-panel">
+                <p>
+                  Many peptides have limited or early-stage data in humans. Research
+                  findings should be interpreted carefully and within the context of
+                  peer-reviewed evidence.
+                </p>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger" type="button">
+                HOW DO I READ HPLC OR MASS SPEC DATA
+              </button>
+              <div class="accordion-panel">
+                <p>
+                  Look for retention time, peak profile, and the reported purity
+                  percentage, then compare with the lab methodology. If needed,
+                  consult the testing laboratory for clarification.
+                </p>
               </div>
             </div>
           </div>
@@ -152,26 +529,6 @@
         </div>
       </div>
     </footer>
-
-    <div class="modal" id="coa-modal" aria-hidden="true">
-      <div class="modal-overlay" data-modal-close></div>
-      <div class="modal-card" role="dialog" aria-modal="true">
-        <div class="modal-header">
-          <span class="label">BATCH COA</span>
-          <button class="text-link modal-close" type="button">CLOSE</button>
-        </div>
-        <div class="modal-body">
-          <p class="meta">BATCH REFERENCE: BB-CLARITY-042</p>
-          <div class="coa-placeholder">
-            <div class="image-placeholder coa">COA PREVIEW</div>
-          </div>
-          <p>
-            Your certificate of analysis is prepared in a clean, readable
-            format for each batch.
-          </p>
-        </div>
-      </div>
-    </div>
 
     <script src="scripts.js"></script>
   </body>
