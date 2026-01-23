@@ -7,32 +7,32 @@ import { api, Product, Category } from '@/lib/api';
 
 // Trust badges data
 const trustBadges = [
-  { icon: '🧪', text: '99%+ Purity' },
-  { icon: '✓', text: 'Third-Party Tested' },
-  { icon: '🇺🇸', text: 'American Made' },
-  { icon: '📦', text: 'Same-Day Shipping' },
+  { icon: '🧪', text: '99%+ Purity Verified' },
+  { icon: '✓', text: 'Independent Lab Tested' },
+  { icon: '🇺🇸', text: 'Made in America' },
+  { icon: '📦', text: 'Ships Same Day' },
 ];
 
 // Value propositions
 const valueProps = [
   {
-    title: 'Premium Quality',
-    description: 'Every product undergoes rigorous third-party testing to ensure 99%+ purity.',
+    title: 'Verified Purity',
+    description: 'Every batch is tested by independent laboratories like Janoshik and Colmaric to verify 99%+ purity.',
     icon: '🔬',
   },
   {
     title: 'Research Grade',
-    description: 'Formulated specifically for laboratory research and analytical applications.',
+    description: 'Our peptides are manufactured to exacting standards for laboratory and analytical research applications.',
     icon: '📊',
   },
   {
-    title: 'Fast Shipping',
-    description: 'Orders placed before 2PM EST ship same day. Free shipping over $99.',
+    title: 'Fast & Reliable',
+    description: 'Orders placed before 2PM EST ship the same day. Free shipping on orders over $99.',
     icon: '🚀',
   },
   {
-    title: 'Expert Support',
-    description: 'Our team is here to help with your research needs.',
+    title: 'Here to Help',
+    description: 'Have questions? Our knowledgeable team is happy to assist with your research needs.',
     icon: '💬',
   },
 ];
@@ -88,7 +88,7 @@ export default function HomePage() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-primary/10 border border-brand-primary/20 rounded-full text-brand-primary text-sm font-medium animate-fade-in">
               <span className="w-2 h-2 bg-brand-primary rounded-full animate-pulse" />
-              America&apos;s #1 Research Peptide Supplier
+              Trusted by Researchers Across America
             </div>
 
             {/* Headline */}
@@ -99,8 +99,8 @@ export default function HomePage() {
 
             {/* Subheadline */}
             <p className="text-xl md:text-2xl text-zinc-300 max-w-2xl mx-auto animate-fade-in-up">
-              Third-party tested. 99%+ purity verified.
-              <br />Same-day shipping on all orders.
+              Independently tested. 99%+ purity verified.
+              <br />Quality you can trust, shipped same day.
             </p>
 
             {/* CTA Buttons */}
@@ -140,9 +140,9 @@ export default function HomePage() {
       <section className="section bg-background-secondary">
         <div className="container-default">
           <div className="section-header">
-            <h2 className="section-title">Shop by Category</h2>
+            <h2 className="section-title">Explore Our Categories</h2>
             <p className="section-subtitle">
-              Find the perfect research compound for your laboratory needs
+              Browse our complete selection of research-grade peptides
             </p>
           </div>
 
@@ -169,9 +169,9 @@ export default function HomePage() {
       <section className="section">
         <div className="container-default">
           <div className="section-header">
-            <h2 className="section-title">Featured Products</h2>
+            <h2 className="section-title">Popular Peptides</h2>
             <p className="section-subtitle">
-              Our most popular research peptides, trusted by researchers worldwide
+              Our most requested research compounds, each with verified purity documentation
             </p>
           </div>
 
@@ -264,18 +264,17 @@ export default function HomePage() {
         <div className="container-default">
           <div className="card-glass p-12 text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Ready to Start Your Research?
+              Questions? We&apos;re Here to Help
             </h2>
             <p className="text-xl text-zinc-300 mb-8 max-w-2xl mx-auto">
-              Join thousands of researchers who trust Science Based Body
-              for their peptide needs.
+              Whether you&apos;re looking for a specific compound or need help understanding our documentation, our team is happy to assist.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/shop" className="btn-primary btn-lg">
-                Shop Now
+                Browse Products
               </Link>
               <Link href="/contact" className="btn-ghost btn-lg">
-                Contact Us
+                Get in Touch
               </Link>
             </div>
           </div>

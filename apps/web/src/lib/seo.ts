@@ -4,7 +4,7 @@
 export const siteConfig = {
   name: 'Science Based Body',
   tagline: 'Premium Research Peptides',
-  description: 'America\'s premier source for research peptides. 99%+ purity, third-party tested, same-day shipping. BPC-157, Semaglutide, TB-500 and more.',
+  description: 'Your trusted source for research-grade peptides. Every batch independently tested for 99%+ purity. BPC-157, Semaglutide, TB-500, and more. Same-day shipping.',
   url: 'https://sciencebasedbody.com',
   ogImage: 'https://sciencebasedbody.com/og-image.jpg',
   twitterHandle: '@sciencebasedbdy',
@@ -15,20 +15,20 @@ export const siteConfig = {
 };
 
 export const defaultMeta = {
-  title: 'Science Based Body | Premium Research Peptides | 99%+ Purity',
-  description: 'America\'s #1 source for premium research peptides. Third-party tested, 99%+ purity verified. BPC-157, Semaglutide, TB-500, Tirzepatide. Same-day shipping.',
+  title: 'Science Based Body | Research Peptides | 99%+ Purity Verified',
+  description: 'Research-grade peptides you can trust. Every batch independently tested by Janoshik and Colmaric labs. BPC-157, Semaglutide, TB-500, Retatrutide. Same-day shipping.',
   keywords: [
     'research peptides',
-    'buy peptides',
+    'peptides for research',
     'BPC-157',
     'semaglutide',
-    'tirzepatide',
+    'retatrutide',
     'TB-500',
-    'peptide supplier',
-    'research chemicals',
-    'american peptides',
+    'peptide supplier USA',
+    'research grade peptides',
+    'american made peptides',
     'third party tested peptides',
-    '99% purity peptides',
+    'verified purity peptides',
   ],
 };
 
