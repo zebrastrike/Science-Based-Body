@@ -2,8 +2,6 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
-import { api, Product } from '@/lib/api';
 
 // Trust badges - simple, factual
 const trustBadges = [
@@ -13,93 +11,51 @@ const trustBadges = [
   { icon: '📦', text: 'Same-Day Shipping' },
 ];
 
-// Research categories with icons - real peptide categories
-const researchCategories = [
-  {
-    name: 'Metabolic Research',
-    slug: 'metabolic-peptides',
-    description: 'GLP-1 agonists and metabolic compounds',
-    icon: '⚡',
-    featured: ['Semaglutide', 'Retatrutide'],
-  },
-  {
-    name: 'Recovery Research',
-    slug: 'recovery-peptides',
-    description: 'Tissue repair and regeneration',
-    icon: '🔄',
-    featured: ['BPC-157', 'TB-500'],
-  },
-  {
-    name: 'Cognitive Research',
-    slug: 'nootropic-peptides',
-    description: 'Nootropic and neuroprotective',
-    icon: '🧠',
-    featured: ['Semax', 'Selank'],
-  },
-  {
-    name: 'Longevity Research',
-    slug: 'longevity-peptides',
-    description: 'Cellular health and anti-aging',
-    icon: '⏳',
-    featured: ['Epithalon', 'NAD+'],
-  },
-  {
-    name: 'Growth Hormone',
-    slug: 'growth-hormone',
-    description: 'GHRH and secretagogues',
-    icon: '📈',
-    featured: ['Ipamorelin', 'CJC-1295'],
-  },
-  {
-    name: 'Peptide Blends',
-    slug: 'peptide-blends',
-    description: 'Synergistic combinations',
-    icon: '🧬',
-    featured: ['BPC+TB500', 'CJC+Ipamorelin'],
-  },
+// Featured products - one from each main category (6 total)
+const featuredProducts = [
+  { name: 'Semaglutide', slug: 'semaglutide', price: 130, strength: '10mg', category: 'Metabolic', tag: 'popular' },
+  { name: 'BPC-157', slug: 'bpc-157', price: 125, strength: '10mg', category: 'Recovery', tag: 'popular' },
+  { name: 'Semax', slug: 'semax', price: 79, strength: '10mg', category: 'Nootropic', tag: 'popular' },
+  { name: 'Epithalon', slug: 'epithalon', price: 69, strength: '10mg', category: 'Longevity', tag: 'popular' },
+  { name: 'Ipamorelin', slug: 'ipamorelin', price: 99, strength: '10mg', category: 'Growth Hormone', tag: null },
+  { name: 'BPC-157 + TB-500', slug: 'bpc-157-tb-500', price: 129, strength: '10mg', category: 'Blend', tag: 'popular' },
 ];
 
-// Why us - factual, not fluffy
+// Research categories
+const researchCategories = [
+  { name: 'Metabolic', slug: 'metabolic', count: 5, icon: '⚡' },
+  { name: 'Recovery', slug: 'recovery', count: 5, icon: '🔄' },
+  { name: 'Nootropic', slug: 'nootropic', count: 4, icon: '🧠' },
+  { name: 'Longevity', slug: 'longevity', count: 3, icon: '⏳' },
+  { name: 'Growth Hormone', slug: 'growth-hormone', count: 4, icon: '📈' },
+  { name: 'Blends', slug: 'blends', count: 3, icon: '🧬' },
+];
+
+// Why us - factual
 const whyUs = [
   {
     title: 'Independent Testing',
-    description: 'Every batch tested by Janoshik or Colmaric labs. COA included with your order.',
+    description: 'Every batch tested by Janoshik or Colmaric. COA included.',
     icon: '🔬',
   },
   {
-    title: 'Real Peptides',
-    description: 'No made-up names or mystery blends. Just verified research compounds.',
+    title: 'Real Compounds',
+    description: 'No made-up names. Just verified research peptides.',
     icon: '✓',
   },
   {
-    title: 'Fast Shipping',
+    title: 'Same-Day Shipping',
     description: 'Orders before 2PM EST ship same day. Free over $99.',
     icon: '🚀',
   },
   {
     title: 'Actual Support',
-    description: 'Questions about a compound? We actually answer.',
+    description: 'Questions? We actually answer.',
     icon: '💬',
   },
 ];
 
 export default function HomePage() {
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const products = await api.getFeaturedProducts();
-        setFeaturedProducts(products);
-      } catch (error) {
-        console.error('Failed to load homepage data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadData();
-  }, []);
 
   return (
     <main id="main-content">
@@ -177,156 +133,113 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Research Categories - Real categories, real peptides */}
-      <section className="section bg-background-secondary">
+      {/* Browse by Category */}
+      <section className="section bg-background-secondary/50">
         <div className="container-default">
           <div className="section-header">
-            <h2 className="section-title">Research Categories</h2>
-            <p className="section-subtitle">
-              Real peptides for real research. No made-up names.
-            </p>
+            <h2 className="section-title">Browse by Category</h2>
+            <p className="section-subtitle">28 research peptides across 6 categories</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {researchCategories.map((category) => (
               <Link
                 key={category.slug}
-                href={`/shop/${category.slug}`}
-                className="card p-6 group hover:border-brand-primary/50 transition-all"
+                href={`/shop?category=${category.slug}`}
+                className="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-4 text-center group hover:bg-white/10 hover:border-brand-primary/30 transition-all"
               >
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-xl bg-brand-primary/10 flex items-center justify-center group-hover:bg-brand-primary/20 transition-colors flex-shrink-0">
-                    <span className="text-2xl">{category.icon}</span>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-white text-lg group-hover:text-brand-primary transition-colors">
-                      {category.name}
-                    </h3>
-                    <p className="text-sm text-zinc-500 mt-1">
-                      {category.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      {category.featured.map((peptide) => (
-                        <span
-                          key={peptide}
-                          className="text-xs px-2 py-1 bg-background-tertiary rounded text-zinc-400"
-                        >
-                          {peptide}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <div className="text-3xl mb-2">{category.icon}</div>
+                <h3 className="font-medium text-white text-sm group-hover:text-brand-primary transition-colors">
+                  {category.name}
+                </h3>
+                <p className="text-xs text-zinc-500 mt-1">{category.count} peptides</p>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Featured Products - Real peptides with real images */}
+      {/* Featured Peptides - 6 products, one per category */}
       <section className="section">
         <div className="container-default">
           <div className="section-header">
             <h2 className="section-title">Featured Peptides</h2>
-            <p className="section-subtitle">
-              Most requested compounds. COA included with every order.
-            </p>
+            <p className="section-subtitle">One from each category. COA included with every order.</p>
           </div>
 
-          {isLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="card animate-pulse">
-                  <div className="aspect-square bg-zinc-800 rounded-lg" />
-                  <div className="p-4 space-y-3">
-                    <div className="h-5 bg-zinc-800 rounded w-3/4" />
-                    <div className="h-4 bg-zinc-800 rounded w-1/2" />
-                    <div className="h-6 bg-zinc-800 rounded w-1/3" />
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+            {featuredProducts.map((product) => (
+              <Link
+                key={product.slug}
+                href={`/products/${product.slug}`}
+                className="group backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:bg-white/10 hover:border-brand-primary/30 transition-all"
+              >
+                {/* Product Image */}
+                <div className="aspect-square relative bg-gradient-to-br from-zinc-800/30 to-zinc-900/30 overflow-hidden">
+                  <Image
+                    src="/products/sample-vial.svg"
+                    alt={product.name}
+                    fill
+                    className="object-contain p-8 group-hover:scale-105 transition-transform duration-300"
+                  />
+                  {/* Category tag */}
+                  <div className="absolute top-3 left-3">
+                    <span className="text-[10px] px-2 py-1 backdrop-blur-sm bg-black/40 text-zinc-300 rounded">
+                      {product.category}
+                    </span>
+                  </div>
+                  {/* Popular badge */}
+                  {product.tag === 'popular' && (
+                    <div className="absolute top-3 right-3">
+                      <span className="text-[10px] px-2 py-1 bg-brand-primary text-black font-medium rounded">
+                        Popular
+                      </span>
+                    </div>
+                  )}
+                  {/* Purity */}
+                  <div className="absolute bottom-3 right-3">
+                    <span className="text-[10px] px-2 py-1 backdrop-blur-sm bg-black/40 text-green-400 rounded">
+                      99%+ Pure
+                    </span>
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {featuredProducts.map((product) => (
-                <Link
-                  key={product.id}
-                  href={`/products/${product.slug}`}
-                  className="card group hover:border-brand-primary/50 transition-all overflow-hidden"
-                >
-                  {/* Product Image - Large, prominent */}
-                  <div className="aspect-square relative bg-gradient-to-br from-zinc-800 to-zinc-900 overflow-hidden">
-                    <Image
-                      src={product.images?.[0]?.url || '/products/sample-vial.svg'}
-                      alt={product.name}
-                      fill
-                      className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
-                    />
-                    {/* Badges */}
-                    <div className="absolute top-3 left-3 flex flex-col gap-2">
-                      {product.tags?.includes('bestseller') && (
-                        <span className="text-xs px-2 py-1 bg-brand-primary text-black font-medium rounded">
-                          Popular
-                        </span>
-                      )}
-                      {product.tags?.includes('new') && (
-                        <span className="text-xs px-2 py-1 bg-blue-500 text-white font-medium rounded">
-                          New
-                        </span>
-                      )}
-                    </div>
-                    {/* Purity badge */}
-                    <div className="absolute bottom-3 right-3">
-                      <span className="text-xs px-2 py-1 bg-black/70 text-green-400 font-medium rounded">
-                        99%+ Pure
-                      </span>
-                    </div>
-                  </div>
 
-                  {/* Product Info */}
-                  <div className="p-4">
-                    <h3 className="font-semibold text-white text-lg group-hover:text-brand-primary transition-colors">
+                {/* Product Info */}
+                <div className="p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-semibold text-white group-hover:text-brand-primary transition-colors">
                       {product.name}
                     </h3>
-                    <p className="text-sm text-zinc-500 mt-1 line-clamp-1">
-                      {product.shortDescription}
-                    </p>
-                    <div className="flex items-center justify-between mt-3">
-                      <span className="text-xl font-bold text-white">
-                        ${product.basePrice.toFixed(2)}
-                      </span>
-                      <span className="text-xs text-zinc-500">
-                        COA included
-                      </span>
-                    </div>
+                    <span className="text-xs text-zinc-500 flex-shrink-0">{product.strength}</span>
                   </div>
-                </Link>
-              ))}
-            </div>
-          )}
+                  <div className="flex items-center justify-between mt-3">
+                    <span className="text-xl font-bold text-white">${product.price}</span>
+                    <span className="text-[10px] text-zinc-500">COA included</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-10">
             <Link href="/shop" className="btn-primary btn-lg">
-              View All Peptides
+              View All 28 Peptides
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Why Science Based Body */}
-      <section className="section bg-gradient-premium">
+      {/* Our Standards */}
+      <section className="section bg-background-secondary/30">
         <div className="container-default">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-3">Why Science Based Body</h2>
-            <p className="text-zinc-400">No gimmicks. Just quality research compounds.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {whyUs.map((item) => (
-              <div key={item.title} className="text-center">
-                <div className="text-4xl mb-4">{item.icon}</div>
-                <h3 className="text-xl font-semibold text-white mb-2">
-                  {item.title}
-                </h3>
+              <div
+                key={item.title}
+                className="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-6 text-center"
+              >
+                <div className="text-3xl mb-3">{item.icon}</div>
+                <h3 className="font-semibold text-white mb-2">{item.title}</h3>
                 <p className="text-zinc-400 text-sm">{item.description}</p>
               </div>
             ))}
@@ -337,23 +250,17 @@ export default function HomePage() {
       {/* Simple CTA */}
       <section className="section">
         <div className="container-default">
-          <div className="card-glass p-8 md:p-12">
+          <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8 md:p-10">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                  Have Questions?
-                </h2>
-                <p className="text-zinc-400">
-                  Need help finding a compound or understanding COA documentation? We respond.
+                <h2 className="text-2xl font-bold text-white mb-2">Have Questions?</h2>
+                <p className="text-zinc-400 text-sm">
+                  Need help finding a compound or understanding COA documentation?
                 </p>
               </div>
-              <div className="flex gap-4 flex-shrink-0">
-                <Link href="/contact" className="btn-primary">
-                  Contact Us
-                </Link>
-                <Link href="/coa" className="btn-secondary">
-                  View COAs
-                </Link>
+              <div className="flex gap-3 flex-shrink-0">
+                <Link href="/contact" className="btn-primary">Contact Us</Link>
+                <Link href="/coa" className="btn-secondary">View COAs</Link>
               </div>
             </div>
           </div>

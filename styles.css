@@ -305,6 +305,21 @@ button.btn {
   filter: saturate(0.95);
 }
 
+.shop-hero {
+  position: relative;
+  min-height: 70vh;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
 .image-placeholder.portrait {
   min-height: 520px;
 }
@@ -809,6 +824,10 @@ body.is-ready .reveal {
     grid-template-columns: 1fr;
   }
 
+  .shop-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .standards-grid {
     grid-template-columns: 1fr;
   }
@@ -824,7 +843,8 @@ body.is-ready .reveal {
   }
 
   .goal-grid,
-  .program-grid {
+  .program-grid,
+  .shop-grid {
     grid-template-columns: 1fr;
   }
 
