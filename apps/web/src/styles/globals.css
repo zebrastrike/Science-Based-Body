@@ -413,6 +413,47 @@
 }
 
 /* ============================================================================
+   FLOATING MOLECULES
+   ============================================================================ */
+
+@keyframes molecule-float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(-30px) translateX(15px);
+  }
+  50% {
+    transform: translateY(-15px) translateX(-10px);
+  }
+  75% {
+    transform: translateY(-45px) translateX(20px);
+  }
+}
+
+@keyframes molecule-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.molecule-float {
+  animation: molecule-float 20s ease-in-out infinite;
+}
+
+.molecule-rotate {
+  animation: molecule-rotate 30s linear infinite;
+}
+
+/* Purple/magenta color filter to match site theme */
+.molecule-purple {
+  filter: hue-rotate(280deg) saturate(0.7) brightness(1.2);
+}
+
+/* ============================================================================
    PRINT STYLES
    ============================================================================ */
 

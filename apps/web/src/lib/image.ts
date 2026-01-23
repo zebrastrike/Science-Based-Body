@@ -131,7 +131,7 @@ export function getProductImageUrl(
   options: ImageOptions = {},
 ): string {
   if (!images || images.length === 0) {
-    return '/products/sample-vial.svg';
+    return '/logo.png';
   }
 
   // Sort by sortOrder and get first
@@ -146,7 +146,7 @@ export function getProductImages(
   images: Array<{ url: string; sortOrder?: number; altText?: string }> | undefined,
 ): Array<{ url: string; alt: string }> {
   if (!images || images.length === 0) {
-    return [{ url: '/products/sample-vial.svg', alt: 'Product image' }];
+    return [{ url: '/logo.png', alt: 'Product image' }];
   }
 
   return [...images]

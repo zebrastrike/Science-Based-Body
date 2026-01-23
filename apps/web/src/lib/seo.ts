@@ -103,7 +103,7 @@ export function generateProductSchema(product: {
     description: product.description,
     sku: product.sku,
     url: `${siteConfig.url}/products/${product.slug}`,
-    image: product.images?.[0] || `${siteConfig.url}/products/sample-vial.svg`,
+    image: product.images?.[0] || `${siteConfig.url}/logo.png`,
     brand: {
       '@type': 'Brand',
       name: siteConfig.name,

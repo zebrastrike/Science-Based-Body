@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(copy:*)"
+      "Bash(copy:*)",
+      "Bash(git checkout:*)",
+      "Bash(ls:*)",
+      "Bash(dir \"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\apps\\\\web\\\\tsconfig*\")",
+      "Bash(dir \"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\apps\\\\web\\\\public\\\\media\\\\decorative\")",
+      "Bash(git branch:*)"
     ]
   }
 }

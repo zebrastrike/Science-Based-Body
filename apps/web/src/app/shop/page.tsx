@@ -246,7 +246,7 @@ export default function ShopPage() {
                     {/* Product Image */}
                     <div className="aspect-square relative bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 overflow-hidden">
                       <Image
-                        src="/products/sample-vial.svg"
+                        src="/logo.png"
                         alt={product.name}
                         fill
                         className="object-contain p-6 group-hover:scale-105 transition-transform duration-300"

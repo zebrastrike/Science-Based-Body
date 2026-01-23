@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import FloatingMolecules from '../components/decorative/FloatingMolecules';
 
 // Trust badges - simple, factual
 const trustBadges = [
@@ -59,6 +60,9 @@ export default function HomePage() {
 
   return (
     <main id="main-content">
+      {/* Floating Molecules - decorative background */}
+      <FloatingMolecules count={6} />
+
       {/* Hero Section */}
       <section className="hero relative min-h-[90vh] flex items-center">
         {/* Video Background */}
