@@ -1,0 +1,878 @@
+// =============================================================================
+// SCIENCE BASED BODY - DATABASE SCHEMA
+// =============================================================================
+// Prisma Schema for Peptide E-Commerce Platform
+// Run: npx prisma generate && npx prisma db push
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+enum UserRole {
+  CLIENT
+  CLINIC
+  DISTRIBUTOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+  BANNED
+}
+
+enum OrderStatus {
+  PENDING
+  AWAITING_PAYMENT
+  PAYMENT_RECEIVED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  EPICOR_PROPELLO
+  WIRE_TRANSFER
+  ZELLE
+  CASHAPP
+  CRYPTO
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum ProductCategory {
+  RESEARCH_PEPTIDES
+  ANALYTICAL_REFERENCE_MATERIALS
+  LABORATORY_ADJUNCTS
+  RESEARCH_COMBINATIONS
+  MATERIALS_SUPPLIES
+  MERCHANDISE
+}
+
+enum KycStatus {
+  NOT_REQUIRED
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum ShipmentStatus {
+  PENDING
+  LABEL_CREATED
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  EXCEPTION
+  RETURNED
+}
+
+enum FileType {
+  COA
+  MSDS
+  KYC_DOCUMENT
+  PAYMENT_PROOF
+  PRODUCT_IMAGE
+  OTHER
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  VERIFY
+  APPROVE
+  REJECT
+  SHIP
+  REFUND
+}
+
+enum LoyaltyPointType {
+  EARNED
+  REDEEMED
+  BONUS
+  EXPIRED
+  ADJUSTED
+}
+
+// =============================================================================
+// USER & AUTHENTICATION
+// =============================================================================
+
+model User {
+  id                String      @id @default(cuid())
+  email             String      @unique
+  passwordHash      String
+  firstName         String?
+  lastName          String?
+  phone             String?
+  role              UserRole    @default(CLIENT)
+  status            UserStatus  @default(ACTIVE)
+  emailVerified     Boolean     @default(false)
+  emailVerifiedAt   DateTime?
+  lastLoginAt       DateTime?
+  lastLoginIp       String?
+
+  // Encrypted fields (PII)
+  dateOfBirth       String?     // Encrypted
+  governmentId      String?     // Encrypted
+
+  // Loyalty
+  loyaltyPoints         Int       @default(0)
+  lifetimeLoyaltyPoints Int       @default(0)
+
+  // Relations
+  addresses         Address[]
+  orders            Order[]
+  kycVerification   KycVerification?
+  complianceAcks    ComplianceAcknowledgment[]
+  auditLogs         AuditLog[]  @relation("UserAuditLogs")
+  adminAuditLogs    AuditLog[]  @relation("AdminAuditLogs")
+  stockNotifications StockNotification[]
+  loyaltyTransactions LoyaltyTransaction[]
+
+  // Wholesale/B2B
+  organizationId    String?
+  organization      Organization? @relation(fields: [organizationId], references: [id])
+  priceListId       String?
+  priceList         PriceList?   @relation(fields: [priceListId], references: [id])
+
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@index([email])
+  @@index([role])
+  @@index([status])
+}
+
+model Address {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  label           String?   // "Home", "Office", etc.
+  firstName       String
+  lastName        String
+  company         String?
+  street1         String
+  street2         String?
+  city            String
+  state           String
+  postalCode      String
+  country         String    @default("US")
+  phone           String?
+
+  isDefault       Boolean   @default(false)
+  isBilling       Boolean   @default(false)
+  isShipping      Boolean   @default(true)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  orders          Order[]   @relation("ShippingAddress")
+  billingOrders   Order[]   @relation("BillingAddress")
+
+  @@index([userId])
+}
+
+// =============================================================================
+// ORGANIZATION (B2B)
+// =============================================================================
+
+model Organization {
+  id              String    @id @default(cuid())
+  name            String
+  type            String    // "CLINIC", "DISTRIBUTOR", "RESEARCH_LAB"
+  taxId           String?
+  licenseNumber   String?
+
+  street1         String?
+  street2         String?
+  city            String?
+  state           String?
+  postalCode      String?
+  country         String?
+
+  users           User[]
+  priceList       PriceList?
+
+  isVerified      Boolean   @default(false)
+  verifiedAt      DateTime?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// =============================================================================
+// KYC (Know Your Customer)
+// =============================================================================
+
+model KycVerification {
+  id              String      @id @default(cuid())
+  userId          String      @unique
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  status          KycStatus   @default(PENDING)
+  verificationType String     @default("STANDARD") // STANDARD, ENHANCED
+
+  // Review info
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  rejectionReason String?
+
+  // Expiration (annual re-verification)
+  expiresAt       DateTime?
+
+  documents       KycDocument[]
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([status])
+}
+
+model KycDocument {
+  id              String          @id @default(cuid())
+  kycId           String
+  kyc             KycVerification @relation(fields: [kycId], references: [id], onDelete: Cascade)
+
+  type            String          // GOVERNMENT_ID, PROOF_OF_ADDRESS, BUSINESS_LICENSE
+  fileId          String
+  file            File            @relation(fields: [fileId], references: [id])
+
+  verifiedAt      DateTime?
+
+  createdAt       DateTime        @default(now())
+
+  @@index([kycId])
+}
+
+// =============================================================================
+// PRODUCTS & CATALOG
+// =============================================================================
+
+model Product {
+  id              String          @id @default(cuid())
+  sku             String          @unique
+  name            String
+  slug            String          @unique
+
+  // Description (compliance-checked)
+  shortDescription String?
+  longDescription  String?
+
+  category        ProductCategory
+
+  // Research details
+  purityPercent   Float?          // e.g., 99.5
+  molecularWeight Float?
+  sequence        String?         // Amino acid sequence
+  casNumber       String?         // CAS Registry Number
+
+  // Pricing
+  basePrice       Decimal         @db.Decimal(10, 2)
+  compareAtPrice  Decimal?        @db.Decimal(10, 2)
+
+  // Inventory
+  trackInventory  Boolean         @default(true)
+
+  // Status
+  isActive        Boolean         @default(true)
+  isFeatured      Boolean         @default(false)
+
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+
+  variants        ProductVariant[]
+  batches         ProductBatch[]
+  images          ProductImage[]
+  inventory       Inventory?
+  orderItems      OrderItem[]
+  priceListItems  PriceListItem[]
+  stockNotifications StockNotification[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([sku])
+  @@index([slug])
+  @@index([category])
+  @@index([isActive])
+}
+
+model ProductVariant {
+  id              String    @id @default(cuid())
+  productId       String
+  product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  sku             String    @unique
+  name            String    // e.g., "10mg", "5mg"
+
+  price           Decimal   @db.Decimal(10, 2)
+  compareAtPrice  Decimal?  @db.Decimal(10, 2)
+
+  // Variant-specific details
+  strength        String?   // "10mg", "20mg"
+  quantity        Int?      // Number of vials/units
+
+  isActive        Boolean   @default(true)
+  sortOrder       Int       @default(0)
+
+  inventory       Inventory?
+  orderItems      OrderItem[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([productId])
+  @@index([sku])
+}
+
+model ProductImage {
+  id              String    @id @default(cuid())
+  productId       String
+  product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  url             String
+  altText         String?
+  sortOrder       Int       @default(0)
+  isPrimary       Boolean   @default(false)
+
+  createdAt       DateTime  @default(now())
+
+  @@index([productId])
+}
+
+model ProductBatch {
+  id              String    @id @default(cuid())
+  productId       String
+  product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  batchNumber     String    @unique
+
+  manufacturingDate DateTime
+  expirationDate   DateTime
+
+  purityPercent   Float     // HPLC verified purity
+
+  // COA & Documentation
+  coaFileId       String?
+  coaFile         File?     @relation("BatchCOA", fields: [coaFileId], references: [id])
+  msdsFileId      String?
+  msdsFile        File?     @relation("BatchMSDS", fields: [msdsFileId], references: [id])
+
+  // Inventory
+  initialQuantity Int
+  currentQuantity Int
+
+  isActive        Boolean   @default(true)
+
+  notes           String?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([productId])
+  @@index([batchNumber])
+  @@index([isActive])
+}
+
+// =============================================================================
+// INVENTORY
+// =============================================================================
+
+model Inventory {
+  id              String          @id @default(cuid())
+
+  productId       String?         @unique
+  product         Product?        @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  variantId       String?         @unique
+  variant         ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  quantity        Int             @default(0)
+  reservedQuantity Int            @default(0)
+  lowStockThreshold Int           @default(10)
+
+  lastRestockedAt DateTime?
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model StockNotification {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  email           String
+  notified        Boolean   @default(false)
+  notifiedAt      DateTime?
+
+  createdAt       DateTime  @default(now())
+
+  @@unique([userId, productId])
+  @@index([productId])
+}
+
+// =============================================================================
+// ORDERS
+// =============================================================================
+
+model Order {
+  id              String        @id @default(cuid())
+  orderNumber     String        @unique
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+
+  status          OrderStatus   @default(PENDING)
+
+  // Addresses
+  shippingAddressId String
+  shippingAddress   Address     @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
+  billingAddressId  String
+  billingAddress    Address     @relation("BillingAddress", fields: [billingAddressId], references: [id])
+
+  // Totals
+  subtotal        Decimal       @db.Decimal(10, 2)
+  shippingCost    Decimal       @db.Decimal(10, 2) @default(0)
+  taxAmount       Decimal       @db.Decimal(10, 2) @default(0)
+  discountAmount  Decimal       @db.Decimal(10, 2) @default(0)
+  totalAmount     Decimal       @db.Decimal(10, 2)
+
+  // Discount/Promo
+  discountCode    String?
+
+  // Notes
+  customerNotes   String?
+  adminNotes      String?
+
+  // Processing
+  processingType  String        @default("STANDARD") // STANDARD, RUSH, EXPRESS
+
+  items           OrderItem[]
+  payments        Payment[]
+  shipment        Shipment?
+  complianceAck   ComplianceAcknowledgment?
+  loyaltyTransactions LoyaltyTransaction[]
+
+  paidAt          DateTime?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+  cancelledAt     DateTime?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([orderNumber])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id              String          @id @default(cuid())
+  orderId         String
+  order           Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId       String
+  product         Product         @relation(fields: [productId], references: [id])
+  variantId       String?
+  variant         ProductVariant? @relation(fields: [variantId], references: [id])
+
+  // Snapshot at time of order
+  productName     String
+  variantName     String?
+  sku             String
+
+  quantity        Int
+  unitPrice       Decimal         @db.Decimal(10, 2)
+  totalPrice      Decimal         @db.Decimal(10, 2)
+
+  // Batch tracking
+  batchNumber     String?
+
+  createdAt       DateTime        @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+// =============================================================================
+// PAYMENTS
+// =============================================================================
+
+model Payment {
+  id              String        @id @default(cuid())
+  orderId         String
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  method          PaymentMethod
+  status          PaymentStatus @default(PENDING)
+
+  amount          Decimal       @db.Decimal(10, 2)
+  currency        String        @default("USD")
+
+  // Epicor Propello
+  propelloTransactionId String?
+  propelloPaymentIntentId String?
+
+  // Manual payments
+  referenceNumber String?       // Zelle/CashApp/Wire reference
+  proofFileId     String?
+  proofFile       File?         @relation(fields: [proofFileId], references: [id])
+
+  // Verification
+  verifiedBy      String?
+  verifiedAt      DateTime?
+  verificationNotes String?
+
+  // Refund
+  refundedAmount  Decimal?      @db.Decimal(10, 2)
+  refundedAt      DateTime?
+  refundReason    String?
+
+  metadata        Json?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([orderId])
+  @@index([status])
+}
+
+model PaymentLink {
+  id              String    @id @default(cuid())
+
+  orderId         String?
+  amount          Decimal   @db.Decimal(10, 2)
+  currency        String    @default("USD")
+
+  description     String?
+
+  token           String    @unique @default(cuid())
+  expiresAt       DateTime
+
+  usedAt          DateTime?
+
+  createdAt       DateTime  @default(now())
+
+  @@index([token])
+}
+
+// =============================================================================
+// SHIPPING
+// =============================================================================
+
+model Shipment {
+  id              String        @id @default(cuid())
+  orderId         String        @unique
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  status          ShipmentStatus @default(PENDING)
+
+  // Carrier info
+  carrier         String?       // "USPS", "FEDEX", "UPS"
+  serviceLevel    String?       // "Priority Mail", "Ground", etc.
+
+  // Shippo
+  shippoShipmentId String?
+  shippoRateId    String?
+  shippoTransactionId String?
+
+  // Tracking
+  trackingNumber  String?
+  trackingUrl     String?
+
+  // Label
+  labelUrl        String?
+  labelFileId     String?
+
+  // Costs
+  shippingCost    Decimal       @db.Decimal(10, 2)
+  insuranceAmount Decimal?      @db.Decimal(10, 2)
+
+  // Dates
+  estimatedDelivery DateTime?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+
+  // Package details
+  weightLbs       Decimal?      @db.Decimal(5, 2)
+  lengthIn        Decimal?      @db.Decimal(5, 2)
+  widthIn         Decimal?      @db.Decimal(5, 2)
+  heightIn        Decimal?      @db.Decimal(5, 2)
+
+  notes           String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([trackingNumber])
+}
+
+// =============================================================================
+// COMPLIANCE
+// =============================================================================
+
+model ComplianceAcknowledgment {
+  id              String    @id @default(cuid())
+  orderId         String    @unique
+  order           Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+
+  // Required checkboxes
+  researchPurposeOnly    Boolean
+  ageConfirmation        Boolean
+  noHumanConsumption     Boolean
+  responsibilityAccepted Boolean
+  termsAccepted          Boolean
+
+  // Audit trail
+  ipAddress       String
+  userAgent       String?
+
+  // Version tracking
+  checkboxVersion String    @default("1.0.0")
+
+  createdAt       DateTime  @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model ForbiddenTerm {
+  id              String    @id @default(cuid())
+  term            String    @unique
+  category        String?   // "medical", "supplement", "claim"
+  severity        String    @default("BLOCK") // BLOCK, WARN
+
+  createdAt       DateTime  @default(now())
+
+  @@index([term])
+}
+
+// =============================================================================
+// PRICING (Wholesale/B2B)
+// =============================================================================
+
+model PriceList {
+  id              String          @id @default(cuid())
+  name            String
+  description     String?
+
+  discountPercent Float?          // Global discount
+
+  organization    Organization?   @relation(fields: [organizationId], references: [id])
+  organizationId  String?         @unique
+
+  isActive        Boolean         @default(true)
+
+  items           PriceListItem[]
+  users           User[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model PriceListItem {
+  id              String    @id @default(cuid())
+  priceListId     String
+  priceList       PriceList @relation(fields: [priceListId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  customPrice     Decimal?  @db.Decimal(10, 2)
+  discountPercent Float?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([priceListId, productId])
+}
+
+model PriceTier {
+  id              String    @id @default(cuid())
+  name            String
+  minQuantity     Int
+  discountPercent Float
+
+  createdAt       DateTime  @default(now())
+}
+
+// =============================================================================
+// FILES
+// =============================================================================
+
+model File {
+  id              String        @id @default(cuid())
+
+  filename        String
+  originalName    String
+  mimeType        String
+  size            Int
+
+  type            FileType
+
+  // Storage
+  bucket          String
+  key             String        // S3/R2 key
+
+  // Access
+  isPublic        Boolean       @default(false)
+
+  uploadedBy      String?
+
+  // Relations
+  kycDocuments    KycDocument[]
+  payments        Payment[]
+  batchCoas       ProductBatch[] @relation("BatchCOA")
+  batchMsds       ProductBatch[] @relation("BatchMSDS")
+
+  createdAt       DateTime      @default(now())
+
+  @@index([type])
+  @@index([bucket, key])
+}
+
+// =============================================================================
+// CONTENT
+// =============================================================================
+
+model Blog {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  excerpt         String?
+  content         String
+
+  featuredImage   String?
+
+  authorId        String?
+
+  isPublished     Boolean   @default(false)
+  publishedAt     DateTime?
+
+  metaTitle       String?
+  metaDescription String?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([isPublished])
+}
+
+model Faq {
+  id              String    @id @default(cuid())
+  question        String
+  answer          String
+  category        String?
+  sortOrder       Int       @default(0)
+
+  isPublished     Boolean   @default(true)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([category])
+}
+
+// =============================================================================
+// SETTINGS
+// =============================================================================
+
+model Setting {
+  id              String    @id @default(cuid())
+  key             String    @unique
+  value           String
+  type            String    @default("string") // string, number, boolean, json
+  description     String?
+
+  updatedAt       DateTime  @updatedAt
+
+  @@index([key])
+}
+
+// =============================================================================
+// AUDIT LOG
+// =============================================================================
+
+model AuditLog {
+  id              String      @id @default(cuid())
+
+  userId          String?
+  user            User?       @relation("UserAuditLogs", fields: [userId], references: [id])
+  adminId         String?
+  admin           User?       @relation("AdminAuditLogs", fields: [adminId], references: [id])
+
+  action          AuditAction
+  resourceType    String      // "Order", "Product", "User", etc.
+  resourceId      String?
+
+  previousState   Json?
+  newState        Json?
+
+  ipAddress       String?
+  userAgent       String?
+
+  metadata        Json?
+
+  createdAt       DateTime    @default(now())
+
+  @@index([userId])
+  @@index([adminId])
+  @@index([action])
+  @@index([resourceType])
+  @@index([createdAt])
+}
+
+// =============================================================================
+// LOYALTY
+// =============================================================================
+
+model LoyaltyTransaction {
+  id              String            @id @default(cuid())
+  userId          String
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  orderId         String?
+  order           Order?            @relation(fields: [orderId], references: [id])
+
+  type            LoyaltyPointType
+  points          Int               // Positive for earned/bonus, negative for redeemed/expired
+  description     String?
+
+  createdAt       DateTime          @default(now())
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([type])
+  @@index([createdAt])
+}

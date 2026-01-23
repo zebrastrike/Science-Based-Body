@@ -1,6 +1,75 @@
+# Dependencies
 node_modules
-.next
+.pnp
+.pnp.js
+
+# Build outputs
 dist
+.next
+out
+build
+
+# Environment files
 .env
 .env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage
+.nyc_output
+
+# Prisma
+prisma/migrations/**/migration_lock.toml
+
+# SSL certificates (development)
+ssl/*.pem
+ssl/*.key
+ssl/*.crt
+!ssl/README.md
+
+# Temporary files
+tmp
+temp
+.temp
+.tmp
+
+# Docker
+docker-compose.override.yml
+
+# Credentials
+*.pem
+*.key
+credentials.json
+service-account.json
+
+# Package locks (keep one)
+package-lock.json
+!apps/api/package-lock.json
+!apps/web/package-lock.json
+
+# Debug
+.debug
+
+# Misc
+*.bak
+*.backup

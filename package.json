@@ -1,0 +1,9 @@
+{
+  "name": "science-based-body-ui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Static UI preview server for Science Based Body.",
+  "scripts": {
+    "dev": "node scripts/dev-server.js"
+  }
+}
