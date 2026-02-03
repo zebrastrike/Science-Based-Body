@@ -1,0 +1,302 @@
+[
+  {
+    "name": "Semaglutide",
+    "category": "Metabolic",
+    "description": "A GLP-1 receptor agonist peptide used in metabolic research.",
+    "peptalk_url": "https://peptalk.bio/peptides/semaglutide"
+  },
+  {
+    "name": "Tirzepatide",
+    "category": "Metabolic",
+    "description": "A dual GLP-1/GIP receptor agonist studied in metabolic pathways.",
+    "peptalk_url": "https://peptalk.bio/peptides/tirzepatide"
+  },
+  {
+    "name": "Retatrutide",
+    "category": "Metabolic",
+    "description": "A triple agonist peptide targeting GLP-1, GIP, and glucagon receptors.",
+    "peptalk_url": "https://peptalk.bio/peptides/retatrutide"
+  },
+  {
+    "name": "Cagrilintide",
+    "category": "Metabolic",
+    "description": "An amylin analog peptide studied in satiety and metabolic research.",
+    "peptalk_url": "https://peptalk.bio/peptides/cagrilintide"
+  },
+  {
+    "name": "Mazdutide",
+    "category": "Metabolic",
+    "description": "A dual GLP-1/GIP agonist peptide in metabolic research.",
+    "peptalk_url": "https://peptalk.bio/peptides/mazdutide"
+  },
+  {
+    "name": "Survodutide",
+    "category": "Metabolic",
+    "description": "A dual GLP-1/glucagon agonist peptide studied in hepatic research.",
+    "peptalk_url": "https://peptalk.bio/peptides/survodutide"
+  },
+  {
+    "name": "BPC-157",
+    "category": "Repair",
+    "description": "A 15-amino acid gastric peptide studied in tissue repair research.",
+    "peptalk_url": "https://peptalk.bio/peptides/bpc-157"
+  },
+  {
+    "name": "TB-500",
+    "category": "Repair",
+    "description": "A thymosin beta-4 fragment studied in cell migration and repair.",
+    "peptalk_url": "https://peptalk.bio/peptides/tb-500"
+  },
+  {
+    "name": "LL-37",
+    "category": "Antimicrobial",
+    "description": "A naturally occurring antimicrobial peptide with immune functions.",
+    "peptalk_url": "https://peptalk.bio/peptides/ll-37"
+  },
+  {
+    "name": "GHK-Cu",
+    "category": "Copper Peptide",
+    "description": "A copper-binding tripeptide studied in skin and gene expression research.",
+    "peptalk_url": "https://peptalk.bio/peptides/ghk-cu"
+  },
+  {
+    "name": "CJC-1295",
+    "category": "Growth Hormone",
+    "description": "A GHRH analog peptide that stimulates growth hormone secretion.",
+    "peptalk_url": "https://peptalk.bio/peptides/cjc-1295"
+  },
+  {
+    "name": "Ipamorelin",
+    "category": "Growth Hormone",
+    "description": "A selective growth hormone secretagogue pentapeptide.",
+    "peptalk_url": "https://peptalk.bio/peptides/ipamorelin"
+  },
+  {
+    "name": "Tesamorelin",
+    "category": "Growth Hormone",
+    "description": "A GHRH analog that stimulates natural growth hormone production.",
+    "peptalk_url": "https://peptalk.bio/peptides/tesamorelin"
+  },
+  {
+    "name": "Sermorelin",
+    "category": "Growth Hormone",
+    "description": "A 29-amino acid GHRH fragment used in GH axis research.",
+    "peptalk_url": "https://peptalk.bio/peptides/sermorelin"
+  },
+  {
+    "name": "GHRP-2",
+    "category": "Growth Hormone",
+    "description": "A synthetic hexapeptide growth hormone secretagogue.",
+    "peptalk_url": "https://peptalk.bio/peptides/ghrp-2"
+  },
+  {
+    "name": "GHRP-6",
+    "category": "Growth Hormone",
+    "description": "A hexapeptide that stimulates growth hormone release.",
+    "peptalk_url": "https://peptalk.bio/peptides/ghrp-6"
+  },
+  {
+    "name": "Hexarelin",
+    "category": "Growth Hormone",
+    "description": "A synthetic hexapeptide GH secretagogue with cardiac research interest.",
+    "peptalk_url": "https://peptalk.bio/peptides/hexarelin"
+  },
+  {
+    "name": "HGH Fragment 176-191",
+    "category": "Growth Hormone",
+    "description": "A fragment of human growth hormone studied in fat metabolism.",
+    "peptalk_url": "https://peptalk.bio/peptides/hgh-fragment-176-191"
+  },
+  {
+    "name": "AOD-9604",
+    "category": "Metabolic",
+    "description": "A modified HGH fragment studied in lipolysis research.",
+    "peptalk_url": "https://peptalk.bio/peptides/aod-9604"
+  },
+  {
+    "name": "IGF-1 LR3",
+    "category": "Growth Hormone",
+    "description": "A long-acting IGF-1 variant with extended half-life.",
+    "peptalk_url": "https://peptalk.bio/peptides/igf-1-lr3"
+  },
+  {
+    "name": "Somatropin",
+    "category": "Growth Hormone",
+    "description": "Recombinant human growth hormone (191 amino acids).",
+    "peptalk_url": "https://peptalk.bio/peptides/somatropin"
+  },
+  {
+    "name": "Semax",
+    "category": "Nootropic",
+    "description": "A 7-amino acid neuropeptide derived from ACTH.",
+    "peptalk_url": "https://peptalk.bio/peptides/semax"
+  },
+  {
+    "name": "Selank",
+    "category": "Nootropic",
+    "description": "A synthetic peptide derived from tuftsin with anxiolytic research.",
+    "peptalk_url": "https://peptalk.bio/peptides/selank"
+  },
+  {
+    "name": "Dihexa",
+    "category": "Nootropic",
+    "description": "A hexapeptide studied in cognitive and synaptic plasticity research.",
+    "peptalk_url": "https://peptalk.bio/peptides/dihexa"
+  },
+  {
+    "name": "Pinealon",
+    "category": "Nootropic",
+    "description": "A tripeptide studied in neuroprotection research.",
+    "peptalk_url": "https://peptalk.bio/peptides/pinealon"
+  },
+  {
+    "name": "PT-141",
+    "category": "Sexual Health",
+    "description": "A melanocortin receptor agonist (also known as Bremelanotide).",
+    "peptalk_url": "https://peptalk.bio/peptides/pt-141"
+  },
+  {
+    "name": "DSIP",
+    "category": "Sleep",
+    "description": "Delta sleep-inducing peptide, a 9-amino acid neuropeptide.",
+    "peptalk_url": "https://peptalk.bio/peptides/dsip"
+  },
+  {
+    "name": "Dermorphin",
+    "category": "Opioid",
+    "description": "An amphibian-derived opioid peptide studied in pain research.",
+    "peptalk_url": "https://peptalk.bio/peptides/dermorphin"
+  },
+  {
+    "name": "VIP",
+    "category": "Neuropeptide",
+    "description": "Vasoactive intestinal peptide, a 28-amino acid regulatory peptide.",
+    "peptalk_url": "https://peptalk.bio/peptides/vip"
+  },
+  {
+    "name": "Oxytocin",
+    "category": "Hormone",
+    "description": "A 9-amino acid cyclic peptide hormone involved in social bonding.",
+    "peptalk_url": "https://peptalk.bio/peptides/oxytocin"
+  },
+  {
+    "name": "MOTS-c",
+    "category": "Mitochondrial",
+    "description": "A mitochondrial-derived peptide studied in metabolic regulation.",
+    "peptalk_url": "https://peptalk.bio/peptides/mots-c"
+  },
+  {
+    "name": "SS-31",
+    "category": "Mitochondrial",
+    "description": "A tetrapeptide that targets mitochondrial cardiolipin.",
+    "peptalk_url": "https://peptalk.bio/peptides/ss-31"
+  },
+  {
+    "name": "Epithalon",
+    "category": "Longevity",
+    "description": "A tetrapeptide studied in telomerase activation research.",
+    "peptalk_url": "https://peptalk.bio/peptides/epithalon"
+  },
+  {
+    "name": "SLU-PP-332",
+    "category": "Mitochondrial",
+    "description": "An ERR agonist compound studied in energy metabolism.",
+    "peptalk_url": "https://peptalk.bio/peptides/slu-pp-332"
+  },
+  {
+    "name": "5-Amino-1MQ",
+    "category": "Metabolic",
+    "description": "An NNMT inhibitor studied in NAD+ and fat metabolism research.",
+    "peptalk_url": "https://peptalk.bio/peptides/5-amino-1mq"
+  },
+  {
+    "name": "Thymosin Alpha-1",
+    "category": "Immune",
+    "description": "A 28-amino acid thymic peptide with immune modulating properties.",
+    "peptalk_url": "https://peptalk.bio/peptides/thymosin-alpha-1"
+  },
+  {
+    "name": "Thymalin",
+    "category": "Immune",
+    "description": "A thymic peptide studied in immune system research.",
+    "peptalk_url": "https://peptalk.bio/peptides/thymalin"
+  },
+  {
+    "name": "KPV",
+    "category": "Anti-inflammatory",
+    "description": "A tripeptide fragment of alpha-MSH with anti-inflammatory research.",
+    "peptalk_url": "https://peptalk.bio/peptides/kpv"
+  },
+  {
+    "name": "Melanotan-1",
+    "category": "Tanning",
+    "description": "An alpha-MSH analog studied in pigmentation research.",
+    "peptalk_url": "https://peptalk.bio/peptides/melanotan-1"
+  },
+  {
+    "name": "Melanotan-2",
+    "category": "Tanning",
+    "description": "A cyclic alpha-MSH analog with melanocortin receptor activity.",
+    "peptalk_url": "https://peptalk.bio/peptides/melanotan-2"
+  },
+  {
+    "name": "ARA-290",
+    "category": "Neuroprotective",
+    "description": "An EPO-derived peptide studied in neuroprotection research.",
+    "peptalk_url": "https://peptalk.bio/peptides/ara-290"
+  },
+  {
+    "name": "Kisspeptin-10",
+    "category": "Reproductive",
+    "description": "A decapeptide that activates GnRH neurons in reproductive research.",
+    "peptalk_url": "https://peptalk.bio/peptides/kisspeptin-10"
+  },
+  {
+    "name": "hCG",
+    "category": "Reproductive",
+    "description": "Human chorionic gonadotropin, a glycoprotein hormone.",
+    "peptalk_url": "https://peptalk.bio/peptides/hcg"
+  },
+  {
+    "name": "HMG",
+    "category": "Reproductive",
+    "description": "Human menopausal gonadotropin, containing FSH and LH activity.",
+    "peptalk_url": "https://peptalk.bio/peptides/hmg"
+  },
+  {
+    "name": "SNAP-8",
+    "category": "Cosmetic",
+    "description": "An octapeptide studied in neuromuscular junction research.",
+    "peptalk_url": "https://peptalk.bio/peptides/snap-8"
+  },
+  {
+    "name": "Cerebrolysin",
+    "category": "Nootropic",
+    "description": "A peptide mixture derived from pig brain proteins.",
+    "peptalk_url": "https://peptalk.bio/peptides/cerebrolysin"
+  },
+  {
+    "name": "Glutathione",
+    "category": "Antioxidant",
+    "description": "A tripeptide antioxidant found naturally in cells.",
+    "peptalk_url": "https://peptalk.bio/peptides/glutathione"
+  },
+  {
+    "name": "NAD+",
+    "category": "Mitochondrial",
+    "description": "A coenzyme essential for cellular energy production.",
+    "peptalk_url": "https://peptalk.bio/peptides/nad"
+  },
+  {
+    "name": "Adipotide",
+    "category": "Metabolic",
+    "description": "A peptide that targets blood vessels in fat tissue.",
+    "peptalk_url": "https://peptalk.bio/peptides/adipotide"
+  },
+  {
+    "name": "PNC-27",
+    "category": "Research",
+    "description": "A p53-derived peptide studied in cancer cell research.",
+    "peptalk_url": "https://peptalk.bio/peptides/pnc-27"
+  }
+]

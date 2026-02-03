@@ -152,6 +152,7 @@ model User {
   adminAuditLogs    AuditLog[]  @relation("AdminAuditLogs")
   stockNotifications StockNotification[]
   loyaltyTransactions LoyaltyTransaction[]
+  paymentLinksCreated PaymentLink[] @relation("PaymentLinksCreated")
 
   // Wholesale/B2B
   organizationId    String?
@@ -480,7 +481,9 @@ model Order {
   shipment        Shipment?
   complianceAck   ComplianceAcknowledgment?
   loyaltyTransactions LoyaltyTransaction[]
+  paymentLinks    PaymentLink[]
 
+  paymentStatus   String        @default("PENDING") // PENDING, AWAITING_PAYMENT, PAID, FAILED
   paidAt          DateTime?
   shippedAt       DateTime?
   deliveredAt     DateTime?
@@ -570,19 +573,34 @@ model PaymentLink {
   id              String    @id @default(cuid())
 
   orderId         String?
+  order           Order?    @relation(fields: [orderId], references: [id])
+
+  customerEmail   String
+  customerName    String?
   amount          Decimal   @db.Decimal(10, 2)
   currency        String    @default("USD")
 
-  description     String?
+  status          String    @default("PENDING") // PENDING, PAID, EXPIRED, CANCELLED
+  paymentMethods  Json      @default("[]") // ["Zelle", "Wire", "CashApp", "Crypto"]
+  paymentMethod   String?   // Method used when paid
 
-  token           String    @unique @default(cuid())
+  notes           String?
+  proofUrl        String?
+
+  token           String    @unique
   expiresAt       DateTime
 
-  usedAt          DateTime?
+  paidAt          DateTime?
+
+  createdById     String?
+  createdBy       User?     @relation("PaymentLinksCreated", fields: [createdById], references: [id])
 
   createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   @@index([token])
+  @@index([status])
+  @@index([customerEmail])
 }
 
 // =============================================================================

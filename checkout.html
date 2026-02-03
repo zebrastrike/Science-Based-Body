@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Checkout | Science Based Body</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400&family=Sora:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="page-checkout">
+    <header class="site-header">
+      <div class="container header-grid">
+        <a class="logo" href="index.html">
+          <img src="/logo.png" alt="Science Based Body" />
+        </a>
+        <nav class="site-nav">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="shop.html" class="nav-link">Shop</a>
+          <a href="product.html" class="nav-link">Peptide Library</a>
+          <button type="button" class="cart-toggle" data-cart-toggle aria-label="Open cart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 6h15l-1.5 9h-12z"/>
+              <circle cx="9" cy="20" r="1"/>
+              <circle cx="18" cy="20" r="1"/>
+              <path d="M6 6L5 3H2"/>
+            </svg>
+            <span class="cart-badge is-hidden">0</span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="section checkout-section">
+        <div class="container">
+          <div class="checkout-header">
+            <span class="label">CHECKOUT</span>
+            <h1>Complete Your Order</h1>
+          </div>
+
+          <div class="checkout-grid">
+            <!-- Order Summary -->
+            <div class="checkout-summary">
+              <div class="card">
+                <h2>Order Summary</h2>
+                <div id="checkout-items" class="checkout-items">
+                  <!-- Populated by JavaScript -->
+                </div>
+                <div class="checkout-totals">
+                  <div class="checkout-row">
+                    <span>Subtotal</span>
+                    <span id="checkout-subtotal">$0.00</span>
+                  </div>
+                  <div class="checkout-row">
+                    <span>Shipping</span>
+                    <span id="checkout-shipping">Calculated at next step</span>
+                  </div>
+                  <div class="checkout-row checkout-total">
+                    <span>Total</span>
+                    <span id="checkout-total">$0.00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Checkout Form -->
+            <div class="checkout-form-container">
+              <form id="checkout-form" class="checkout-form">
+                <!-- Contact Information -->
+                <div class="card checkout-step">
+                  <h2>1. Contact Information</h2>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label for="email">Email Address *</label>
+                      <input type="email" id="email" name="email" required placeholder="your@email.com" />
+                    </div>
+                    <div class="form-group">
+                      <label for="phone">Phone Number *</label>
+                      <input type="tel" id="phone" name="phone" required placeholder="(555) 123-4567" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Shipping Address -->
+                <div class="card checkout-step">
+                  <h2>2. Shipping Address</h2>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label for="firstName">First Name *</label>
+                      <input type="text" id="firstName" name="firstName" required />
+                    </div>
+                    <div class="form-group">
+                      <label for="lastName">Last Name *</label>
+                      <input type="text" id="lastName" name="lastName" required />
+                    </div>
+                    <div class="form-group form-group-full">
+                      <label for="company">Company / Institution (Optional)</label>
+                      <input type="text" id="company" name="company" placeholder="Research lab, university, etc." />
+                    </div>
+                    <div class="form-group form-group-full">
+                      <label for="address1">Street Address *</label>
+                      <input type="text" id="address1" name="address1" required />
+                    </div>
+                    <div class="form-group form-group-full">
+                      <label for="address2">Apt, Suite, Unit (Optional)</label>
+                      <input type="text" id="address2" name="address2" />
+                    </div>
+                    <div class="form-group">
+                      <label for="city">City *</label>
+                      <input type="text" id="city" name="city" required />
+                    </div>
+                    <div class="form-group">
+                      <label for="state">State / Province *</label>
+                      <input type="text" id="state" name="state" required />
+                    </div>
+                    <div class="form-group">
+                      <label for="zip">ZIP / Postal Code *</label>
+                      <input type="text" id="zip" name="zip" required />
+                    </div>
+                    <div class="form-group">
+                      <label for="country">Country *</label>
+                      <select id="country" name="country" required>
+                        <option value="US">United States</option>
+                        <option value="CA">Canada</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="card checkout-step">
+                  <h2>3. Payment Method</h2>
+                  <p class="checkout-note">Select your preferred payment method. A payment link will be sent to your email.</p>
+                  <div class="payment-methods">
+                    <label class="payment-option">
+                      <input type="radio" name="paymentMethod" value="zelle" checked />
+                      <span class="payment-label">
+                        <strong>Zelle</strong>
+                        <span>Send to our Zelle ID</span>
+                      </span>
+                    </label>
+                    <label class="payment-option">
+                      <input type="radio" name="paymentMethod" value="wire" />
+                      <span class="payment-label">
+                        <strong>Wire Transfer</strong>
+                        <span>Bank wire transfer</span>
+                      </span>
+                    </label>
+                    <label class="payment-option">
+                      <input type="radio" name="paymentMethod" value="cashapp" />
+                      <span class="payment-label">
+                        <strong>CashApp</strong>
+                        <span>Pay via CashApp</span>
+                      </span>
+                    </label>
+                    <label class="payment-option">
+                      <input type="radio" name="paymentMethod" value="crypto" />
+                      <span class="payment-label">
+                        <strong>Cryptocurrency</strong>
+                        <span>BTC, ETH, USDC</span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Compliance Acknowledgments (REQUIRED) -->
+                <div class="card checkout-step compliance-section">
+                  <h2>4. Research Use Acknowledgment</h2>
+                  <p class="compliance-intro">
+                    <strong>Important:</strong> All products are sold for research and educational purposes only.
+                    You must acknowledge and agree to the following statements to complete your order.
+                  </p>
+
+                  <div class="compliance-checkboxes">
+                    <label class="compliance-checkbox">
+                      <input type="checkbox" id="compliance1" name="researchPurposeOnly" required />
+                      <span class="checkbox-mark"></span>
+                      <span class="checkbox-text">I confirm all products are for <strong>research purposes only</strong> and will not be used for human or animal consumption.</span>
+                    </label>
+
+                    <label class="compliance-checkbox">
+                      <input type="checkbox" id="compliance2" name="ageConfirmation" required />
+                      <span class="checkbox-mark"></span>
+                      <span class="checkbox-text">I confirm I am <strong>21 years of age or older</strong>.</span>
+                    </label>
+
+                    <label class="compliance-checkbox">
+                      <input type="checkbox" id="compliance3" name="noHumanConsumption" required />
+                      <span class="checkbox-mark"></span>
+                      <span class="checkbox-text">I understand these products are <strong>not for human consumption</strong>, not FDA approved, and not intended to diagnose, treat, cure, or prevent any disease.</span>
+                    </label>
+
+                    <label class="compliance-checkbox">
+                      <input type="checkbox" id="compliance4" name="responsibilityAccepted" required />
+                      <span class="checkbox-mark"></span>
+                      <span class="checkbox-text">I accept <strong>full responsibility</strong> for proper handling, storage, and lawful use of these research materials.</span>
+                    </label>
+
+                    <label class="compliance-checkbox">
+                      <input type="checkbox" id="compliance5" name="termsAccepted" required />
+                      <span class="checkbox-mark"></span>
+                      <span class="checkbox-text">I have read and agree to the <a href="terms.html" target="_blank">Terms of Service</a> and <a href="privacy.html" target="_blank">Privacy Policy</a>.</span>
+                    </label>
+                  </div>
+
+                  <p class="compliance-warning" id="compliance-warning" style="display: none;">
+                    Please acknowledge all research use statements to continue.
+                  </p>
+                </div>
+
+                <!-- Submit -->
+                <div class="checkout-submit">
+                  <button type="submit" class="btn btn-primary btn-large" id="submit-order">
+                    Place Order & Request Payment Link
+                  </button>
+                  <p class="checkout-secure">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                      <path d="M7 11V7a5 5 0 0110 0v4"/>
+                    </svg>
+                    Your information is secure and encrypted.
+                  </p>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Order Confirmation Modal -->
+      <div class="modal" id="order-confirmation-modal" aria-hidden="true">
+        <div class="modal-overlay" data-modal-close></div>
+        <div class="modal-card">
+          <button type="button" class="modal-close" data-modal-close>&times;</button>
+          <div class="modal-body">
+            <div class="confirmation-icon">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M9 12l2 2 4-4"/>
+              </svg>
+            </div>
+            <h2>Order Received!</h2>
+            <p class="confirmation-order-number">Order #<span id="confirmation-order-id">SBB-XXXXX</span></p>
+            <p>Thank you for your order. A payment link has been sent to your email address.</p>
+            <div class="confirmation-details">
+              <p><strong>What happens next:</strong></p>
+              <ol>
+                <li>Check your email for the payment link</li>
+                <li>Complete payment using your selected method</li>
+                <li>We'll verify and process your order</li>
+                <li>You'll receive tracking info once shipped</li>
+              </ol>
+            </div>
+            <a href="index.html" class="btn btn-primary">Return to Homepage</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <div class="footer-brand">
+            <a class="footer-logo" href="index.html">
+              <img src="/logo.png" alt="Science Based Body" />
+            </a>
+            <span class="label">SCIENCE BASED BODY</span>
+          </div>
+          <p>Research peptide supply with transparent batch standards.</p>
+        </div>
+        <div class="footer-links">
+          <a href="terms.html" class="text-link">Terms</a>
+          <a href="privacy.html" class="text-link">Privacy</a>
+          <a href="shipping.html" class="text-link">Shipping</a>
+          <a href="returns.html" class="text-link">Returns</a>
+          <a href="research-use.html" class="text-link">Research Use Only</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Cart Overlay -->
+    <div class="cart-overlay" id="cart-overlay"></div>
+
+    <!-- Cart Drawer -->
+    <aside class="cart-drawer" id="cart-drawer" aria-hidden="true">
+      <div class="cart-drawer-header">
+        <h2>Your Cart</h2>
+        <button type="button" class="cart-drawer-close" data-cart-close aria-label="Close cart">&times;</button>
+      </div>
+      <div class="cart-drawer-body">
+        <p id="cart-empty" class="cart-empty">Your cart is empty.</p>
+        <div id="cart-items"></div>
+      </div>
+      <div class="cart-drawer-footer">
+        <div class="cart-subtotal">
+          <span>Subtotal</span>
+          <span id="cart-subtotal">$0.00</span>
+        </div>
+        <a href="checkout.html" class="btn btn-primary cart-checkout-btn is-hidden" id="cart-checkout-btn">Proceed to Checkout</a>
+      </div>
+    </aside>
+
+    <script src="scripts.js"></script>
+    <script>
+      // Checkout page specific functionality
+      document.addEventListener('DOMContentLoaded', () => {
+        const checkoutItems = document.getElementById('checkout-items');
+        const checkoutSubtotal = document.getElementById('checkout-subtotal');
+        const checkoutTotal = document.getElementById('checkout-total');
+        const checkoutForm = document.getElementById('checkout-form');
+        const complianceWarning = document.getElementById('compliance-warning');
+        const confirmationModal = document.getElementById('order-confirmation-modal');
+
+        // Load cart items into checkout summary
+        const loadCheckoutItems = () => {
+          const cart = JSON.parse(localStorage.getItem('sbb_cart') || '[]');
+
+          if (cart.length === 0) {
+            checkoutItems.innerHTML = '<p class="empty-cart-msg">Your cart is empty. <a href="shop.html">Continue shopping</a></p>';
+            return;
+          }
+
+          const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+          checkoutItems.innerHTML = cart.map(item => `
+            <div class="checkout-item">
+              <img src="${item.image || '/images/products/vial.png'}" alt="${item.name}" />
+              <div class="checkout-item-details">
+                <h4>${item.name}</h4>
+                ${item.variant ? `<span class="variant">${item.variant}</span>` : ''}
+                <span class="qty">Qty: ${item.quantity}</span>
+              </div>
+              <span class="checkout-item-price">$${(item.price * item.quantity).toFixed(2)}</span>
+            </div>
+          `).join('');
+
+          checkoutSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+          checkoutTotal.textContent = `$${subtotal.toFixed(2)}`;
+        };
+
+        loadCheckoutItems();
+
+        // Form submission
+        checkoutForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+
+          // Check all compliance checkboxes
+          const complianceBoxes = checkoutForm.querySelectorAll('.compliance-checkbox input[type="checkbox"]');
+          const allChecked = Array.from(complianceBoxes).every(cb => cb.checked);
+
+          if (!allChecked) {
+            complianceWarning.style.display = 'block';
+            document.querySelector('.compliance-section').scrollIntoView({ behavior: 'smooth' });
+            return;
+          }
+
+          complianceWarning.style.display = 'none';
+
+          // Gather form data
+          const formData = new FormData(checkoutForm);
+          const orderData = {
+            contact: {
+              email: formData.get('email'),
+              phone: formData.get('phone')
+            },
+            shipping: {
+              firstName: formData.get('firstName'),
+              lastName: formData.get('lastName'),
+              company: formData.get('company'),
+              address1: formData.get('address1'),
+              address2: formData.get('address2'),
+              city: formData.get('city'),
+              state: formData.get('state'),
+              zip: formData.get('zip'),
+              country: formData.get('country')
+            },
+            paymentMethod: formData.get('paymentMethod'),
+            compliance: {
+              researchPurposeOnly: formData.get('researchPurposeOnly') === 'on',
+              ageConfirmation: formData.get('ageConfirmation') === 'on',
+              noHumanConsumption: formData.get('noHumanConsumption') === 'on',
+              responsibilityAccepted: formData.get('responsibilityAccepted') === 'on',
+              termsAccepted: formData.get('termsAccepted') === 'on',
+              timestamp: new Date().toISOString()
+            },
+            items: JSON.parse(localStorage.getItem('sbb_cart') || '[]'),
+            orderDate: new Date().toISOString()
+          };
+
+          // Generate order ID
+          const orderId = 'SBB-' + Date.now().toString(36).toUpperCase();
+          orderData.orderId = orderId;
+
+          // Save order to localStorage (for demo - would go to API in production)
+          const orders = JSON.parse(localStorage.getItem('sbb_orders') || '[]');
+          orders.push(orderData);
+          localStorage.setItem('sbb_orders', JSON.stringify(orders));
+
+          // Clear cart
+          localStorage.setItem('sbb_cart', '[]');
+          if (window.SBBCart) {
+            window.SBBCart.items = [];
+            window.SBBCart.updateBadge();
+          }
+
+          // Show confirmation modal
+          document.getElementById('confirmation-order-id').textContent = orderId;
+          confirmationModal.classList.add('is-open');
+          confirmationModal.setAttribute('aria-hidden', 'false');
+
+          // Log for demo purposes
+          console.log('Order submitted:', orderData);
+        });
+
+        // Modal close handlers
+        confirmationModal.querySelectorAll('[data-modal-close]').forEach(el => {
+          el.addEventListener('click', () => {
+            confirmationModal.classList.remove('is-open');
+            confirmationModal.setAttribute('aria-hidden', 'true');
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

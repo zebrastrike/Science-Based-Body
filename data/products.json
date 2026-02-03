@@ -1,0 +1,1243 @@
+{
+  "categories": [
+    { "id": "anti-inflammatory", "name": "Anti-inflammatory" },
+    { "id": "antimicrobial", "name": "Antimicrobial" },
+    { "id": "antioxidant", "name": "Antioxidant" },
+    { "id": "copper-peptide", "name": "Copper Peptide" },
+    { "id": "cosmetic", "name": "Cosmetic" },
+    { "id": "growth-hormone", "name": "Growth Hormone" },
+    { "id": "hormone", "name": "Hormone" },
+    { "id": "immune", "name": "Immune" },
+    { "id": "longevity", "name": "Longevity" },
+    { "id": "metabolic", "name": "Metabolic" },
+    { "id": "mitochondrial", "name": "Mitochondrial" },
+    { "id": "neuropeptide", "name": "Neuropeptide" },
+    { "id": "neuroprotective", "name": "Neuroprotective" },
+    { "id": "nootropic", "name": "Nootropic" },
+    { "id": "opioid", "name": "Opioid" },
+    { "id": "recovery", "name": "Recovery" },
+    { "id": "reproductive", "name": "Reproductive" },
+    { "id": "research", "name": "Research" },
+    { "id": "sexual-health", "name": "Sexual Health" },
+    { "id": "sleep", "name": "Sleep" },
+    { "id": "supplies", "name": "Supplies" },
+    { "id": "tanning", "name": "Tanning" }
+  ],
+  "products": [
+    {
+      "id": "kpv-10mg",
+      "name": "KPV",
+      "variant": "10mg",
+      "category": "anti-inflammatory",
+      "price": 135.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "kpv-5mg",
+      "name": "KPV",
+      "variant": "5mg",
+      "category": "anti-inflammatory",
+      "price": 108.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "ll37-5mg",
+      "name": "LL37",
+      "variant": "5mg",
+      "category": "antimicrobial",
+      "price": 198.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "glutathione-1500mg",
+      "name": "Glutathione",
+      "variant": "1500mg",
+      "category": "antioxidant",
+      "price": 171.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "ghk-cu-100mg",
+      "name": "GHK-Cu",
+      "variant": "100mg",
+      "category": "copper-peptide",
+      "price": 85.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "ghk-cu-50mg",
+      "name": "GHK-Cu",
+      "variant": "50mg",
+      "category": "copper-peptide",
+      "price": 67.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "glow-blend",
+      "name": "GLOW (BPC+GHK-Cu+TB500)",
+      "variant": "blend",
+      "category": "cosmetic",
+      "price": 427.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "snap8-ghkcu-serum-single",
+      "name": "SNAP-8 + GHK-Cu Serum",
+      "variant": "30ml single",
+      "category": "cosmetic",
+      "price": 11.70,
+      "unit": "1 bottle",
+      "availability": "pending"
+    },
+    {
+      "id": "snap8-ghkcu-serum-10",
+      "name": "SNAP-8 + GHK-Cu Serum",
+      "variant": "30ml",
+      "category": "cosmetic",
+      "price": 117.00,
+      "unit": "10 bottles",
+      "availability": "pending"
+    },
+    {
+      "id": "snap8-10mg",
+      "name": "SNAP-8",
+      "variant": "10mg",
+      "category": "cosmetic",
+      "price": 99.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "cjc1295-nodac-10mg",
+      "name": "CJC-1295 (no DAC)",
+      "variant": "10mg",
+      "category": "growth-hormone",
+      "price": 382.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "cjc1295-nodac-5mg",
+      "name": "CJC-1295 (no DAC)",
+      "variant": "5mg",
+      "category": "growth-hormone",
+      "price": 198.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "cjc1295-withdac-5mg",
+      "name": "CJC-1295 (with DAC)",
+      "variant": "5mg",
+      "category": "growth-hormone",
+      "price": 382.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "cjc1295-ipamorelin-10mg",
+      "name": "CJC-1295 + Ipamorelin",
+      "variant": "10mg (5mg+5mg)",
+      "category": "growth-hormone",
+      "price": 238.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "ghrp2-10mg",
+      "name": "GHRP-2",
+      "variant": "10mg",
+      "category": "growth-hormone",
+      "price": 171.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "ghrp2-5mg",
+      "name": "GHRP-2",
+      "variant": "5mg",
+      "category": "growth-hormone",
+      "price": 112.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "ghrp6-10mg",
+      "name": "GHRP-6",
+      "variant": "10mg",
+      "category": "growth-hormone",
+      "price": 112.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "ghrp6-5mg",
+      "name": "GHRP-6",
+      "variant": "5mg",
+      "category": "growth-hormone",
+      "price": 90.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "hgh-10iu",
+      "name": "HGH",
+      "variant": "10iu",
+      "category": "growth-hormone",
+      "price": 130.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "hgh-15iu",
+      "name": "HGH",
+      "variant": "15iu",
+      "category": "growth-hormone",
+      "price": 175.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "hgh-frag-176-191-5mg",
+      "name": "HGH Frag 176-191",
+      "variant": "5mg",
+      "category": "growth-hormone",
+      "price": 247.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "hexarelin-5mg",
+      "name": "Hexarelin",
+      "variant": "5mg",
+      "category": "growth-hormone",
+      "price": 202.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "igf1-lr3-0.1mg",
+      "name": "IGF-1 LR3",
+      "variant": "0.1mg",
+      "category": "growth-hormone",
+      "price": 85.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "igf1-lr3-1mg",
+      "name": "IGF-1 LR3",
+      "variant": "1mg",
+      "category": "growth-hormone",
+      "price": 454.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "ipamorelin-10mg",
+      "name": "Ipamorelin",
+      "variant": "10mg",
+      "category": "growth-hormone",
+      "price": 171.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "ipamorelin-5mg",
+      "name": "Ipamorelin",
+      "variant": "5mg",
+      "category": "growth-hormone",
+      "price": 99.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "sermorelin-10mg",
+      "name": "Sermorelin",
+      "variant": "10mg",
+      "category": "growth-hormone",
+      "price": 247.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "sermorelin-5mg",
+      "name": "Sermorelin",
+      "variant": "5mg",
+      "category": "growth-hormone",
+      "price": 157.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "tesamorelin-10mg",
+      "name": "Tesamorelin",
+      "variant": "10mg",
+      "category": "growth-hormone",
+      "price": 450.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "tesamorelin-5mg",
+      "name": "Tesamorelin",
+      "variant": "5mg",
+      "category": "growth-hormone",
+      "price": 238.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "oxytocin-2mg",
+      "name": "Oxytocin",
+      "variant": "2mg",
+      "category": "hormone",
+      "price": 90.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "thymalin-10mg",
+      "name": "Thymalin",
+      "variant": "10mg",
+      "category": "immune",
+      "price": 135.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "thymosin-alpha1-10mg",
+      "name": "Thymosin Alpha-1",
+      "variant": "10mg",
+      "category": "immune",
+      "price": 378.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "thymosin-alpha1-5mg",
+      "name": "Thymosin Alpha-1",
+      "variant": "5mg",
+      "category": "immune",
+      "price": 198.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "epithalon-10mg",
+      "name": "Epithalon",
+      "variant": "10mg",
+      "category": "longevity",
+      "price": 108.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "epithalon-50mg",
+      "name": "Epithalon",
+      "variant": "50mg",
+      "category": "longevity",
+      "price": 315.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "5-amino-1mq-5mg",
+      "name": "5-Amino-1MQ",
+      "variant": "5mg",
+      "category": "metabolic",
+      "price": 157.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "aod-5mg",
+      "name": "AOD",
+      "variant": "5mg",
+      "category": "metabolic",
+      "price": 261.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "adipotide-5mg",
+      "name": "Adipotide",
+      "variant": "5mg",
+      "category": "metabolic",
+      "price": 405.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "cagrilintide-10mg",
+      "name": "Cagrilintide",
+      "variant": "10mg",
+      "category": "metabolic",
+      "price": 400.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "cagrilintide-5mg",
+      "name": "Cagrilintide",
+      "variant": "5mg",
+      "category": "metabolic",
+      "price": 261.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "cagrilintide-semaglutide-10mg",
+      "name": "Cagrilintide+Semaglutide",
+      "variant": "10mg",
+      "category": "metabolic",
+      "price": 472.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "cagrilintide-semaglutide-5mg",
+      "name": "Cagrilintide+Semaglutide",
+      "variant": "5mg",
+      "category": "metabolic",
+      "price": 270.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "l-carnitine-10ml",
+      "name": "L-Carnitine",
+      "variant": "10ml",
+      "category": "metabolic",
+      "price": 171.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "lc120",
+      "name": "LC120",
+      "variant": "standard",
+      "category": "metabolic",
+      "price": 144.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "lc216",
+      "name": "LC216",
+      "variant": "standard",
+      "category": "metabolic",
+      "price": 144.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "mazdutide-10mg",
+      "name": "Mazdutide",
+      "variant": "10mg",
+      "category": "metabolic",
+      "price": 450.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "retatrutide-5mg",
+      "name": "Retatrutide",
+      "variant": "5mg",
+      "category": "metabolic",
+      "price": 135.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "retatrutide-10mg",
+      "name": "Retatrutide",
+      "variant": "10mg",
+      "category": "metabolic",
+      "price": 216.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "retatrutide-15mg",
+      "name": "Retatrutide",
+      "variant": "15mg",
+      "category": "metabolic",
+      "price": 283.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "retatrutide-20mg",
+      "name": "Retatrutide",
+      "variant": "20mg",
+      "category": "metabolic",
+      "price": 351.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "retatrutide-30mg",
+      "name": "Retatrutide",
+      "variant": "30mg",
+      "category": "metabolic",
+      "price": 472.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "retatrutide-40mg",
+      "name": "Retatrutide",
+      "variant": "40mg",
+      "category": "metabolic",
+      "price": 558.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "semaglutide-2mg",
+      "name": "Semaglutide",
+      "variant": "2mg",
+      "category": "metabolic",
+      "price": 72.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "semaglutide-5mg",
+      "name": "Semaglutide",
+      "variant": "5mg",
+      "category": "metabolic",
+      "price": 85.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "semaglutide-10mg",
+      "name": "Semaglutide",
+      "variant": "10mg",
+      "category": "metabolic",
+      "price": 126.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "semaglutide-15mg",
+      "name": "Semaglutide",
+      "variant": "15mg",
+      "category": "metabolic",
+      "price": 157.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "semaglutide-20mg",
+      "name": "Semaglutide",
+      "variant": "20mg",
+      "category": "metabolic",
+      "price": 193.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "semaglutide-30mg",
+      "name": "Semaglutide",
+      "variant": "30mg",
+      "category": "metabolic",
+      "price": 247.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "survodutide-10mg",
+      "name": "Survodutide",
+      "variant": "10mg",
+      "category": "metabolic",
+      "price": 594.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "tirzepatide-5mg",
+      "name": "Tirzepatide",
+      "variant": "5mg",
+      "category": "metabolic",
+      "price": 90.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "tirzepatide-10mg",
+      "name": "Tirzepatide",
+      "variant": "10mg",
+      "category": "metabolic",
+      "price": 130.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "tirzepatide-15mg",
+      "name": "Tirzepatide",
+      "variant": "15mg",
+      "category": "metabolic",
+      "price": 175.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "tirzepatide-20mg",
+      "name": "Tirzepatide",
+      "variant": "20mg",
+      "category": "metabolic",
+      "price": 202.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "tirzepatide-30mg",
+      "name": "Tirzepatide",
+      "variant": "30mg",
+      "category": "metabolic",
+      "price": 270.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "tirzepatide-40mg",
+      "name": "Tirzepatide",
+      "variant": "40mg",
+      "category": "metabolic",
+      "price": 315.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "tirzepatide-50mg",
+      "name": "Tirzepatide",
+      "variant": "50mg",
+      "category": "metabolic",
+      "price": 382.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "tirzepatide-60mg",
+      "name": "Tirzepatide",
+      "variant": "60mg",
+      "category": "metabolic",
+      "price": 472.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "mots-c-10mg",
+      "name": "MOTS-c",
+      "variant": "10mg",
+      "category": "mitochondrial",
+      "price": 153.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "mots-c-40mg",
+      "name": "MOTS-c",
+      "variant": "40mg",
+      "category": "mitochondrial",
+      "price": 450.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "nad-100mg",
+      "name": "NAD",
+      "variant": "100mg",
+      "category": "mitochondrial",
+      "price": 79.20,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "nad-500mg",
+      "name": "NAD",
+      "variant": "500mg",
+      "category": "mitochondrial",
+      "price": 180.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "slu-pp-332-5mg",
+      "name": "SLU-PP-332",
+      "variant": "5mg",
+      "category": "mitochondrial",
+      "price": 297.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "ss31-10mg",
+      "name": "SS-31",
+      "variant": "10mg",
+      "category": "mitochondrial",
+      "price": 216.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "ss31-50mg",
+      "name": "SS-31",
+      "variant": "50mg",
+      "category": "mitochondrial",
+      "price": 900.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "vip-10mg",
+      "name": "VIP",
+      "variant": "10mg",
+      "category": "neuropeptide",
+      "price": 328.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "vip-5mg",
+      "name": "VIP",
+      "variant": "5mg",
+      "category": "neuropeptide",
+      "price": 184.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "ara290-10mg",
+      "name": "ARA-290",
+      "variant": "10mg",
+      "category": "neuroprotective",
+      "price": 148.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "cerebrolysin-60mg",
+      "name": "Cerebrolysin",
+      "variant": "60mg",
+      "category": "nootropic",
+      "price": 96.30,
+      "unit": "6 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "dihexa-10mg",
+      "name": "Dihexa",
+      "variant": "10mg",
+      "category": "nootropic",
+      "price": 283.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "dihexa-5mg",
+      "name": "Dihexa",
+      "variant": "5mg",
+      "category": "nootropic",
+      "price": 180.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "pinealon-5mg",
+      "name": "Pinealon",
+      "variant": "5mg",
+      "category": "nootropic",
+      "price": 112.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "pinealon-10mg",
+      "name": "Pinealon",
+      "variant": "10mg",
+      "category": "nootropic",
+      "price": 157.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "pinealon-20mg",
+      "name": "Pinealon",
+      "variant": "20mg",
+      "category": "nootropic",
+      "price": 216.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "selank-5mg",
+      "name": "Selank",
+      "variant": "5mg",
+      "category": "nootropic",
+      "price": 85.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "selank-10mg",
+      "name": "Selank",
+      "variant": "10mg",
+      "category": "nootropic",
+      "price": 135.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "semax-5mg",
+      "name": "Semax",
+      "variant": "5mg",
+      "category": "nootropic",
+      "price": 85.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "semax-10mg",
+      "name": "Semax",
+      "variant": "10mg",
+      "category": "nootropic",
+      "price": 126.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "dermorphin-5mg",
+      "name": "Dermorphin",
+      "variant": "5mg",
+      "category": "opioid",
+      "price": 126.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "bpc-tb500-10mg",
+      "name": "BPC + TB500",
+      "variant": "10mg",
+      "category": "recovery",
+      "price": 225.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "bpc-tb500-20mg",
+      "name": "BPC + TB500",
+      "variant": "20mg",
+      "category": "recovery",
+      "price": 472.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "bpc157-5mg",
+      "name": "BPC-157",
+      "variant": "5mg",
+      "category": "recovery",
+      "price": 99.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "bpc157-10mg",
+      "name": "BPC-157",
+      "variant": "10mg",
+      "category": "recovery",
+      "price": 148.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "tb500-5mg",
+      "name": "TB500",
+      "variant": "5mg",
+      "category": "recovery",
+      "price": 180.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "tb500-10mg",
+      "name": "TB500",
+      "variant": "10mg",
+      "category": "recovery",
+      "price": 328.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "hmg-75iu",
+      "name": "HMG",
+      "variant": "75iu",
+      "category": "reproductive",
+      "price": 157.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "kisspeptin10-5mg",
+      "name": "Kisspeptin-10",
+      "variant": "5mg",
+      "category": "reproductive",
+      "price": 148.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "kisspeptin10-10mg",
+      "name": "Kisspeptin-10",
+      "variant": "10mg",
+      "category": "reproductive",
+      "price": 247.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "hcg-5000iu",
+      "name": "hCG",
+      "variant": "5000IU",
+      "category": "reproductive",
+      "price": 184.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "hcg-10000iu",
+      "name": "hCG",
+      "variant": "10000IU",
+      "category": "reproductive",
+      "price": 360.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "klow80-blend-80mg",
+      "name": "KLOW80 Blend",
+      "variant": "80mg",
+      "category": "research",
+      "price": 540.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "pnc27-5mg",
+      "name": "PNC-27",
+      "variant": "5mg",
+      "category": "research",
+      "price": 225.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "pnc27-10mg",
+      "name": "PNC-27",
+      "variant": "10mg",
+      "category": "research",
+      "price": 373.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "pt141-10mg",
+      "name": "PT-141",
+      "variant": "10mg",
+      "category": "sexual-health",
+      "price": 157.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "dsip-5mg",
+      "name": "DSIP",
+      "variant": "5mg",
+      "category": "sleep",
+      "price": 99.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "dsip-15mg",
+      "name": "DSIP",
+      "variant": "15mg",
+      "category": "sleep",
+      "price": 216.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "acetic-acid-3ml",
+      "name": "Acetic Acid",
+      "variant": "3ml",
+      "category": "supplies",
+      "price": 13.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "acetic-acid-10ml",
+      "name": "Acetic Acid",
+      "variant": "10ml",
+      "category": "supplies",
+      "price": 18.00,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "bac-water-3ml",
+      "name": "BAC Water",
+      "variant": "3ml",
+      "category": "supplies",
+      "price": 11.70,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "bac-water-10ml",
+      "name": "BAC Water",
+      "variant": "10ml",
+      "category": "supplies",
+      "price": 16.20,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "sterile-water-3ml",
+      "name": "Sterile Water",
+      "variant": "3ml",
+      "category": "supplies",
+      "price": 11.70,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "sterile-water-10ml",
+      "name": "Sterile Water",
+      "variant": "10ml",
+      "category": "supplies",
+      "price": 16.20,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "melanotan1-10mg",
+      "name": "Melanotan-1",
+      "variant": "10mg",
+      "category": "tanning",
+      "price": 112.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    },
+    {
+      "id": "melanotan2-10mg",
+      "name": "Melanotan-2",
+      "variant": "10mg",
+      "category": "tanning",
+      "price": 103.50,
+      "unit": "10 vials",
+      "availability": "pending"
+    }
+  ],
+  "stacks": [
+    {
+      "id": "gut-health-stack",
+      "name": "Gut Health Stack",
+      "category": ["recovery", "anti-inflammatory"],
+      "components": ["BPC-157 10mg", "KPV 10mg"],
+      "componentIds": ["bpc157-10mg", "kpv-10mg"],
+      "basePrice": 283.50,
+      "price": 255.15,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "bloat-buster-stack",
+      "name": "Bloat Buster Stack",
+      "category": ["metabolic", "recovery"],
+      "components": ["BPC-157 10mg", "Retatrutide 10mg"],
+      "componentIds": ["bpc157-10mg", "retatrutide-10mg"],
+      "basePrice": 364.50,
+      "price": 328.05,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "belly-buster-stack",
+      "name": "Belly Buster Stack",
+      "category": ["metabolic", "growth-hormone"],
+      "components": ["Retatrutide 10mg", "Tesamorelin 10mg", "BPC-157 10mg"],
+      "componentIds": ["retatrutide-10mg", "tesamorelin-10mg", "bpc157-10mg"],
+      "basePrice": 814.50,
+      "price": 733.05,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "weight-loss-stack",
+      "name": "Weight Loss Stack",
+      "category": ["metabolic", "mitochondrial"],
+      "components": ["Retatrutide 10mg", "NAD+ 100mg", "GHK-Cu 100mg"],
+      "componentIds": ["retatrutide-10mg", "nad-100mg", "ghk-cu-100mg"],
+      "basePrice": 380.70,
+      "price": 342.63,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "baywatch-stack",
+      "name": "Baywatch Stack",
+      "category": ["metabolic", "tanning"],
+      "components": ["Retatrutide 10mg", "Melanotan-1 10mg", "BPC-157 10mg"],
+      "componentIds": ["retatrutide-10mg", "melanotan1-10mg", "bpc157-10mg"],
+      "basePrice": 477.00,
+      "price": 429.30,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "healing-stack",
+      "name": "Healing Stack",
+      "category": ["recovery", "anti-inflammatory"],
+      "components": ["BPC-157 10mg", "TB500 10mg", "KPV 10mg"],
+      "componentIds": ["bpc157-10mg", "tb500-10mg", "kpv-10mg"],
+      "basePrice": 612.00,
+      "price": 550.80,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "recovery-stack",
+      "name": "Recovery Stack",
+      "category": ["recovery", "copper-peptide"],
+      "components": ["BPC-157 10mg", "TB500 10mg", "GHK-Cu 100mg"],
+      "componentIds": ["bpc157-10mg", "tb500-10mg", "ghk-cu-100mg"],
+      "basePrice": 562.50,
+      "price": 506.25,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "anti-aging-stack",
+      "name": "Anti-Aging Stack",
+      "category": ["longevity", "mitochondrial"],
+      "components": ["Epithalon 10mg", "NAD+ 100mg", "GHK-Cu 100mg"],
+      "componentIds": ["epithalon-10mg", "nad-100mg", "ghk-cu-100mg"],
+      "basePrice": 272.70,
+      "price": 245.43,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "longevity-research-stack",
+      "name": "Longevity Research Stack",
+      "category": ["longevity", "mitochondrial"],
+      "components": ["Epithalon 10mg", "NAD+ 100mg", "SS-31 10mg"],
+      "componentIds": ["epithalon-10mg", "nad-100mg", "ss31-10mg"],
+      "basePrice": 403.20,
+      "price": 362.88,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "growth-stack",
+      "name": "Growth Stack",
+      "category": ["growth-hormone", "mitochondrial"],
+      "components": ["CJC-1295 (no DAC) 10mg", "Ipamorelin 10mg", "NAD+ 100mg"],
+      "componentIds": ["cjc1295-nodac-10mg", "ipamorelin-10mg", "nad-100mg"],
+      "basePrice": 632.70,
+      "price": 569.43,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "cognitive-stack",
+      "name": "Cognitive Stack",
+      "category": ["nootropic"],
+      "components": ["Semax 10mg", "Selank 10mg", "Pinealon 10mg"],
+      "componentIds": ["semax-10mg", "selank-10mg", "pinealon-10mg"],
+      "basePrice": 418.50,
+      "price": 376.65,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "mental-wellness-stack",
+      "name": "Mental Wellness Stack",
+      "category": ["nootropic", "sleep"],
+      "components": ["Semax 10mg", "Selank 10mg", "DSIP 5mg"],
+      "componentIds": ["semax-10mg", "selank-10mg", "dsip-5mg"],
+      "basePrice": 360.00,
+      "price": 324.00,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "sleep-stack",
+      "name": "Sleep Stack",
+      "category": ["sleep", "longevity"],
+      "components": ["DSIP 5mg", "Pinealon 10mg", "Epithalon 10mg"],
+      "componentIds": ["dsip-5mg", "pinealon-10mg", "epithalon-10mg"],
+      "basePrice": 364.50,
+      "price": 328.05,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "skin-hair-radiance-stack",
+      "name": "Skin + Hair Radiance Stack",
+      "category": ["cosmetic", "anti-inflammatory"],
+      "components": ["GHK-Cu 100mg", "SNAP-8 Serum 30ml", "KPV 10mg"],
+      "componentIds": ["ghk-cu-100mg", "snap8-ghkcu-serum-10", "kpv-10mg"],
+      "basePrice": 337.50,
+      "price": 303.75,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "glow-stack",
+      "name": "Glow Stack",
+      "category": ["cosmetic", "recovery"],
+      "components": ["GHK-Cu 100mg", "TB500 10mg", "BPC-157 10mg"],
+      "componentIds": ["ghk-cu-100mg", "tb500-10mg", "bpc157-10mg"],
+      "basePrice": 562.50,
+      "price": 506.25,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "immune-support-stack",
+      "name": "Immune Support Stack",
+      "category": ["immune", "anti-inflammatory"],
+      "components": ["Thymosin Alpha-1 10mg", "Thymalin 10mg", "KPV 10mg"],
+      "componentIds": ["thymosin-alpha1-10mg", "thymalin-10mg", "kpv-10mg"],
+      "basePrice": 648.00,
+      "price": 583.20,
+      "discount": "10%",
+      "availability": "pending"
+    },
+    {
+      "id": "energy-stack",
+      "name": "Energy Stack",
+      "category": ["mitochondrial"],
+      "components": ["MOTS-c 10mg", "SS-31 10mg", "NAD+ 100mg"],
+      "componentIds": ["mots-c-10mg", "ss31-10mg", "nad-100mg"],
+      "basePrice": 448.20,
+      "price": 403.38,
+      "discount": "10%",
+      "availability": "pending"
+    }
+  ]
+}

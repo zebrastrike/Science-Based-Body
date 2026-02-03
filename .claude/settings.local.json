@@ -6,7 +6,14 @@
       "Bash(ls:*)",
       "Bash(dir \"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\apps\\\\web\\\\tsconfig*\")",
       "Bash(dir \"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\apps\\\\web\\\\public\\\\media\\\\decorative\")",
-      "Bash(git branch:*)"
+      "Bash(git branch:*)",
+      "Bash(Remove-Item \"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\chunk_*.md\" -Force)",
+      "Bash(Remove-Item \"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\output.md\" -Force -ErrorAction SilentlyContinue)",
+      "Bash(Remove-Item \"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\extract_pdf.py\" -Force -ErrorAction SilentlyContinue)",
+      "Bash(Remove-Item \"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\input.pdf\" -Force -ErrorAction SilentlyContinue)",
+      "Bash(Remove-Item \"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\nul\" -Force -ErrorAction SilentlyContinue)",
+      "Bash(dir /b \"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\")",
+      "Bash(timeout:*)"
     ]
   }
 }

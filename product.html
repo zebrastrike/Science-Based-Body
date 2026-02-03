@@ -10,7 +10,7 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body class="page-library">
     <div class="bubble-field" aria-hidden="true">
       <span class="bubble bubble-1"></span>
       <span class="bubble bubble-2"></span>
@@ -34,6 +34,15 @@
           <a href="product.html" class="nav-link">Peptide Library</a>
           <a href="branded-for-science.html" class="nav-link">Branded for Science</a>
           <a href="brand-partnerships.html" class="nav-link">Brand Partners &amp; Affiliates</a>
+          <button type="button" class="cart-toggle" data-cart-toggle aria-label="Open cart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 6h15l-1.5 9h-12z"/>
+              <circle cx="9" cy="20" r="1"/>
+              <circle cx="18" cy="20" r="1"/>
+              <path d="M6 6L5 3H2"/>
+            </svg>
+            <span class="cart-badge is-hidden">0</span>
+          </button>
         </nav>
       </div>
     </header>
@@ -45,369 +54,1081 @@
             <span class="label">PEPTIDE LIBRARY</span>
             <h1>Peptide Research Library</h1>
             <p>
-              Structured profiles for research peptides with clear documentation fields,
-              composition notes, and research context. This library is for educational and
-              research reference only.
+              Browse our complete catalog of research peptides with category classifications
+              and basic research context. For research and educational reference only.
             </p>
           </div>
           <div class="card reveal library-note">
             <span class="label">RESEARCH USE ONLY</span>
             <p>
-              Products and information are intended for research and educational purposes only.
-              This content is not medical advice and does not describe treatment outcomes.
+              All products are intended for research and educational purposes only.
+              Not for human consumption.
             </p>
           </div>
         </div>
       </section>
-
       <section class="section peptide-library" id="library">
         <div class="container">
           <div class="section-heading reveal">
-            <span class="label">LIBRARY TOOL</span>
-            <h2>Select a peptide to view its research profile.</h2>
+            <span class="label">PEPTIDE CATALOG</span>
+            <h2>Explore peptides by research category.</h2>
             <p>
-              Profiles include composition, structure, testing, and documentation fields. Replace
-              the placeholder data with your verified dossiers when ready.
+              Choose a category to reveal peptide profiles with quick research context
+              and direct links to PepTalk.
             </p>
           </div>
 
-          <div class="library-grid">
-            <div class="library-panel">
-              <div class="card library-search-card">
-                <span class="label">SEARCH</span>
-                <input
-                  class="library-search"
-                  type="search"
-                  placeholder="Search peptides, categories, or notes"
-                  aria-label="Search peptides"
-                  data-library-search
-                />
-                <span class="meta">Filter by name, category, or research context.</span>
-              </div>
-
-              <div class="library-list">
-                <button
-                  class="library-item is-active"
-                  type="button"
-                  data-peptide="bpc-157"
-                  data-keywords="bpc-157 recovery gastric pentadecapeptide"
-                >
-                  <span class="label">RECOVERY</span>
-                  <h3>BPC-157</h3>
-                  <p>Body protection compound. Research profile pending.</p>
-                  <span class="meta">Profile in progress</span>
+          <div class="library-shell" data-library>
+            <div class="library-category-view" data-library-category-view>
+              <div class="library-category-grid">
+                <button class="library-category-card" type="button" data-category-id="weight-management" data-category-name="Weight Management" data-category-description="GLP-1, amylin, and metabolic regulation research." data-category-icon="WM" data-category-accent="227 167 161" style="--category-accent: 227 167 161;">
+                  <span class="category-icon" aria-hidden="true">WM</span>
+                  <div class="library-category-meta">
+                    <span class="label">Weight Management</span>
+                    <p class="category-desc">GLP-1, amylin, and metabolic regulation research.</p>
+                  </div>
+                  <span class="library-category-count" data-category-count>0 peptides</span>
                 </button>
-                <button
-                  class="library-item"
-                  type="button"
-                  data-peptide="semaglutide"
-                  data-keywords="semaglutide metabolic glp-1 analog"
-                >
-                  <span class="label">METABOLIC</span>
-                  <h3>Semaglutide</h3>
-                  <p>GLP-1 analog. Research profile pending.</p>
-                  <span class="meta">Profile in progress</span>
+                <button class="library-category-card" type="button" data-category-id="muscle-recovery" data-category-name="Muscle &amp; Recovery" data-category-description="Repair pathways, GH signaling, and tissue recovery peptides." data-category-icon="MR" data-category-accent="128 181 255" style="--category-accent: 128 181 255;">
+                  <span class="category-icon" aria-hidden="true">MR</span>
+                  <div class="library-category-meta">
+                    <span class="label">Muscle &amp; Recovery</span>
+                    <p class="category-desc">Repair pathways, GH signaling, and tissue recovery peptides.</p>
+                  </div>
+                  <span class="library-category-count" data-category-count>0 peptides</span>
                 </button>
-                <button
-                  class="library-item"
-                  type="button"
-                  data-peptide="tb-500"
-                  data-keywords="tb-500 recovery thymosin beta-4"
-                >
-                  <span class="label">RECOVERY</span>
-                  <h3>TB-500</h3>
-                  <p>Thymosin beta-4 fragment. Research profile pending.</p>
-                  <span class="meta">Profile in progress</span>
+                <button class="library-category-card" type="button" data-category-id="anti-aging" data-category-name="Anti-Aging &amp; Longevity" data-category-description="Cellular resilience, mitochondria, and longevity pathways." data-category-icon="AL" data-category-accent="242 195 123" style="--category-accent: 242 195 123;">
+                  <span class="category-icon" aria-hidden="true">AL</span>
+                  <div class="library-category-meta">
+                    <span class="label">Anti-Aging &amp; Longevity</span>
+                    <p class="category-desc">Cellular resilience, mitochondria, and longevity pathways.</p>
+                  </div>
+                  <span class="library-category-count" data-category-count>0 peptides</span>
                 </button>
-                <button
-                  class="library-item"
-                  type="button"
-                  data-peptide="selank"
-                  data-keywords="selank nootropic tuftsin analog"
-                >
-                  <span class="label">NOOTROPIC</span>
-                  <h3>Selank</h3>
-                  <p>Tuftsin analog. Research profile pending.</p>
-                  <span class="meta">Profile in progress</span>
+                <button class="library-category-card" type="button" data-category-id="cognitive" data-category-name="Cognitive Enhancement" data-category-description="Neurotransmission, cognition, and neurotrophic research." data-category-icon="CE" data-category-accent="134 214 204" style="--category-accent: 134 214 204;">
+                  <span class="category-icon" aria-hidden="true">CE</span>
+                  <div class="library-category-meta">
+                    <span class="label">Cognitive Enhancement</span>
+                    <p class="category-desc">Neurotransmission, cognition, and neurotrophic research.</p>
+                  </div>
+                  <span class="library-category-count" data-category-count>0 peptides</span>
                 </button>
-                <button
-                  class="library-item"
-                  type="button"
-                  data-peptide="epithalon"
-                  data-keywords="epithalon longevity bioregulator"
-                >
-                  <span class="label">LONGEVITY</span>
-                  <h3>Epithalon</h3>
-                  <p>Bioregulator peptide. Research profile pending.</p>
-                  <span class="meta">Profile in progress</span>
+                <button class="library-category-card" type="button" data-category-id="skin-beauty" data-category-name="Skin &amp; Beauty" data-category-description="Collagen, pigmentation, and dermal signaling peptides." data-category-icon="SB" data-category-accent="244 169 193" style="--category-accent: 244 169 193;">
+                  <span class="category-icon" aria-hidden="true">SB</span>
+                  <div class="library-category-meta">
+                    <span class="label">Skin &amp; Beauty</span>
+                    <p class="category-desc">Collagen, pigmentation, and dermal signaling peptides.</p>
+                  </div>
+                  <span class="library-category-count" data-category-count>0 peptides</span>
                 </button>
-                <button
-                  class="library-item"
-                  type="button"
-                  data-peptide="ipamorelin"
-                  data-keywords="ipamorelin growth hormone ghrp"
-                >
-                  <span class="label">GROWTH HORMONE</span>
-                  <h3>Ipamorelin</h3>
-                  <p>GHRP analog. Research profile pending.</p>
-                  <span class="meta">Profile in progress</span>
+                <button class="library-category-card" type="button" data-category-id="immune-support" data-category-name="Immune Support" data-category-description="Innate defense and immune-modulating peptides." data-category-icon="IS" data-category-accent="154 213 154" style="--category-accent: 154 213 154;">
+                  <span class="category-icon" aria-hidden="true">IS</span>
+                  <div class="library-category-meta">
+                    <span class="label">Immune Support</span>
+                    <p class="category-desc">Innate defense and immune-modulating peptides.</p>
+                  </div>
+                  <span class="library-category-count" data-category-count>0 peptides</span>
+                </button>
+                <button class="library-category-card" type="button" data-category-id="sexual-health" data-category-name="Sexual Health" data-category-description="Reproductive signaling and sexual health peptides." data-category-icon="SH" data-category-accent="242 141 107" style="--category-accent: 242 141 107;">
+                  <span class="category-icon" aria-hidden="true">SH</span>
+                  <div class="library-category-meta">
+                    <span class="label">Sexual Health</span>
+                    <p class="category-desc">Reproductive signaling and sexual health peptides.</p>
+                  </div>
+                  <span class="library-category-count" data-category-count>0 peptides</span>
+                </button>
+                <button class="library-category-card" type="button" data-category-id="sleep-relaxation" data-category-name="Sleep &amp; Relaxation" data-category-description="Circadian, calming, and relaxation pathways." data-category-icon="SR" data-category-accent="123 177 212" style="--category-accent: 123 177 212;">
+                  <span class="category-icon" aria-hidden="true">SR</span>
+                  <div class="library-category-meta">
+                    <span class="label">Sleep &amp; Relaxation</span>
+                    <p class="category-desc">Circadian, calming, and relaxation pathways.</p>
+                  </div>
+                  <span class="library-category-count" data-category-count>0 peptides</span>
                 </button>
               </div>
             </div>
 
-            <div class="library-detail">
-              <div class="library-detail-panel is-active" data-peptide-panel="bpc-157">
-                <span class="label">PEPTIDE PROFILE</span>
-                <h2>BPC-157</h2>
-                <p class="library-subtitle">
-                  Placeholder overview. Replace with validated research summary and composition.
-                </p>
-                <div class="library-detail-grid">
-                  <div class="library-detail-block">
-                    <span class="meta">Origin / Source</span>
-                    <p>Peptide origin and sourcing notes to be provided.</p>
+            <div class="library-peptide-view is-hidden" data-library-peptide-view>
+              <div class="library-peptide-header">
+                <button class="library-back" type="button" data-library-back>
+                  Back to categories
+                </button>
+                <div class="library-category-header card" data-active-category>
+                  <span class="category-icon" data-active-category-icon aria-hidden="true">WM</span>
+                  <div class="library-category-title">
+                    <span class="label">CATEGORY</span>
+                    <h3 data-active-category-name>Category</h3>
+                    <p data-active-category-description></p>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Composition</span>
-                    <p>Sequence length and amino acid profile pending.</p>
-                  </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Format</span>
-                    <p>Lyophilized format and batch reference pending.</p>
-                  </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Documentation</span>
-                    <p>COA, HPLC, and MS data to be attached.</p>
-                  </div>
-                </div>
-                <div class="library-detail-section">
-                  <span class="label">Research Notes</span>
-                  <ul class="library-detail-list">
-                    <li>Summary to be aligned with published research only.</li>
-                    <li>No therapeutic or outcome-based statements will be added.</li>
-                    <li>Use for research and educational reference only.</li>
-                  </ul>
-                </div>
-                <div class="library-detail-section">
-                  <span class="label">Storage and Handling</span>
-                  <ul class="library-detail-list">
-                    <li>Storage guidance to be provided with verified dossier.</li>
-                    <li>Handling and reconstitution notes to follow COA.</li>
-                  </ul>
+                  <span class="library-category-count" data-active-category-count>0 peptides</span>
                 </div>
               </div>
 
-              <div class="library-detail-panel" data-peptide-panel="semaglutide">
-                <span class="label">PEPTIDE PROFILE</span>
-                <h2>Semaglutide</h2>
-                <p class="library-subtitle">
-                  Placeholder overview. Replace with validated research summary and composition.
-                </p>
-                <div class="library-detail-grid">
-                  <div class="library-detail-block">
-                    <span class="meta">Origin / Source</span>
-                    <p>Source and synthesis details pending.</p>
+              <div class="library-peptide-list" data-library-list>
+                <article class="peptide-card" data-peptide-card data-peptide-id="semaglutide" data-categories="weight-management" data-peptide-subtitle="A GLP-1 receptor agonist peptide used in metabolic research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Semaglutide</h3>
+                      <p class="peptide-tagline">A GLP-1 receptor agonist peptide used in metabolic research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/semaglutide" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#metabolic">Shop This Peptide</a>
+                    </div>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Composition</span>
-                    <p>Sequence and molecular data pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="tirzepatide" data-categories="weight-management" data-peptide-subtitle="A dual GLP-1/GIP receptor agonist studied in metabolic pathways." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Tirzepatide</h3>
+                      <p class="peptide-tagline">A dual GLP-1/GIP receptor agonist studied in metabolic pathways.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/tirzepatide" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#metabolic">Shop This Peptide</a>
+                    </div>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Format</span>
-                    <p>Presentation, vial size, and batch notes pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="retatrutide" data-categories="weight-management" data-peptide-subtitle="A triple agonist peptide targeting GLP-1, GIP, and glucagon receptors." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Retatrutide</h3>
+                      <p class="peptide-tagline">A triple agonist peptide targeting GLP-1, GIP, and glucagon receptors.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/retatrutide" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#metabolic">Shop This Peptide</a>
+                    </div>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Documentation</span>
-                    <p>COA and analytical reports to be linked.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="cagrilintide" data-categories="weight-management" data-peptide-subtitle="An amylin analog peptide studied in satiety and metabolic research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Cagrilintide</h3>
+                      <p class="peptide-tagline">An amylin analog peptide studied in satiety and metabolic research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/cagrilintide" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#metabolic">Shop This Peptide</a>
+                    </div>
                   </div>
-                </div>
-                <div class="library-detail-section">
-                  <span class="label">Research Notes</span>
-                  <ul class="library-detail-list">
-                    <li>Research context to be summarized from peer-reviewed sources.</li>
-                    <li>Any limitations and uncertainties will be explicit.</li>
-                    <li>Not for human consumption or medical use.</li>
-                  </ul>
-                </div>
-                <div class="library-detail-section">
-                  <span class="label">Storage and Handling</span>
-                  <ul class="library-detail-list">
-                    <li>Storage guidance to follow lab documentation.</li>
-                    <li>Handling protocols to be included in dossier.</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div class="library-detail-panel" data-peptide-panel="tb-500">
-                <span class="label">PEPTIDE PROFILE</span>
-                <h2>TB-500</h2>
-                <p class="library-subtitle">
-                  Placeholder overview. Replace with validated research summary and composition.
-                </p>
-                <div class="library-detail-grid">
-                  <div class="library-detail-block">
-                    <span class="meta">Origin / Source</span>
-                    <p>Origin and source details pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="mazdutide" data-categories="weight-management" data-peptide-subtitle="A dual GLP-1/GIP agonist peptide in metabolic research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Mazdutide</h3>
+                      <p class="peptide-tagline">A dual GLP-1/GIP agonist peptide in metabolic research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/mazdutide" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#metabolic">Shop This Peptide</a>
+                    </div>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Composition</span>
-                    <p>Sequence profile pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="survodutide" data-categories="weight-management" data-peptide-subtitle="A dual GLP-1/glucagon agonist peptide studied in hepatic research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Survodutide</h3>
+                      <p class="peptide-tagline">A dual GLP-1/glucagon agonist peptide studied in hepatic research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/survodutide" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#metabolic">Shop This Peptide</a>
+                    </div>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Format</span>
-                    <p>Lyophilized format and batch reference pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="bpc-157" data-categories="muscle-recovery" data-peptide-subtitle="A 15-amino acid gastric peptide studied in tissue repair research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>BPC-157</h3>
+                      <p class="peptide-tagline">A 15-amino acid gastric peptide studied in tissue repair research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/bpc-157" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#recovery">Shop This Peptide</a>
+                    </div>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Documentation</span>
-                    <p>COA and analytical documentation pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="tb-500" data-categories="muscle-recovery" data-peptide-subtitle="A thymosin beta-4 fragment studied in cell migration and repair." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>TB-500</h3>
+                      <p class="peptide-tagline">A thymosin beta-4 fragment studied in cell migration and repair.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/tb-500" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#recovery">Shop This Peptide</a>
+                    </div>
                   </div>
-                </div>
-                <div class="library-detail-section">
-                  <span class="label">Research Notes</span>
-                  <ul class="library-detail-list">
-                    <li>Research summary to be based on published data.</li>
-                    <li>No outcome or clinical claims will be included.</li>
-                    <li>For research use only.</li>
-                  </ul>
-                </div>
-                <div class="library-detail-section">
-                  <span class="label">Storage and Handling</span>
-                  <ul class="library-detail-list">
-                    <li>Storage and handling notes to be provided.</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div class="library-detail-panel" data-peptide-panel="selank">
-                <span class="label">PEPTIDE PROFILE</span>
-                <h2>Selank</h2>
-                <p class="library-subtitle">
-                  Placeholder overview. Replace with validated research summary and composition.
-                </p>
-                <div class="library-detail-grid">
-                  <div class="library-detail-block">
-                    <span class="meta">Origin / Source</span>
-                    <p>Origin and synthesis notes pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="ll-37" data-categories="immune-support" data-peptide-subtitle="A naturally occurring antimicrobial peptide with immune functions." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>LL-37</h3>
+                      <p class="peptide-tagline">A naturally occurring antimicrobial peptide with immune functions.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/ll-37" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#antimicrobial">Shop This Peptide</a>
+                    </div>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Composition</span>
-                    <p>Sequence details pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="ghk-cu" data-categories="anti-aging,skin-beauty" data-peptide-subtitle="A copper-binding tripeptide studied in skin and gene expression research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>GHK-Cu</h3>
+                      <p class="peptide-tagline">A copper-binding tripeptide studied in skin and gene expression research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/ghk-cu" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#cosmetic">Shop This Peptide</a>
+                    </div>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Format</span>
-                    <p>Format and batch details pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="cjc-1295" data-categories="muscle-recovery" data-peptide-subtitle="A GHRH analog peptide that stimulates growth hormone secretion." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>CJC-1295</h3>
+                      <p class="peptide-tagline">A GHRH analog peptide that stimulates growth hormone secretion.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/cjc-1295" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#growth-hormone">Shop This Peptide</a>
+                    </div>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Documentation</span>
-                    <p>COA and purity data pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="ipamorelin" data-categories="muscle-recovery" data-peptide-subtitle="A selective growth hormone secretagogue pentapeptide." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Ipamorelin</h3>
+                      <p class="peptide-tagline">A selective growth hormone secretagogue pentapeptide.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/ipamorelin" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#growth-hormone">Shop This Peptide</a>
+                    </div>
                   </div>
-                </div>
-                <div class="library-detail-section">
-                  <span class="label">Research Notes</span>
-                  <ul class="library-detail-list">
-                    <li>Educational summary to reference public literature.</li>
-                    <li>No medical claims or outcomes will be added.</li>
-                  </ul>
-                </div>
-                <div class="library-detail-section">
-                  <span class="label">Storage and Handling</span>
-                  <ul class="library-detail-list">
-                    <li>Storage guidance to be provided with lab data.</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div class="library-detail-panel" data-peptide-panel="epithalon">
-                <span class="label">PEPTIDE PROFILE</span>
-                <h2>Epithalon</h2>
-                <p class="library-subtitle">
-                  Placeholder overview. Replace with validated research summary and composition.
-                </p>
-                <div class="library-detail-grid">
-                  <div class="library-detail-block">
-                    <span class="meta">Origin / Source</span>
-                    <p>Origin and source notes pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="tesamorelin" data-categories="muscle-recovery" data-peptide-subtitle="A GHRH analog that stimulates natural growth hormone production." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Tesamorelin</h3>
+                      <p class="peptide-tagline">A GHRH analog that stimulates natural growth hormone production.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/tesamorelin" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#growth-hormone">Shop This Peptide</a>
+                    </div>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Composition</span>
-                    <p>Sequence and molecular data pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="sermorelin" data-categories="muscle-recovery" data-peptide-subtitle="A 29-amino acid GHRH fragment used in GH axis research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Sermorelin</h3>
+                      <p class="peptide-tagline">A 29-amino acid GHRH fragment used in GH axis research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/sermorelin" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#growth-hormone">Shop This Peptide</a>
+                    </div>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Format</span>
-                    <p>Format and batch notes pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="ghrp-2" data-categories="muscle-recovery" data-peptide-subtitle="A synthetic hexapeptide growth hormone secretagogue." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>GHRP-2</h3>
+                      <p class="peptide-tagline">A synthetic hexapeptide growth hormone secretagogue.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/ghrp-2" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#growth-hormone">Shop This Peptide</a>
+                    </div>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Documentation</span>
-                    <p>COA and analytical reports pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="ghrp-6" data-categories="muscle-recovery" data-peptide-subtitle="A hexapeptide that stimulates growth hormone release." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>GHRP-6</h3>
+                      <p class="peptide-tagline">A hexapeptide that stimulates growth hormone release.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/ghrp-6" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#growth-hormone">Shop This Peptide</a>
+                    </div>
                   </div>
-                </div>
-                <div class="library-detail-section">
-                  <span class="label">Research Notes</span>
-                  <ul class="library-detail-list">
-                    <li>Summary will reflect published research only.</li>
-                    <li>Limits and uncertainty will be explicit.</li>
-                  </ul>
-                </div>
-                <div class="library-detail-section">
-                  <span class="label">Storage and Handling</span>
-                  <ul class="library-detail-list">
-                    <li>Storage and handling notes pending.</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div class="library-detail-panel" data-peptide-panel="ipamorelin">
-                <span class="label">PEPTIDE PROFILE</span>
-                <h2>Ipamorelin</h2>
-                <p class="library-subtitle">
-                  Placeholder overview. Replace with validated research summary and composition.
-                </p>
-                <div class="library-detail-grid">
-                  <div class="library-detail-block">
-                    <span class="meta">Origin / Source</span>
-                    <p>Origin and synthesis notes pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="hexarelin" data-categories="muscle-recovery" data-peptide-subtitle="A synthetic hexapeptide GH secretagogue with cardiac research interest." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Hexarelin</h3>
+                      <p class="peptide-tagline">A synthetic hexapeptide GH secretagogue with cardiac research interest.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/hexarelin" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#growth-hormone">Shop This Peptide</a>
+                    </div>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Composition</span>
-                    <p>Sequence and molecular data pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="hgh-fragment-176-191" data-categories="weight-management,muscle-recovery" data-peptide-subtitle="A fragment of human growth hormone studied in fat metabolism." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>HGH Fragment 176-191</h3>
+                      <p class="peptide-tagline">A fragment of human growth hormone studied in fat metabolism.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/hgh-fragment-176-191" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#growth-hormone">Shop This Peptide</a>
+                    </div>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Format</span>
-                    <p>Format and batch references pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="aod-9604" data-categories="weight-management" data-peptide-subtitle="A modified HGH fragment studied in lipolysis research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>AOD-9604</h3>
+                      <p class="peptide-tagline">A modified HGH fragment studied in lipolysis research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/aod-9604" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#metabolic">Shop This Peptide</a>
+                    </div>
                   </div>
-                  <div class="library-detail-block">
-                    <span class="meta">Documentation</span>
-                    <p>COA and analytical reports pending.</p>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="igf-1-lr3" data-categories="muscle-recovery" data-peptide-subtitle="A long-acting IGF-1 variant with extended half-life." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>IGF-1 LR3</h3>
+                      <p class="peptide-tagline">A long-acting IGF-1 variant with extended half-life.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/igf-1-lr3" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#growth-hormone">Shop This Peptide</a>
+                    </div>
                   </div>
-                </div>
-                <div class="library-detail-section">
-                  <span class="label">Research Notes</span>
-                  <ul class="library-detail-list">
-                    <li>Research summary will use public literature sources.</li>
-                    <li>No medical or outcome claims will be added.</li>
-                  </ul>
-                </div>
-                <div class="library-detail-section">
-                  <span class="label">Storage and Handling</span>
-                  <ul class="library-detail-list">
-                    <li>Storage and handling guidance pending.</li>
-                  </ul>
-                </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="somatropin" data-categories="muscle-recovery" data-peptide-subtitle="Recombinant human growth hormone (191 amino acids)." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Somatropin</h3>
+                      <p class="peptide-tagline">Recombinant human growth hormone (191 amino acids).</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/somatropin" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#growth-hormone">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="semax" data-categories="cognitive" data-peptide-subtitle="A 7-amino acid neuropeptide derived from ACTH." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Semax</h3>
+                      <p class="peptide-tagline">A 7-amino acid neuropeptide derived from ACTH.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/semax" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#nootropic">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="selank" data-categories="cognitive,sleep-relaxation" data-peptide-subtitle="A synthetic peptide derived from tuftsin with anxiolytic research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Selank</h3>
+                      <p class="peptide-tagline">A synthetic peptide derived from tuftsin with anxiolytic research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/selank" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#nootropic">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="dihexa" data-categories="cognitive" data-peptide-subtitle="A hexapeptide studied in cognitive and synaptic plasticity research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Dihexa</h3>
+                      <p class="peptide-tagline">A hexapeptide studied in cognitive and synaptic plasticity research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/dihexa" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#nootropic">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="pinealon" data-categories="cognitive" data-peptide-subtitle="A tripeptide studied in neuroprotection research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Pinealon</h3>
+                      <p class="peptide-tagline">A tripeptide studied in neuroprotection research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/pinealon" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#nootropic">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="pt-141" data-categories="sexual-health" data-peptide-subtitle="A melanocortin receptor agonist (also known as Bremelanotide)." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>PT-141</h3>
+                      <p class="peptide-tagline">A melanocortin receptor agonist (also known as Bremelanotide).</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/pt-141" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#reproductive">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="dsip" data-categories="sleep-relaxation" data-peptide-subtitle="Delta sleep-inducing peptide, a 9-amino acid neuropeptide." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>DSIP</h3>
+                      <p class="peptide-tagline">Delta sleep-inducing peptide, a 9-amino acid neuropeptide.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/dsip" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#sleep">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="dermorphin" data-categories="sleep-relaxation" data-peptide-subtitle="An amphibian-derived opioid peptide studied in pain research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Dermorphin</h3>
+                      <p class="peptide-tagline">An amphibian-derived opioid peptide studied in pain research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/dermorphin" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#neuropeptide">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="vip" data-categories="cognitive,immune-support" data-peptide-subtitle="Vasoactive intestinal peptide, a 28-amino acid regulatory peptide." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>VIP</h3>
+                      <p class="peptide-tagline">Vasoactive intestinal peptide, a 28-amino acid regulatory peptide.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/vip" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#neuropeptide">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="oxytocin" data-categories="sexual-health,sleep-relaxation" data-peptide-subtitle="A 9-amino acid cyclic peptide hormone involved in social bonding." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Oxytocin</h3>
+                      <p class="peptide-tagline">A 9-amino acid cyclic peptide hormone involved in social bonding.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/oxytocin" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#hormone">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="mots-c" data-categories="weight-management,anti-aging" data-peptide-subtitle="A mitochondrial-derived peptide studied in metabolic regulation." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>MOTS-c</h3>
+                      <p class="peptide-tagline">A mitochondrial-derived peptide studied in metabolic regulation.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/mots-c" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#mitochondrial">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="ss-31" data-categories="anti-aging" data-peptide-subtitle="A tetrapeptide that targets mitochondrial cardiolipin." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>SS-31</h3>
+                      <p class="peptide-tagline">A tetrapeptide that targets mitochondrial cardiolipin.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/ss-31" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#mitochondrial">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="epithalon" data-categories="anti-aging" data-peptide-subtitle="A tetrapeptide studied in telomerase activation research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Epithalon</h3>
+                      <p class="peptide-tagline">A tetrapeptide studied in telomerase activation research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/epithalon" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#longevity">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="slu-pp-332" data-categories="weight-management,anti-aging" data-peptide-subtitle="An ERR agonist compound studied in energy metabolism." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>SLU-PP-332</h3>
+                      <p class="peptide-tagline">An ERR agonist compound studied in energy metabolism.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/slu-pp-332" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#mitochondrial">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="5-amino-1mq" data-categories="weight-management" data-peptide-subtitle="An NNMT inhibitor studied in NAD+ and fat metabolism research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>5-Amino-1MQ</h3>
+                      <p class="peptide-tagline">An NNMT inhibitor studied in NAD+ and fat metabolism research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/5-amino-1mq" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#metabolic">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="thymosin-alpha-1" data-categories="immune-support" data-peptide-subtitle="A 28-amino acid thymic peptide with immune modulating properties." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Thymosin Alpha-1</h3>
+                      <p class="peptide-tagline">A 28-amino acid thymic peptide with immune modulating properties.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/thymosin-alpha-1" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#immune">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="thymalin" data-categories="anti-aging,immune-support" data-peptide-subtitle="A thymic peptide studied in immune system research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Thymalin</h3>
+                      <p class="peptide-tagline">A thymic peptide studied in immune system research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/thymalin" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#immune">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="kpv" data-categories="skin-beauty,immune-support" data-peptide-subtitle="A tripeptide fragment of alpha-MSH with anti-inflammatory research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>KPV</h3>
+                      <p class="peptide-tagline">A tripeptide fragment of alpha-MSH with anti-inflammatory research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/kpv" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#anti-inflammatory">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="melanotan-1" data-categories="skin-beauty" data-peptide-subtitle="An alpha-MSH analog studied in pigmentation research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Melanotan-1</h3>
+                      <p class="peptide-tagline">An alpha-MSH analog studied in pigmentation research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/melanotan-1" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#tanning">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="melanotan-2" data-categories="skin-beauty" data-peptide-subtitle="A cyclic alpha-MSH analog with melanocortin receptor activity." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Melanotan-2</h3>
+                      <p class="peptide-tagline">A cyclic alpha-MSH analog with melanocortin receptor activity.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/melanotan-2" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#tanning">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="ara-290" data-categories="muscle-recovery,cognitive" data-peptide-subtitle="An EPO-derived peptide studied in neuroprotection research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>ARA-290</h3>
+                      <p class="peptide-tagline">An EPO-derived peptide studied in neuroprotection research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/ara-290" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#nootropic">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="kisspeptin-10" data-categories="sexual-health" data-peptide-subtitle="A decapeptide that activates GnRH neurons in reproductive research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Kisspeptin-10</h3>
+                      <p class="peptide-tagline">A decapeptide that activates GnRH neurons in reproductive research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/kisspeptin-10" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#reproductive">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="hcg" data-categories="sexual-health" data-peptide-subtitle="Human chorionic gonadotropin, a glycoprotein hormone." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>hCG</h3>
+                      <p class="peptide-tagline">Human chorionic gonadotropin, a glycoprotein hormone.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/hcg" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#reproductive">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="hmg" data-categories="sexual-health" data-peptide-subtitle="Human menopausal gonadotropin, containing FSH and LH activity." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>HMG</h3>
+                      <p class="peptide-tagline">Human menopausal gonadotropin, containing FSH and LH activity.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/hmg" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#reproductive">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="snap-8" data-categories="skin-beauty" data-peptide-subtitle="An octapeptide studied in neuromuscular junction research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>SNAP-8</h3>
+                      <p class="peptide-tagline">An octapeptide studied in neuromuscular junction research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/snap-8" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#cosmetic">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="cerebrolysin" data-categories="cognitive" data-peptide-subtitle="A peptide mixture derived from pig brain proteins." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Cerebrolysin</h3>
+                      <p class="peptide-tagline">A peptide mixture derived from pig brain proteins.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/cerebrolysin" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#nootropic">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="glutathione" data-categories="anti-aging,skin-beauty" data-peptide-subtitle="A tripeptide antioxidant found naturally in cells." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Glutathione</h3>
+                      <p class="peptide-tagline">A tripeptide antioxidant found naturally in cells.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/glutathione" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#longevity">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="nad" data-categories="anti-aging" data-peptide-subtitle="A coenzyme essential for cellular energy production." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>NAD+</h3>
+                      <p class="peptide-tagline">A coenzyme essential for cellular energy production.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/nad" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#mitochondrial">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="adipotide" data-categories="weight-management" data-peptide-subtitle="A peptide that targets blood vessels in fat tissue." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>Adipotide</h3>
+                      <p class="peptide-tagline">A peptide that targets blood vessels in fat tissue.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/adipotide" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#metabolic">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
+                <article class="peptide-card" data-peptide-card data-peptide-id="pnc-27" data-categories="anti-aging" data-peptide-subtitle="A p53-derived peptide studied in cancer cell research." data-peptide-mechanism="">
+                  <button class="peptide-toggle" type="button" data-peptide-toggle aria-expanded="false">
+                    <span class="peptide-category" data-peptide-category></span>
+                    <div class="peptide-title">
+                      <h3>PNC-27</h3>
+                      <p class="peptide-tagline">A p53-derived peptide studied in cancer cell research.</p>
+                    </div>
+                    <span class="peptide-chevron" aria-hidden="true"></span>
+                  </button>
+                  <div class="peptide-details" hidden>
+                    <p class="peptide-summary" data-peptide-summary></p>
+                    <ul class="peptide-bullets" data-peptide-bullets></ul>
+                    <div class="peptide-tags" data-peptide-tags></div>
+                    <div class="peptide-actions">
+                      <a class="btn btn-primary peptide-cta" href="https://peptalk.bio/peptides/pnc-27" target="_blank" rel="noopener">Learn More on PepTalk</a>
+                      <a class="btn btn-secondary peptide-cta peptide-shop" href="shop.html#research">Shop This Peptide</a>
+                    </div>
+                  </div>
+                </article>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+
+
 
       <section class="section">
         <div class="container">
           <div class="section-heading reveal">
-            <span class="label">PEPTIDE FAQ</span>
-            <h2>Research-focused questions and answers.</h2>
-            <p>
-              Clear, compliance-aware answers intended for research education,
-              not medical guidance.
-            </p>
+            <span class="label">FAQ</span>
+            <h2>Frequently Asked Questions</h2>
           </div>
           <div class="accordion">
             <div class="accordion-item">
@@ -419,30 +1140,6 @@
                   Research peptides are short chains of amino acids used in laboratory
                   and preclinical research. They are not approved drugs and are supplied
                   for research and educational use only.
-                </p>
-              </div>
-            </div>
-            <div class="accordion-item">
-              <button class="accordion-trigger" type="button">
-                HOW ARE RESEARCH PEPTIDES MANUFACTURED
-              </button>
-              <div class="accordion-panel">
-                <p>
-                  Most are produced using solid-phase peptide synthesis, then purified
-                  and tested with analytical methods such as HPLC and mass spectrometry.
-                  Methods vary by manufacturer and compound.
-                </p>
-              </div>
-            </div>
-            <div class="accordion-item">
-              <button class="accordion-trigger" type="button">
-                WHAT DOES 99 PERCENT PURITY MEAN
-              </button>
-              <div class="accordion-panel">
-                <p>
-                  Purity is typically reported as the percentage of the target compound
-                  measured by analytical testing. It describes lab measurements, not
-                  clinical outcomes.
                 </p>
               </div>
             </div>
@@ -460,18 +1157,6 @@
             </div>
             <div class="accordion-item">
               <button class="accordion-trigger" type="button">
-                HOW SHOULD RESEARCH PEPTIDES BE STORED
-              </button>
-              <div class="accordion-panel">
-                <p>
-                  Storage guidance varies by compound and should follow the lab
-                  documentation. Common guidance is cool, dry, and light-protected
-                  storage, but always reference the COA or dossier.
-                </p>
-              </div>
-            </div>
-            <div class="accordion-item">
-              <button class="accordion-trigger" type="button">
                 WHAT DOES FOR RESEARCH USE ONLY MEAN
               </button>
               <div class="accordion-panel">
@@ -483,25 +1168,13 @@
             </div>
             <div class="accordion-item">
               <button class="accordion-trigger" type="button">
-                ARE PEPTIDE STUDIES CONCLUSIVE IN HUMANS
+                HOW SHOULD RESEARCH PEPTIDES BE STORED
               </button>
               <div class="accordion-panel">
                 <p>
-                  Many peptides have limited or early-stage data in humans. Research
-                  findings should be interpreted carefully and within the context of
-                  peer-reviewed evidence.
-                </p>
-              </div>
-            </div>
-            <div class="accordion-item">
-              <button class="accordion-trigger" type="button">
-                HOW DO I READ HPLC OR MASS SPEC DATA
-              </button>
-              <div class="accordion-panel">
-                <p>
-                  Look for retention time, peak profile, and the reported purity
-                  percentage, then compare with the lab methodology. If needed,
-                  consult the testing laboratory for clarification.
+                  Storage guidance varies by compound and should follow the lab
+                  documentation. Common guidance is cool, dry, and light-protected
+                  storage, but always reference the COA or dossier.
                 </p>
               </div>
             </div>
@@ -522,13 +1195,46 @@
           <p>Research peptide supply with transparent batch standards.</p>
         </div>
         <div class="footer-links">
-          <a href="#" class="text-link">Support</a>
-          <a href="#" class="text-link">Standards</a>
-          <a href="#" class="text-link">Compliance</a>
-          <a href="#" class="text-link">Privacy</a>
+          <a href="about.html" class="text-link">About</a>
+          <a href="support.html" class="text-link">Support</a>
+          <a href="faq.html" class="text-link">FAQ</a>
+          <a href="shipping.html" class="text-link">Shipping</a>
+          <a href="returns.html" class="text-link">Returns</a>
+          <a href="tracking.html" class="text-link">Order Tracking</a>
+          <a href="terms.html" class="text-link">Terms</a>
+          <a href="privacy.html" class="text-link">Privacy</a>
+          <a href="cookies.html" class="text-link">Cookies</a>
+          <a href="accessibility.html" class="text-link">Accessibility</a>
+          <a href="testing-standards.html" class="text-link">Testing Standards</a>
+          <a href="storage-guidelines.html" class="text-link">Storage Guidelines</a>
+          <a href="coa-verification.html" class="text-link">COA Verification</a>
+          <a href="research-use.html" class="text-link">Research Use Only</a>
+          <a href="compliance.html" class="text-link">Compliance</a>
         </div>
       </div>
     </footer>
+
+    <!-- Cart Overlay -->
+    <div class="cart-overlay" id="cart-overlay"></div>
+
+    <!-- Cart Drawer -->
+    <aside class="cart-drawer" id="cart-drawer" aria-hidden="true">
+      <div class="cart-drawer-header">
+        <h2>Your Cart</h2>
+        <button type="button" class="cart-drawer-close" data-cart-close aria-label="Close cart">&times;</button>
+      </div>
+      <div class="cart-drawer-body">
+        <p id="cart-empty" class="cart-empty">Your cart is empty.</p>
+        <div id="cart-items"></div>
+      </div>
+      <div class="cart-drawer-footer">
+        <div class="cart-subtotal">
+          <span>Subtotal</span>
+          <span id="cart-subtotal">$0.00</span>
+        </div>
+        <a href="checkout.html" class="btn btn-primary cart-checkout-btn is-hidden" id="cart-checkout-btn">Proceed to Checkout</a>
+      </div>
+    </aside>
 
     <script src="scripts.js"></script>
   </body>

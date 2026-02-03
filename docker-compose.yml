@@ -3,67 +3,128 @@ version: '3.8'
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:15-alpine
-    container_name: sbb_postgres
+    image: postgres:16-alpine
+    container_name: sbb-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-sciencebasedbody}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sbb_dev_password}
-      POSTGRES_DB: ${POSTGRES_DB:-sbb_dev}
+      POSTGRES_USER: ${DB_USER:-sbb_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Database password required}
+      POSTGRES_DB: ${DB_NAME:-science_based_body}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sciencebasedbody}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-sbb_user} -d ${DB_NAME:-science_based_body}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - sbb-network
 
   # Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: sbb_redis
+    container_name: sbb-redis
     restart: unless-stopped
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?Redis password required}
     volumes:
       - redis_data:/data
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - sbb-network
 
-  # NestJS API (Production)
+  # NestJS API
   api:
     build:
       context: ./apps/api
       dockerfile: Dockerfile
-    container_name: sbb_api
+    container_name: sbb-api
     restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://${DB_USER:-sbb_user}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-science_based_body}?schema=public
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      JWT_SECRET: ${JWT_SECRET:?JWT secret required}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?Encryption key required}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://sciencebasedbody.com}
+      # Cloudflare R2
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME}
+      # Epicor Propello
+      EPICOR_API_KEY: ${EPICOR_API_KEY}
+      EPICOR_MERCHANT_ID: ${EPICOR_MERCHANT_ID}
+      EPICOR_ENVIRONMENT: ${EPICOR_ENVIRONMENT:-production}
+      # Shippo
+      SHIPPO_API_KEY: ${SHIPPO_API_KEY}
+      # Mailgun
+      MAILGUN_API_KEY: ${MAILGUN_API_KEY}
+      MAILGUN_DOMAIN: ${MAILGUN_DOMAIN}
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-    environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://${POSTGRES_USER:-sciencebasedbody}:${POSTGRES_PASSWORD:-sbb_dev_password}@postgres:5432/${POSTGRES_DB:-sbb_dev}?schema=public
-      REDIS_URL: redis://redis:6379
-    env_file:
-      - ./apps/api/.env
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - sbb-network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: sbb-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./apps/api:/app
-      - /app/node_modules
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - certbot_webroot:/var/www/certbot:ro
+      - certbot_certs:/etc/letsencrypt:ro
+    depends_on:
+      - api
+    networks:
+      - sbb-network
+
+  # Certbot for SSL certificates
+  certbot:
+    image: certbot/certbot
+    container_name: sbb-certbot
+    volumes:
+      - certbot_webroot:/var/www/certbot
+      - certbot_certs:/etc/letsencrypt
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - sbb-network
 
 volumes:
   postgres_data:
+    driver: local
   redis_data:
+    driver: local
+  certbot_webroot:
+    driver: local
+  certbot_certs:
+    driver: local
 
 networks:
-  default:
-    name: sbb_network
+  sbb-network:
+    driver: bridge

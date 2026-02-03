@@ -10,7 +10,7 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body class="page-home">
     <div class="bubble-field" aria-hidden="true">
       <span class="bubble bubble-1"></span>
       <span class="bubble bubble-2"></span>
@@ -34,6 +34,15 @@
           <a href="product.html" class="nav-link">Peptide Library</a>
           <a href="branded-for-science.html" class="nav-link">Branded for Science</a>
           <a href="brand-partnerships.html" class="nav-link">Brand Partners &amp; Affiliates</a>
+          <button type="button" class="cart-toggle" data-cart-toggle aria-label="Open cart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 6h15l-1.5 9h-12z"/>
+              <circle cx="9" cy="20" r="1"/>
+              <circle cx="18" cy="20" r="1"/>
+              <path d="M6 6L5 3H2"/>
+            </svg>
+            <span class="cart-badge is-hidden">0</span>
+          </button>
         </nav>
       </div>
     </header>
@@ -50,12 +59,11 @@
             <span class="label">SCIENCE BASED BODY</span>
             <h1>Research peptides with transparent batch standards.</h1>
             <p>
-              Curated formulations, consistent supply, and COA-first sourcing
-              for protocol-led routines.
+              Quality peptides with third-party testing and certificates of analysis.
             </p>
             <div class="hero-actions">
-              <a class="btn btn-primary" href="#featured">SHOP FORMULATIONS</a>
-              <a class="text-link" href="#programs">VIEW PROTOCOLS</a>
+              <a class="btn btn-primary" href="#featured">SHOP PEPTIDES</a>
+              <a class="text-link" href="#programs">LEARN MORE</a>
             </div>
           </div>
         </div>
@@ -71,40 +79,40 @@
       <section class="section" id="shop-by-goal">
         <div class="container">
           <div class="section-heading reveal">
-            <span class="label">SHOP BY GOAL</span>
-            <h2>Find the protocol focus that fits.</h2>
+            <span class="label">SHOP BY CATEGORY</span>
+            <h2>Browse peptides by research area.</h2>
           </div>
           <div class="goal-grid">
-            <article class="card goal-card reveal">
-              <span class="label">BALANCE</span>
-              <h3>Daily Balance</h3>
-              <p>Everyday protocol staples.</p>
-            </article>
-            <article class="card goal-card reveal">
+            <a class="card goal-card reveal goal-link" href="product.html#library">
+              <span class="label">METABOLIC</span>
+              <h3>Weight Management</h3>
+              <p>GLP-1 analogs and metabolic peptides.</p>
+            </a>
+            <a class="card goal-card reveal goal-link" href="product.html#library">
               <span class="label">SKIN</span>
-              <h3>Skin Protocols</h3>
-              <p>Aesthetics-forward routines.</p>
-            </article>
-            <article class="card goal-card reveal">
-              <span class="label">FOCUS</span>
-              <h3>Focus Protocols</h3>
-              <p>Clarity-led routines.</p>
-            </article>
-            <article class="card goal-card reveal">
-              <span class="label">RESET</span>
-              <h3>Evening Reset</h3>
-              <p>Nighttime protocol cadence.</p>
-            </article>
-            <article class="card goal-card reveal">
-              <span class="label">COMPOSITION</span>
-              <h3>Body Composition</h3>
-              <p>Structure-focused routines.</p>
-            </article>
-            <article class="card goal-card reveal">
-              <span class="label">CALM</span>
-              <h3>Calm Protocols</h3>
-              <p>Low-stimulus routines.</p>
-            </article>
+              <h3>Skin & Cosmetic</h3>
+              <p>Copper peptides and collagen support.</p>
+            </a>
+            <a class="card goal-card reveal goal-link" href="product.html#library">
+              <span class="label">COGNITIVE</span>
+              <h3>Cognitive Support</h3>
+              <p>Nootropic and neuroprotective peptides.</p>
+            </a>
+            <a class="card goal-card reveal goal-link" href="product.html#library">
+              <span class="label">RECOVERY</span>
+              <h3>Recovery & Repair</h3>
+              <p>Tissue repair and healing peptides.</p>
+            </a>
+            <a class="card goal-card reveal goal-link" href="product.html#library">
+              <span class="label">GROWTH</span>
+              <h3>Growth Hormone</h3>
+              <p>GHRH analogs and secretagogues.</p>
+            </a>
+            <a class="card goal-card reveal goal-link" href="product.html#library">
+              <span class="label">IMMUNE</span>
+              <h3>Immune Support</h3>
+              <p>Thymic peptides and antimicrobials.</p>
+            </a>
           </div>
         </div>
       </section>
@@ -112,44 +120,35 @@
       <section class="section" id="featured">
         <div class="container">
           <div class="section-heading reveal">
-            <span class="label">FEATURED FORMULATIONS</span>
-            <h2>Top formulations, protocol-ready.</h2>
+            <span class="label">FEATURED PEPTIDES</span>
+            <h2>Popular research peptides.</h2>
           </div>
           <div class="product-grid">
             <article class="card product-card reveal">
-              <div class="image-placeholder product">CLEAN STUDIO PRODUCT</div>
+              <img class="product-image" src="/images/products/vial.png" alt="Semaglutide vial" />
               <div class="product-body">
-                <span class="label">FORMULATION 01</span>
-                <h3>Calm Matrix</h3>
-                <p>Batch-tracked peptide for evening protocols.</p>
-                <span class="meta">SUBSCRIPTION AVAILABLE</span>
+                <span class="label">RESEARCH: METABOLIC</span>
+                <h3>Semaglutide</h3>
+                <p>GLP-1 receptor agonist. 5mg vial.</p>
+                <span class="meta">COA INCLUDED</span>
               </div>
             </article>
             <article class="card product-card reveal">
-              <div class="image-placeholder product">CLEAN STUDIO PRODUCT</div>
+              <img class="product-image" src="/images/products/vial.png" alt="BPC-157 vial" />
               <div class="product-body">
-                <span class="label">FORMULATION 02</span>
-                <h3>Clarity Bloom</h3>
-                <p>Batch-tracked peptide for focus protocols.</p>
-                <span class="meta">SUBSCRIPTION AVAILABLE</span>
+                <span class="label">RESEARCH: RECOVERY</span>
+                <h3>BPC-157</h3>
+                <p>Gastric pentadecapeptide. 5mg vial.</p>
+                <span class="meta">COA INCLUDED</span>
               </div>
             </article>
             <article class="card product-card reveal">
-              <div class="image-placeholder product">CLEAN STUDIO PRODUCT</div>
+              <img class="product-image" src="/images/products/vial.png" alt="GHK-Cu vial" />
               <div class="product-body">
-                <span class="label">FORMULATION 03</span>
-                <h3>Soft Strength</h3>
-                <p>Batch-tracked peptide for structure-led routines.</p>
-                <span class="meta">SUBSCRIPTION AVAILABLE</span>
-              </div>
-            </article>
-            <article class="card product-card reveal">
-              <div class="image-placeholder product">CLEAN STUDIO PRODUCT</div>
-              <div class="product-body">
-                <span class="label">FORMULATION 04</span>
-                <h3>Rested Glow</h3>
-                <p>Batch-tracked peptide for nighttime protocols.</p>
-                <span class="meta">SUBSCRIPTION AVAILABLE</span>
+                <span class="label">RESEARCH: SKIN</span>
+                <h3>GHK-Cu</h3>
+                <p>Copper tripeptide. 50mg vial.</p>
+                <span class="meta">COA INCLUDED</span>
               </div>
             </article>
           </div>
@@ -188,25 +187,25 @@
       <section class="section" id="programs">
         <div class="container">
           <div class="section-heading reveal">
-            <span class="label">PROGRAMS</span>
-            <h2>Protocol guides, clearly outlined.</h2>
+            <span class="label">RESOURCES</span>
+            <h2>Research guides and documentation.</h2>
           </div>
           <div class="program-grid">
-            <article class="card program-card reveal">
-              <div class="image-placeholder lifestyle">SOFT LIFESTYLE MOMENT</div>
-              <h3>Morning Protocol</h3>
-              <p>Suggested timing and pairing.</p>
-            </article>
-            <article class="card program-card reveal">
-              <div class="image-placeholder lifestyle">SOFT LIFESTYLE MOMENT</div>
-              <h3>Evening Protocol</h3>
-              <p>Suggested timing and pairing.</p>
-            </article>
-            <article class="card program-card reveal">
-              <div class="image-placeholder lifestyle">SOFT LIFESTYLE MOMENT</div>
-              <h3>Weekend Protocol</h3>
-              <p>Suggested timing and pairing.</p>
-            </article>
+            <a class="card program-card reveal" href="product.html">
+              <img class="program-image" src="/images/site/molecules.jpg" alt="Molecular structure" />
+              <h3>Peptide Library</h3>
+              <p>Browse our full catalog of research peptides.</p>
+            </a>
+            <a class="card program-card reveal" href="testing-standards.html">
+              <img class="program-image" src="/images/site/lab-flasks.png" alt="Laboratory testing" />
+              <h3>Testing Standards</h3>
+              <p>How we verify purity and quality.</p>
+            </a>
+            <a class="card program-card reveal" href="storage-guidelines.html">
+              <img class="program-image" src="/images/site/scientists.jpg" alt="Research scientists" />
+              <h3>Storage Guidelines</h3>
+              <p>Proper handling and storage information.</p>
+            </a>
           </div>
         </div>
       </section>
@@ -225,13 +224,46 @@
           <p>Research peptide supply with transparent batch standards.</p>
         </div>
         <div class="footer-links">
-          <a href="#" class="text-link">Support</a>
-          <a href="#" class="text-link">Standards</a>
-          <a href="#" class="text-link">Compliance</a>
-          <a href="#" class="text-link">Privacy</a>
+          <a href="about.html" class="text-link">About</a>
+          <a href="support.html" class="text-link">Support</a>
+          <a href="faq.html" class="text-link">FAQ</a>
+          <a href="shipping.html" class="text-link">Shipping</a>
+          <a href="returns.html" class="text-link">Returns</a>
+          <a href="tracking.html" class="text-link">Order Tracking</a>
+          <a href="terms.html" class="text-link">Terms</a>
+          <a href="privacy.html" class="text-link">Privacy</a>
+          <a href="cookies.html" class="text-link">Cookies</a>
+          <a href="accessibility.html" class="text-link">Accessibility</a>
+          <a href="testing-standards.html" class="text-link">Testing Standards</a>
+          <a href="storage-guidelines.html" class="text-link">Storage Guidelines</a>
+          <a href="coa-verification.html" class="text-link">COA Verification</a>
+          <a href="research-use.html" class="text-link">Research Use Only</a>
+          <a href="compliance.html" class="text-link">Compliance</a>
         </div>
       </div>
     </footer>
+
+    <!-- Cart Overlay -->
+    <div class="cart-overlay" id="cart-overlay"></div>
+
+    <!-- Cart Drawer -->
+    <aside class="cart-drawer" id="cart-drawer" aria-hidden="true">
+      <div class="cart-drawer-header">
+        <h2>Your Cart</h2>
+        <button type="button" class="cart-drawer-close" data-cart-close aria-label="Close cart">&times;</button>
+      </div>
+      <div class="cart-drawer-body">
+        <p id="cart-empty" class="cart-empty">Your cart is empty.</p>
+        <div id="cart-items"></div>
+      </div>
+      <div class="cart-drawer-footer">
+        <div class="cart-subtotal">
+          <span>Subtotal</span>
+          <span id="cart-subtotal">$0.00</span>
+        </div>
+        <a href="checkout.html" class="btn btn-primary cart-checkout-btn is-hidden" id="cart-checkout-btn">Proceed to Checkout</a>
+      </div>
+    </aside>
 
     <script src="scripts.js"></script>
   </body>

@@ -1,40 +1,67 @@
 #!/bin/bash
 
 # =============================================================================
-# SCIENCE BASED BODY - HETZNER DEPLOYMENT SCRIPT
+# SCIENCE BASED BODY - HETZNER DEPLOYMENT SCRIPT (Docker)
 # =============================================================================
-# Usage: ./scripts/deploy-to-hetzner.sh
+# Usage: ./scripts/deploy-to-hetzner.sh [--build] [--migrate]
 # =============================================================================
 
 set -e
 
 # Configuration
-HETZNER_IP="${HETZNER_SERVER_IP:-your_hetzner_ip}"
-SSH_USER="${HETZNER_SSH_USER:-root}"
+HETZNER_IP="${HETZNER_SERVER_IP:-YOUR_SERVER_IP}"
+SSH_USER="${HETZNER_SSH_USER:-sbb}"
 SSH_KEY="${HETZNER_SSH_KEY_PATH:-~/.ssh/hetzner_sbb}"
-REMOTE_DIR="/root/science-based-body"
-DOMAIN="sciencebasedbody.com"
+REMOTE_DIR="/opt/science-based-body"
+DOMAIN="api.sciencebasedbody.com"
+
+# Parse arguments
+BUILD_FLAG=""
+MIGRATE_FLAG=""
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --build) BUILD_FLAG="--build" ;;
+        --migrate) MIGRATE_FLAG="true" ;;
+        *) echo "Unknown parameter: $1"; exit 1 ;;
+    esac
+    shift
+done
 
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+BLUE='\033[0;34m'
+NC='\033[0m'
 
-echo -e "${GREEN}========================================${NC}"
-echo -e "${GREEN}Science Based Body - Hetzner Deployment${NC}"
-echo -e "${GREEN}========================================${NC}"
+echo_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
+echo_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+echo_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+echo_step() { echo -e "\n${BLUE}▸ $1${NC}"; }
+
+echo ""
+echo -e "${GREEN}════════════════════════════════════════════════════${NC}"
+echo -e "${GREEN}  Science Based Body - Production Deployment${NC}"
+echo -e "${GREEN}════════════════════════════════════════════════════${NC}"
+echo ""
+echo -e "Server:  ${YELLOW}$SSH_USER@$HETZNER_IP${NC}"
+echo -e "Path:    ${YELLOW}$REMOTE_DIR${NC}"
+echo -e "Domain:  ${YELLOW}$DOMAIN${NC}"
+echo ""
 
 # Check if SSH key exists
-if [ ! -f "$SSH_KEY" ]; then
-    echo -e "${RED}Error: SSH key not found at $SSH_KEY${NC}"
-    echo "Please set HETZNER_SSH_KEY_PATH environment variable"
+if [ ! -f "$SSH_KEY" ] && [ ! -f "${SSH_KEY/#\~/$HOME}" ]; then
+    echo_error "SSH key not found at $SSH_KEY"
+    echo "Set HETZNER_SSH_KEY_PATH environment variable"
     exit 1
 fi
 
+# Expand tilde in SSH_KEY path
+SSH_KEY="${SSH_KEY/#\~/$HOME}"
+
 # Function to run remote commands
 run_remote() {
-    ssh -i "$SSH_KEY" "$SSH_USER@$HETZNER_IP" "$1"
+    ssh -i "$SSH_KEY" -o StrictHostKeyChecking=accept-new "$SSH_USER@$HETZNER_IP" "$1"
 }
 
 # Function to copy files
@@ -42,43 +69,109 @@ copy_to_remote() {
     scp -i "$SSH_KEY" -r "$1" "$SSH_USER@$HETZNER_IP:$2"
 }
 
-echo -e "\n${YELLOW}Step 1: Testing SSH connection...${NC}"
-run_remote "echo 'SSH connection successful'"
+# =============================================================================
+# Pre-flight checks
+# =============================================================================
+echo_step "Running pre-flight checks..."
 
-echo -e "\n${YELLOW}Step 2: Creating remote directory structure...${NC}"
-run_remote "mkdir -p $REMOTE_DIR"
+# Check SSH connection
+if ! run_remote "echo 'connected'" > /dev/null 2>&1; then
+    echo_error "Cannot connect to server. Check SSH configuration."
+    exit 1
+fi
+echo_info "SSH connection OK"
 
-echo -e "\n${YELLOW}Step 3: Syncing files to server...${NC}"
+# Check if .env exists locally (we don't sync it, but warn if missing on server)
+if [ ! -f ".env" ] && [ ! -f ".env.production" ]; then
+    echo_warn "No .env file found locally - ensure server has .env configured"
+fi
+
+# =============================================================================
+# Sync files
+# =============================================================================
+echo_step "Syncing files to server..."
+
 rsync -avz --progress \
     -e "ssh -i $SSH_KEY" \
     --exclude 'node_modules' \
     --exclude '.git' \
     --exclude '.env' \
     --exclude '.env.local' \
+    --exclude '.env.production' \
     --exclude 'dist' \
     --exclude '.next' \
+    --exclude '*.log' \
+    --exclude 'backups/*' \
+    --exclude 'apps/web' \
+    --delete \
     ./ "$SSH_USER@$HETZNER_IP:$REMOTE_DIR/"
 
-echo -e "\n${YELLOW}Step 4: Installing dependencies...${NC}"
-run_remote "cd $REMOTE_DIR/apps/api && npm ci"
+echo_info "Files synced"
 
-echo -e "\n${YELLOW}Step 5: Running Prisma migrations...${NC}"
-run_remote "cd $REMOTE_DIR/apps/api && npx prisma generate && npx prisma db push"
+# =============================================================================
+# Run migrations (if requested)
+# =============================================================================
+if [ "$MIGRATE_FLAG" = "true" ]; then
+    echo_step "Running database migrations..."
+    run_remote "cd $REMOTE_DIR && docker compose exec -T api npx prisma migrate deploy"
+    echo_info "Migrations complete"
+fi
 
-echo -e "\n${YELLOW}Step 6: Building application...${NC}"
-run_remote "cd $REMOTE_DIR/apps/api && npm run build"
+# =============================================================================
+# Build and deploy
+# =============================================================================
+echo_step "Deploying with Docker Compose..."
 
-echo -e "\n${YELLOW}Step 7: Restarting PM2 processes...${NC}"
-run_remote "pm2 delete sbb-api 2>/dev/null || true"
-run_remote "cd $REMOTE_DIR/apps/api && pm2 start dist/main.js --name sbb-api"
-run_remote "pm2 save"
+if [ -n "$BUILD_FLAG" ]; then
+    echo_info "Building containers (this may take a few minutes)..."
+    run_remote "cd $REMOTE_DIR && docker compose build --no-cache api"
+fi
 
-echo -e "\n${YELLOW}Step 8: Checking application health...${NC}"
-sleep 5
-run_remote "curl -s http://localhost:3001/api/v1/health || echo 'Health check endpoint not available'"
+# Pull latest images and restart
+run_remote "cd $REMOTE_DIR && docker compose pull postgres redis nginx"
+run_remote "cd $REMOTE_DIR && docker compose up -d $BUILD_FLAG"
 
-echo -e "\n${GREEN}========================================${NC}"
-echo -e "${GREEN}Deployment Complete!${NC}"
-echo -e "${GREEN}========================================${NC}"
-echo -e "API: https://$DOMAIN/api/v1"
-echo -e "Swagger: https://$DOMAIN/api/docs"
+echo_info "Containers started"
+
+# =============================================================================
+# Health check
+# =============================================================================
+echo_step "Running health checks..."
+
+# Wait for API to start
+echo_info "Waiting for API to be ready..."
+sleep 10
+
+# Check container status
+echo ""
+run_remote "cd $REMOTE_DIR && docker compose ps"
+echo ""
+
+# Test health endpoint
+HEALTH_STATUS=$(run_remote "curl -s -o /dev/null -w '%{http_code}' http://localhost:3001/api/v1/health" || echo "000")
+
+if [ "$HEALTH_STATUS" = "200" ]; then
+    echo_info "Health check passed (HTTP $HEALTH_STATUS)"
+else
+    echo_warn "Health check returned HTTP $HEALTH_STATUS"
+    echo_warn "Check logs: docker compose logs api"
+fi
+
+# =============================================================================
+# Summary
+# =============================================================================
+echo ""
+echo -e "${GREEN}════════════════════════════════════════════════════${NC}"
+echo -e "${GREEN}  Deployment Complete!${NC}"
+echo -e "${GREEN}════════════════════════════════════════════════════${NC}"
+echo ""
+echo "API Endpoints:"
+echo "  Internal:  http://localhost:3001/api/v1"
+echo "  Public:    https://$DOMAIN/api/v1"
+echo ""
+echo "Useful commands (run on server):"
+echo "  View logs:     docker compose logs -f api"
+echo "  Restart:       docker compose restart api"
+echo "  Shell:         docker compose exec api sh"
+echo "  DB console:    docker compose exec postgres psql -U sbb_user science_based_body"
+echo ""
