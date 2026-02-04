@@ -26,6 +26,7 @@ import { LoyaltyModule } from './modules/loyalty/loyalty.module';
 import { ContentModule } from './modules/content/content.module';
 import { SupportModule } from './modules/support/support.module';
 import { SeoModule } from './modules/seo/seo.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { SeoModule } from './modules/seo/seo.module';
     ContentModule,
     SupportModule,
     SeoModule,
+    HealthModule,
   ],
   providers: [
     // Global rate limiting guard

@@ -18,6 +18,10 @@ import { LoyaltyService } from './loyalty.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Public } from '../auth/decorators/public.decorator';
 
+interface AuthenticatedRequest {
+  user: { id: string; email: string; role: string };
+}
+
 class RedeemPointsDto {
   points: number;
 }
@@ -44,7 +48,7 @@ export class LoyaltyController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current points balance and tier' })
   @ApiResponse({ status: 200, description: 'Balance and tier info' })
-  getBalance(@Request() req) {
+  getBalance(@Request() req: AuthenticatedRequest) {
     return this.loyaltyService.getBalance(req.user.id);
   }
 
@@ -56,7 +60,7 @@ export class LoyaltyController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'Transaction history' })
   getHistory(
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ) {
@@ -72,7 +76,7 @@ export class LoyaltyController {
   @ApiOperation({ summary: 'Calculate max redeemable points for an order' })
   @ApiResponse({ status: 200, description: 'Redemption calculation' })
   async calculateRedemption(
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
     @Body() dto: CalculateRedemptionDto,
   ) {
     const balance = await this.loyaltyService.getBalance(req.user.id);
@@ -88,7 +92,7 @@ export class LoyaltyController {
   @ApiOperation({ summary: 'Redeem points (typically called during checkout)' })
   @ApiResponse({ status: 200, description: 'Redemption result' })
   @ApiResponse({ status: 400, description: 'Invalid redemption request' })
-  async redeemPoints(@Request() req, @Body() dto: RedeemPointsDto) {
+  async redeemPoints(@Request() req: AuthenticatedRequest, @Body() dto: RedeemPointsDto) {
     return this.loyaltyService.redeemPoints(req.user.id, dto.points);
   }
 }

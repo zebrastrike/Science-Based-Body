@@ -13,7 +13,25 @@
       "Bash(Remove-Item \"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\input.pdf\" -Force -ErrorAction SilentlyContinue)",
       "Bash(Remove-Item \"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\nul\" -Force -ErrorAction SilentlyContinue)",
       "Bash(dir /b \"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\")",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(dir:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run test:e2e:*)",
+      "Bash(curl:*)",
+      "Bash(npx prisma db seed:*)",
+      "Bash(npm run seed:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npm run start:dev:*)",
+      "Bash(npm run build:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd /c \"taskkill /PID 56952 /F\")",
+      "Bash(powershell -Command \"Stop-Process -Id 56952 -Force\")",
+      "Bash(powershell -Command:*)",
+      "Bash(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 root@116.203.138.88 \"echo ''Connected successfully!'' && uname -a\")",
+      "Bash(ssh -v -o BatchMode=yes -o ConnectTimeout=15 root@116.203.138.88 \"echo connected\")"
     ]
   }
 }

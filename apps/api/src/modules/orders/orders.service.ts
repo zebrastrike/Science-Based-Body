@@ -31,7 +31,16 @@ export class OrdersService {
 
     // Calculate totals
     let subtotal = 0;
-    const orderItems = [];
+    const orderItems: Array<{
+      productId: string;
+      variantId?: string;
+      productName: string;
+      variantName: string | null;
+      sku: string;
+      quantity: number;
+      unitPrice: number;
+      totalPrice: number;
+    }> = [];
 
     for (const item of data.items) {
       const product = await this.prisma.product.findUnique({
@@ -210,6 +219,7 @@ export class OrdersService {
         carrier: shipmentData.carrier,
         trackingNumber: shipmentData.trackingNumber,
         trackingUrl: shipmentData.trackingUrl || this.generateTrackingUrl(shipmentData.carrier, shipmentData.trackingNumber),
+        shippingCost: order.shippingCost,
         shippedAt: new Date(),
       },
     });

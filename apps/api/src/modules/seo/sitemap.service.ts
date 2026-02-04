@@ -69,7 +69,7 @@ ${sitemaps
    * Static pages sitemap
    */
   private getStaticPages(): SitemapUrl[] {
-    return [
+    const pages: Array<{ loc: string; changefreq: SitemapUrl['changefreq']; priority: number }> = [
       { loc: '/', changefreq: 'daily', priority: 1.0 },
       { loc: '/shop', changefreq: 'daily', priority: 0.9 },
       { loc: '/about', changefreq: 'monthly', priority: 0.7 },
@@ -83,7 +83,8 @@ ${sitemaps
       { loc: '/privacy', changefreq: 'yearly', priority: 0.3 },
       { loc: '/shipping', changefreq: 'yearly', priority: 0.4 },
       { loc: '/refund', changefreq: 'yearly', priority: 0.3 },
-    ].map((page) => ({
+    ];
+    return pages.map((page) => ({
       ...page,
       loc: `${this.siteUrl}${page.loc}`,
       lastmod: new Date().toISOString().split('T')[0],
@@ -121,20 +122,22 @@ ${sitemaps
   }
 
   /**
-   * Category pages sitemap
+   * Category pages sitemap (using ProductCategory enum)
    */
   private async getCategoryUrls(): Promise<SitemapUrl[]> {
-    const categories = await this.prisma.category.findMany({
-      where: { isActive: true },
-      select: {
-        slug: true,
-        updatedAt: true,
-      },
-    });
+    // Categories are enum values, not database records
+    const categoryMappings: Array<{ slug: string; name: string }> = [
+      { slug: 'research-peptides', name: 'RESEARCH_PEPTIDES' },
+      { slug: 'analytical-reference-materials', name: 'ANALYTICAL_REFERENCE_MATERIALS' },
+      { slug: 'laboratory-adjuncts', name: 'LABORATORY_ADJUNCTS' },
+      { slug: 'research-combinations', name: 'RESEARCH_COMBINATIONS' },
+      { slug: 'materials-supplies', name: 'MATERIALS_SUPPLIES' },
+      { slug: 'merchandise', name: 'MERCHANDISE' },
+    ];
 
-    return categories.map((category) => ({
+    return categoryMappings.map((category) => ({
       loc: `${this.siteUrl}/shop/${category.slug}`,
-      lastmod: category.updatedAt.toISOString().split('T')[0],
+      lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly' as const,
       priority: 0.7,
     }));

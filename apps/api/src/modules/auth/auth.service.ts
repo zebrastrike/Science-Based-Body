@@ -74,7 +74,7 @@ export class AuthService {
 
     // Send welcome email (non-blocking)
     this.mailgunService
-      .sendWelcomeEmail(user.email, user.firstName)
+      .sendWelcomeEmail(user.email, user.firstName || 'Researcher')
       .catch((err) => this.logger.error(`Failed to send welcome email: ${err.message}`));
 
     return {

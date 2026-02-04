@@ -23,7 +23,7 @@ interface CreatePaymentLinkDto {
   sendEmail?: boolean;
 }
 
-interface PaymentLinkResponse {
+export interface PaymentLinkResponse {
   id: string;
   token: string;
   customerEmail: string;
@@ -133,9 +133,9 @@ export class PaymentLinksService {
     // Audit log
     await this.audit.log({
       action: 'PAYMENT_LINK_CREATED',
-      entityType: 'PaymentLink',
-      entityId: paymentLink.id,
-      userId: adminUserId,
+      resourceType: 'PaymentLink',
+      resourceId: paymentLink.id,
+      adminId: adminUserId,
       metadata: {
         customerEmail,
         amount,
@@ -150,13 +150,13 @@ export class PaymentLinksService {
       id: paymentLink.id,
       token: paymentLink.token,
       customerEmail: paymentLink.customerEmail,
-      customerName: paymentLink.customerName,
-      amount: paymentLink.amount,
+      customerName: paymentLink.customerName ?? undefined,
+      amount: Number(paymentLink.amount),
       status: paymentLink.status as PaymentLinkStatus,
       paymentMethods: paymentLink.paymentMethods as string[],
       expiresAt: paymentLink.expiresAt,
       createdAt: paymentLink.createdAt,
-      order: paymentLink.order,
+      order: paymentLink.order ?? undefined,
       url: paymentUrl,
     };
   }
@@ -200,15 +200,13 @@ export class PaymentLinksService {
         id: link.id,
         token: link.token,
         customerEmail: link.customerEmail,
-        customerName: link.customerName,
-        amount: link.amount,
+        customerName: link.customerName ?? undefined,
+        amount: Number(link.amount),
         status: link.status as PaymentLinkStatus,
         paymentMethods: link.paymentMethods as string[],
         expiresAt: link.expiresAt,
         createdAt: link.createdAt,
-        paidAt: link.paidAt,
-        paymentMethod: link.paymentMethod,
-        order: link.order,
+        order: link.order ?? undefined,
       })),
       total,
     };
@@ -257,15 +255,15 @@ export class PaymentLinksService {
       id: link.id,
       token: link.token,
       customerEmail: link.customerEmail,
-      customerName: link.customerName,
-      amount: link.amount,
+      customerName: link.customerName ?? undefined,
+      amount: Number(link.amount),
       status: link.status as PaymentLinkStatus,
       paymentMethods: link.paymentMethods as string[],
       expiresAt: link.expiresAt,
       createdAt: link.createdAt,
-      order: link.order,
+      order: link.order ?? undefined,
       url: `${this.baseUrl}/pay/${link.token}`,
-      notes: link.notes,
+      notes: link.notes ?? undefined,
     };
   }
 
@@ -298,22 +296,22 @@ export class PaymentLinksService {
     const paymentUrl = `${this.baseUrl}/pay/${link.token}`;
 
     await this.resend.sendPaymentLinkEmail({
-      customerName: link.customerName,
+      customerName: link.customerName ?? undefined,
       customerEmail: link.customerEmail,
-      amount: link.amount,
+      amount: Number(link.amount),
       paymentUrl,
       orderNumber: link.order?.orderNumber,
       expiresAt: link.expiresAt,
       paymentMethods: link.paymentMethods as string[],
-      notes: link.notes,
+      notes: link.notes ?? undefined,
     });
 
     // Audit log
     await this.audit.log({
       action: 'PAYMENT_LINK_RESENT',
-      entityType: 'PaymentLink',
-      entityId: link.id,
-      userId: adminUserId,
+      resourceType: 'PaymentLink',
+      resourceId: link.id,
+      adminId: adminUserId,
       metadata: { customerEmail: link.customerEmail },
     });
 
@@ -347,9 +345,9 @@ export class PaymentLinksService {
     // Audit log
     await this.audit.log({
       action: 'PAYMENT_LINK_CANCELLED',
-      entityType: 'PaymentLink',
-      entityId: link.id,
-      userId: adminUserId,
+      resourceType: 'PaymentLink',
+      resourceId: link.id,
+      adminId: adminUserId,
     });
 
     this.logger.log(`Payment link cancelled: ${link.token}`);
@@ -409,7 +407,7 @@ export class PaymentLinksService {
     await this.resend.sendPaymentConfirmationEmail(
       link.customerEmail,
       link.customerName || 'Customer',
-      link.amount,
+      Number(link.amount),
       link.order?.orderNumber,
       paymentMethod,
     );
@@ -417,9 +415,9 @@ export class PaymentLinksService {
     // Audit log
     await this.audit.log({
       action: 'PAYMENT_LINK_MARKED_PAID',
-      entityType: 'PaymentLink',
-      entityId: link.id,
-      userId: adminUserId,
+      resourceType: 'PaymentLink',
+      resourceId: link.id,
+      adminId: adminUserId,
       metadata: { paymentMethod, orderId: link.orderId },
     });
 

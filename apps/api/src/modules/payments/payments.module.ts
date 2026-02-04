@@ -9,9 +9,11 @@ import {
   PublicPaymentLinksController,
 } from './payment-links.controller';
 import { FilesModule } from '../files/files.module';
+import { AuditModule } from '../../audit/audit.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
-  imports: [ConfigModule, FilesModule],
+  imports: [ConfigModule, FilesModule, AuditModule, NotificationsModule],
   controllers: [PaymentsController, AdminPaymentLinksController, PublicPaymentLinksController],
   providers: [PaymentsService, EpicorPropelloService, PaymentLinksService],
   exports: [PaymentsService, EpicorPropelloService, PaymentLinksService],

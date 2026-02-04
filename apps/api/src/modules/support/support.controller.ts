@@ -91,9 +91,13 @@ export class SupportController {
     const faqs = this.supportService.getStaticFAQs();
 
     if (category) {
-      const filteredFaqs: any = { categories: [category], faqs: {} };
-      if (faqs.faqs[category]) {
-        filteredFaqs.faqs[category] = faqs.faqs[category];
+      const faqsRecord = faqs.faqs as Record<string, Array<{ question: string; answer: string }>>;
+      const filteredFaqs: { categories: string[]; faqs: Record<string, Array<{ question: string; answer: string }>> } = {
+        categories: [category],
+        faqs: {}
+      };
+      if (faqsRecord[category]) {
+        filteredFaqs.faqs[category] = faqsRecord[category];
       }
       return filteredFaqs;
     }

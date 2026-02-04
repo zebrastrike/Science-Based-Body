@@ -22,6 +22,10 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Public } from '../auth/decorators/public.decorator';
 
+interface AuthenticatedRequest {
+  user: { id: string; email: string; role: string };
+}
+
 // ===========================================================================
 // ADMIN ENDPOINTS
 // ===========================================================================
@@ -38,7 +42,7 @@ export class AdminPaymentLinksController {
   @ApiOperation({ summary: 'Create a new payment link' })
   @ApiResponse({ status: 201, description: 'Payment link created' })
   createPaymentLink(
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
     @Body()
     body: {
       orderId?: string;
@@ -76,7 +80,7 @@ export class AdminPaymentLinksController {
   @ApiOperation({ summary: 'Resend payment link email' })
   @ApiParam({ name: 'id', description: 'Payment link ID' })
   @ApiResponse({ status: 200, description: 'Email resent' })
-  resendPaymentLink(@Request() req, @Param('id') id: string) {
+  resendPaymentLink(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
     return this.paymentLinksService.resendPaymentLink(id, req.user.id);
   }
 
@@ -84,7 +88,7 @@ export class AdminPaymentLinksController {
   @ApiOperation({ summary: 'Cancel payment link' })
   @ApiParam({ name: 'id', description: 'Payment link ID' })
   @ApiResponse({ status: 200, description: 'Payment link cancelled' })
-  cancelPaymentLink(@Request() req, @Param('id') id: string) {
+  cancelPaymentLink(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
     return this.paymentLinksService.cancelPaymentLink(id, req.user.id);
   }
 
@@ -93,7 +97,7 @@ export class AdminPaymentLinksController {
   @ApiParam({ name: 'id', description: 'Payment link ID' })
   @ApiResponse({ status: 200, description: 'Payment marked as paid' })
   markAsPaid(
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() body: { paymentMethod: string; proofUrl?: string },
   ) {

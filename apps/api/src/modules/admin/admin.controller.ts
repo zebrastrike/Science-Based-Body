@@ -24,6 +24,10 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { OrderStatus, UserStatus, ProductCategory } from '@prisma/client';
 
+interface AuthenticatedRequest {
+  user: { id: string; email: string; role: string };
+}
+
 @ApiTags('admin')
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -97,7 +101,7 @@ export class AdminController {
   @ApiResponse({ status: 200, description: 'Status updated' })
   @ApiResponse({ status: 404, description: 'Order not found' })
   updateOrderStatus(
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() body: { status: OrderStatus; notes?: string },
   ) {
@@ -145,7 +149,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Create new product' })
   @ApiResponse({ status: 201, description: 'Product created' })
   createProduct(
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
     @Body()
     body: {
       sku: string;
@@ -172,7 +176,7 @@ export class AdminController {
   @ApiResponse({ status: 200, description: 'Product updated' })
   @ApiResponse({ status: 404, description: 'Product not found' })
   updateProduct(
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body()
     body: {
@@ -198,7 +202,7 @@ export class AdminController {
   @ApiParam({ name: 'id', description: 'Product ID' })
   @ApiResponse({ status: 200, description: 'Product deleted' })
   @ApiResponse({ status: 404, description: 'Product not found' })
-  deleteProduct(@Request() req, @Param('id') id: string) {
+  deleteProduct(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
     return this.adminService.deleteProduct(id, req.user.id);
   }
 
@@ -245,7 +249,7 @@ export class AdminController {
   @ApiResponse({ status: 200, description: 'Status updated' })
   @ApiResponse({ status: 404, description: 'User not found' })
   updateUserStatus(
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() body: { status: UserStatus; reason?: string },
   ) {
@@ -271,10 +275,10 @@ export class AdminController {
   @ApiResponse({ status: 200, description: 'Inventory updated' })
   @ApiResponse({ status: 404, description: 'Product not found' })
   updateInventory(
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
     @Param('productId') productId: string,
+    @Body() body: { quantity: number; notes?: string },
     @Query('variantId') variantId?: string,
-    @Body() body?: { quantity: number; notes?: string },
   ) {
     return this.adminService.updateInventory(
       productId,

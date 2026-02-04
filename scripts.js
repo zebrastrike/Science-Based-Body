@@ -2,6 +2,77 @@ document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("is-ready");
 
   // ============================================
+  // MOBILE NAVIGATION (HAMBURGER MENU)
+  // ============================================
+  const menuToggle = document.querySelector(".menu-toggle");
+  const siteNav = document.querySelector(".site-nav");
+
+  if (menuToggle && siteNav) {
+    // Create overlay element
+    let navOverlay = document.querySelector(".nav-overlay");
+    if (!navOverlay) {
+      navOverlay = document.createElement("div");
+      navOverlay.className = "nav-overlay";
+      document.body.appendChild(navOverlay);
+    }
+
+    const openMenu = () => {
+      menuToggle.setAttribute("aria-expanded", "true");
+      siteNav.classList.add("is-open");
+      navOverlay.classList.add("is-visible");
+      document.body.classList.add("menu-open");
+    };
+
+    const closeMenu = () => {
+      menuToggle.setAttribute("aria-expanded", "false");
+      siteNav.classList.remove("is-open");
+      navOverlay.classList.remove("is-visible");
+      document.body.classList.remove("menu-open");
+    };
+
+    const toggleMenu = () => {
+      const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
+      if (isOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    };
+
+    // Toggle menu on button click
+    menuToggle.addEventListener("click", toggleMenu);
+
+    // Close menu when clicking overlay
+    navOverlay.addEventListener("click", closeMenu);
+
+    // Close menu when clicking a nav link
+    siteNav.querySelectorAll(".nav-link").forEach((link) => {
+      link.addEventListener("click", () => {
+        // Small delay to allow navigation
+        setTimeout(closeMenu, 100);
+      });
+    });
+
+    // Close menu on Escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && siteNav.classList.contains("is-open")) {
+        closeMenu();
+      }
+    });
+
+    // Close menu on window resize (if larger than mobile breakpoint)
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (window.innerWidth > 768 && siteNav.classList.contains("is-open")) {
+          closeMenu();
+        }
+      }, 100);
+    });
+  }
+
+  // ============================================
   // SHOPPING CART MODULE
   // ============================================
   const Cart = {
@@ -211,7 +282,41 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
+      const ensureAddToCartButtons = () => {
+        document.querySelectorAll(".product-card").forEach((card) => {
+          if (card.querySelector(".btn-add-cart")) return;
+          const body = card.querySelector(".product-body") || card;
+          const name =
+            card.querySelector("h3")?.textContent?.trim() || "Product";
+          const priceText =
+            card.querySelector(".price")?.textContent || "";
+          const priceMatch = priceText.match(/[\d,.]+/);
+          const price = priceMatch
+            ? priceMatch[0].replace(/,/g, "")
+            : "0";
+          const img =
+            card.querySelector("img")?.getAttribute("src") ||
+            "/images/products/vial.png";
+          const slug = name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/(^-|-$)/g, "");
+
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "btn-add-cart";
+          button.dataset.addToCart = slug || "product";
+          button.dataset.productName = name;
+          button.dataset.productPrice = price;
+          button.dataset.productImage = img;
+          button.innerHTML =
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg> Add to Cart';
+          body.appendChild(button);
+        });
+      };
+
       // Add to cart buttons
+      ensureAddToCartButtons();
       document.querySelectorAll("[data-add-to-cart]").forEach((btn) => {
         btn.addEventListener("click", (e) => {
           e.preventDefault();

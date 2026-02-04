@@ -49,7 +49,7 @@ export class ForbiddenTermsService implements OnModuleInit {
   /**
    * Load forbidden terms from database
    */
-  async loadTerms() {
+  async loadTerms(): Promise<void> {
     const terms = await this.prisma.forbiddenTerm.findMany();
 
     // If no terms in DB, seed with defaults

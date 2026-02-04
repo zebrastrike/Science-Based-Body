@@ -249,6 +249,36 @@ export default function LegacyScripts() {
         on(itemsContainer, 'click', handler);
       }
 
+      const ensureAddToCartButtons = () => {
+        document.querySelectorAll('.product-card').forEach((card) => {
+          if (card.querySelector('.btn-add-cart')) return;
+          const body = card.querySelector('.product-body') || card;
+          const name = card.querySelector('h3')?.textContent?.trim() || 'Product';
+          const priceText = card.querySelector('.price')?.textContent || '';
+          const priceMatch = priceText.match(/[\d,.]+/);
+          const price = priceMatch ? priceMatch[0].replace(/,/g, '') : '0';
+          const img =
+            card.querySelector('img')?.getAttribute('src') || '/images/products/vial.png';
+          const slug = name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '');
+
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'btn-add-cart';
+          button.dataset.addToCart = slug || 'product';
+          button.dataset.productName = name;
+          button.dataset.productPrice = price;
+          button.dataset.productImage = img;
+          button.innerHTML =
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg> Add to Cart';
+          body.appendChild(button);
+        });
+      };
+
+      ensureAddToCartButtons();
+
       document.querySelectorAll('[data-add-to-cart]').forEach((btn) => {
         const handler = (event: Event) => {
           event.preventDefault();
