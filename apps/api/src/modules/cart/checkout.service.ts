@@ -373,7 +373,7 @@ export class CheckoutService {
       disclaimers: this.complianceService.getDisclaimers(),
       acceptedPaymentMethods: this.paymentsService.getAvailablePaymentMethods(),
       volumeDiscount: this.cartService.getVolumeDiscountInfo(),
-      freeShippingThreshold: 99,
+      freeShippingThreshold: 500,
       policies: {
         termsOfService: '/policies/terms',
         privacyPolicy: '/policies/privacy',

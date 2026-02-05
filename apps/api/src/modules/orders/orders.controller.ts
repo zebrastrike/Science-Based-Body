@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Param, Body, Query, Req } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { Controller, Get, Post, Delete, Param, Body, Query, Req } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 import { OrdersService } from './orders.service';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { ReturnReason } from '@prisma/client';
 
 @ApiTags('orders')
 @ApiBearerAuth()
@@ -36,5 +37,64 @@ export class OrdersController {
   @ApiOperation({ summary: 'Get order by ID' })
   findOne(@Param('id') id: string, @CurrentUser('id') userId: string) {
     return this.ordersService.findById(id, userId);
+  }
+
+  // ===========================================================================
+  // RETURNS ENDPOINTS
+  // ===========================================================================
+
+  @Post(':id/return')
+  @ApiOperation({ summary: 'Request a return for an order' })
+  @ApiResponse({ status: 201, description: 'Return request created' })
+  @ApiResponse({ status: 400, description: 'Order not eligible for return' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  requestReturn(
+    @CurrentUser('id') userId: string,
+    @Param('id') orderId: string,
+    @Body() body: {
+      reason: ReturnReason;
+      reasonDetails?: string;
+      items: Array<{ orderItemId: string; quantity: number }>;
+    },
+  ) {
+    return this.ordersService.requestReturn(userId, orderId, body);
+  }
+
+  @Get('returns/my')
+  @ApiOperation({ summary: 'Get my return requests' })
+  @ApiResponse({ status: 200, description: 'List of return requests' })
+  getMyReturns(
+    @CurrentUser('id') userId: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.ordersService.getMyReturns(
+      userId,
+      page ? parseInt(page, 10) : 1,
+      limit ? parseInt(limit, 10) : 10,
+    );
+  }
+
+  @Get('returns/:returnId')
+  @ApiOperation({ summary: 'Get a specific return request' })
+  @ApiResponse({ status: 200, description: 'Return request details' })
+  @ApiResponse({ status: 404, description: 'Return request not found' })
+  getReturnById(
+    @CurrentUser('id') userId: string,
+    @Param('returnId') returnId: string,
+  ) {
+    return this.ordersService.getReturnById(userId, returnId);
+  }
+
+  @Delete('returns/:returnId')
+  @ApiOperation({ summary: 'Cancel a return request' })
+  @ApiResponse({ status: 200, description: 'Return request cancelled' })
+  @ApiResponse({ status: 400, description: 'Cannot cancel this return request' })
+  @ApiResponse({ status: 404, description: 'Return request not found' })
+  cancelReturn(
+    @CurrentUser('id') userId: string,
+    @Param('returnId') returnId: string,
+  ) {
+    return this.ordersService.cancelReturn(userId, returnId);
   }
 }

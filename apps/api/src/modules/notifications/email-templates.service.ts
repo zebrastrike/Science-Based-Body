@@ -367,6 +367,42 @@ export class EmailTemplatesService {
     return { subject, html, text };
   }
 
+  adminReturnRequest(
+    orderNumber: string,
+    customerEmail: string,
+    reason: string,
+    items: Array<{ name: string; quantity: number }>,
+  ): { subject: string; html: string; text: string } {
+    const subject = `[SBB] Return Request - Order #${orderNumber}`;
+
+    const itemsList = items.map(item => `• ${item.name} x${item.quantity}`).join('\n');
+    const itemsHtml = items.map(item => `<li>${item.name} x${item.quantity}</li>`).join('');
+
+    const html = this.baseTemplate(`
+      <h1 style="margin:0 0 20px 0;font-size:24px;color:#f59e0b;">New Return Request</h1>
+
+      <div style="background:#fffbeb;border-left:4px solid #f59e0b;padding:15px;margin-bottom:20px;">
+        <strong style="color:#b45309;">Order #${orderNumber}</strong><br>
+        <span style="color:#92400e;">Customer: ${customerEmail}</span>
+      </div>
+
+      <h3 style="margin:0 0 10px 0;font-size:16px;color:${this.brandColor};">Return Reason:</h3>
+      <p style="margin:0 0 20px 0;font-size:14px;color:#374151;background:#f9fafb;padding:15px;border-radius:6px;">${reason}</p>
+
+      <h3 style="margin:0 0 10px 0;font-size:16px;color:${this.brandColor};">Items Requested for Return:</h3>
+      <ul style="margin:0 0 25px 0;padding-left:20px;font-size:14px;color:#374151;line-height:1.8;">
+        ${itemsHtml}
+      </ul>
+
+      <p style="margin:0;text-align:center;">
+        ${this.button('Review Return', `https://sciencebasedbody.com/admin/orders/${orderNumber}`)}
+      </p>
+    `);
+
+    const text = `New Return Request\n\nOrder: #${orderNumber}\nCustomer: ${customerEmail}\n\nReason: ${reason}\n\nItems:\n${itemsList}`;
+    return { subject, html, text };
+  }
+
   // ===========================================================================
   // CONTACT & SUPPORT
   // ===========================================================================
@@ -435,6 +471,133 @@ export class EmailTemplatesService {
     `, 'Welcome to the Science Based Body newsletter');
 
     const text = `You're subscribed to the SBB newsletter!\n\nVisit: https://sciencebasedbody.com/shop`;
+    return { subject, html, text };
+  }
+
+  // ===========================================================================
+  // RETURNS & REFUNDS
+  // ===========================================================================
+
+  returnApproved(firstName: string, orderNumber: string, refundAmount: number): { subject: string; html: string; text: string } {
+    const subject = `Return Approved - Order #${orderNumber}`;
+    const formattedAmount = `$${refundAmount.toFixed(2)}`;
+
+    const html = this.baseTemplate(`
+      <h1 style="margin:0 0 20px 0;font-size:28px;color:#059669;">Return Approved!</h1>
+      <p style="margin:0 0 20px 0;font-size:16px;color:#374151;line-height:1.6;">
+        Hi ${firstName}, your return request for order <strong>#${orderNumber}</strong> has been approved.
+      </p>
+
+      <div style="background:#ecfdf5;border-left:4px solid #10b981;padding:20px;margin:20px 0;border-radius:0 8px 8px 0;">
+        <p style="margin:0 0 10px 0;font-size:14px;color:#065f46;font-weight:600;">Refund Amount</p>
+        <p style="margin:0;font-size:24px;color:#047857;font-weight:700;">${formattedAmount}</p>
+      </div>
+
+      <h3 style="margin:25px 0 10px 0;font-size:16px;color:${this.brandColor};">Next Steps:</h3>
+      <ol style="margin:0 0 25px 0;padding-left:20px;font-size:14px;color:#374151;line-height:1.8;">
+        <li>Pack the item(s) securely in original packaging if available</li>
+        <li>Include a copy of this email or your order number</li>
+        <li>Ship to the return address provided</li>
+        <li>Once received and inspected, your refund will be processed within 5-7 business days</li>
+      </ol>
+
+      <p style="margin:0 0 30px 0;text-align:center;">
+        ${this.button('View Return Details', `https://sciencebasedbody.com/account/orders/${orderNumber}`)}
+      </p>
+    `, `Your return for order #${orderNumber} has been approved`);
+
+    const text = `Return Approved!\n\nHi ${firstName},\n\nYour return request for order #${orderNumber} has been approved.\n\nRefund Amount: ${formattedAmount}\n\nPlease pack and ship the items back. Once received, your refund will be processed within 5-7 business days.`;
+    return { subject, html, text };
+  }
+
+  returnRejected(firstName: string, orderNumber: string, reason: string): { subject: string; html: string; text: string } {
+    const subject = `Return Request Update - Order #${orderNumber}`;
+
+    const html = this.baseTemplate(`
+      <h1 style="margin:0 0 20px 0;font-size:28px;color:${this.brandColor};">Return Request Update</h1>
+      <p style="margin:0 0 20px 0;font-size:16px;color:#374151;line-height:1.6;">
+        Hi ${firstName}, we've reviewed your return request for order <strong>#${orderNumber}</strong>.
+      </p>
+
+      <div style="background:#fef2f2;border-left:4px solid #dc2626;padding:20px;margin:20px 0;border-radius:0 8px 8px 0;">
+        <p style="margin:0 0 10px 0;font-size:14px;color:#991b1b;font-weight:600;">Unable to Process Return</p>
+        <p style="margin:0;font-size:14px;color:#7f1d1d;">${reason}</p>
+      </div>
+
+      <p style="margin:0 0 20px 0;font-size:16px;color:#374151;line-height:1.6;">
+        If you believe this decision was made in error or have additional information to provide, please contact our support team.
+      </p>
+
+      <p style="margin:0 0 30px 0;text-align:center;">
+        ${this.button('Contact Support', 'https://sciencebasedbody.com/contact')}
+      </p>
+    `, `Update on your return request for order #${orderNumber}`);
+
+    const text = `Return Request Update\n\nHi ${firstName},\n\nWe've reviewed your return request for order #${orderNumber}.\n\nUnfortunately, we are unable to process this return:\n${reason}\n\nIf you have questions, please contact our support team.`;
+    return { subject, html, text };
+  }
+
+  refundIssued(firstName: string, orderNumber: string, refundAmount: number, refundMethod: string): { subject: string; html: string; text: string } {
+    const subject = `Refund Issued - Order #${orderNumber}`;
+    const formattedAmount = `$${refundAmount.toFixed(2)}`;
+
+    const html = this.baseTemplate(`
+      <h1 style="margin:0 0 20px 0;font-size:28px;color:#059669;">Refund Processed!</h1>
+      <p style="margin:0 0 20px 0;font-size:16px;color:#374151;line-height:1.6;">
+        Hi ${firstName}, your refund for order <strong>#${orderNumber}</strong> has been processed.
+      </p>
+
+      <div style="background:#f9fafb;border-radius:8px;padding:20px;margin:20px 0;">
+        <table role="presentation" style="width:100%;">
+          <tr>
+            <td style="padding:5px 0;">
+              <span style="color:#6b7280;font-size:14px;">Refund Amount</span><br>
+              <strong style="color:#059669;font-size:20px;">${formattedAmount}</strong>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:5px 0;">
+              <span style="color:#6b7280;font-size:14px;">Refund Method</span><br>
+              <strong style="color:${this.brandColor};">${refundMethod}</strong>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <p style="margin:0 0 20px 0;font-size:14px;color:#6b7280;line-height:1.6;">
+        Please allow 5-10 business days for the refund to appear in your account, depending on your financial institution.
+      </p>
+
+      <p style="margin:0;font-size:14px;color:#6b7280;">
+        Thank you for shopping with Science Based Body. We hope to serve you again.
+      </p>
+    `, `Your refund of ${formattedAmount} has been processed`);
+
+    const text = `Refund Processed!\n\nHi ${firstName},\n\nYour refund for order #${orderNumber} has been processed.\n\nRefund Amount: ${formattedAmount}\nRefund Method: ${refundMethod}\n\nPlease allow 5-10 business days for the refund to appear in your account.`;
+    return { subject, html, text };
+  }
+
+  returnReceived(firstName: string, orderNumber: string): { subject: string; html: string; text: string } {
+    const subject = `Return Received - Order #${orderNumber}`;
+
+    const html = this.baseTemplate(`
+      <h1 style="margin:0 0 20px 0;font-size:28px;color:${this.brandColor};">Return Received</h1>
+      <p style="margin:0 0 20px 0;font-size:16px;color:#374151;line-height:1.6;">
+        Hi ${firstName}, we've received your return for order <strong>#${orderNumber}</strong>.
+      </p>
+
+      <div style="background:#f0f9ff;border-left:4px solid #0284c7;padding:20px;margin:20px 0;border-radius:0 8px 8px 0;">
+        <p style="margin:0;font-size:14px;color:#0369a1;">
+          Our team is now inspecting the returned items. Once the inspection is complete, your refund will be processed within 5-7 business days.
+        </p>
+      </div>
+
+      <p style="margin:0;font-size:14px;color:#6b7280;">
+        We'll send you another email once your refund has been issued. Thank you for your patience.
+      </p>
+    `, `We've received your return for order #${orderNumber}`);
+
+    const text = `Return Received\n\nHi ${firstName},\n\nWe've received your return for order #${orderNumber}.\n\nOur team is inspecting the items. Your refund will be processed within 5-7 business days after inspection.\n\nThank you for your patience.`;
     return { subject, html, text };
   }
 }

@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { DiscountType, DiscountStatus } from '@prisma/client';
 
 export interface CartItem {
   productId: string;
@@ -22,6 +23,7 @@ export interface CartItem {
   };
   unitPrice: number;
   lineTotal: number;
+  weightGrams?: number; // Weight per unit for Shippo integration
 }
 
 export interface Cart {
@@ -33,6 +35,9 @@ export interface Cart {
   estimatedShipping: number;
   estimatedTax: number;
   total: number;
+  // Weight tracking for Shippo shipment creation
+  totalWeightGrams: number;
+  totalWeightLbs: number;
 }
 
 @Injectable()
@@ -56,6 +61,7 @@ export class CartService {
     let subtotal = 0;
     let itemCount = 0;
     let discountAmount = 0;
+    let totalWeightGrams = 0;
 
     // Group items by variant for volume discount calculation
     const variantQuantities = new Map<string, number>();
@@ -78,6 +84,8 @@ export class CartService {
 
       let unitPrice = Number(product.basePrice);
       let variant = null;
+      // Get weight: variant weight overrides product weight
+      let itemWeightGrams = product.weightGrams || 0;
 
       if (item.variantId) {
         variant = product.variants.find((v) => v.id === item.variantId);
@@ -85,6 +93,10 @@ export class CartService {
           throw new BadRequestException(`Variant ${item.variantId} is not available`);
         }
         unitPrice = Number(variant.price);
+        // Variant weight overrides product weight if set
+        if (variant.weightGrams) {
+          itemWeightGrams = variant.weightGrams;
+        }
 
         // Track variant quantities for volume discount
         const key = item.variantId;
@@ -100,6 +112,7 @@ export class CartService {
       const lineTotal = unitPrice * item.quantity;
       subtotal += lineTotal;
       itemCount += item.quantity;
+      totalWeightGrams += itemWeightGrams * item.quantity;
 
       enrichedItems.push({
         productId: item.productId,
@@ -124,6 +137,7 @@ export class CartService {
           : undefined,
         unitPrice,
         lineTotal,
+        weightGrams: itemWeightGrams,
       });
     }
 
@@ -138,16 +152,19 @@ export class CartService {
       }
     }
 
-    // Free shipping threshold (example: $99+)
-    const FREE_SHIPPING_THRESHOLD = 99;
-    const STANDARD_SHIPPING = 9.99;
+    // Free shipping threshold: $500+ = FREE, otherwise $20 flat rate
+    const FREE_SHIPPING_THRESHOLD = 500;
+    const STANDARD_SHIPPING = 20;
     const estimatedShipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING;
 
-    // Tax calculation (placeholder - would integrate with tax service)
-    const TAX_RATE = 0; // Research chemicals typically not taxed
-    const estimatedTax = (subtotal - discountAmount) * TAX_RATE;
+    // Tax calculation - configurable via Settings
+    const taxRate = await this.getTaxRate();
+    const estimatedTax = Math.round((subtotal - discountAmount) * taxRate * 100) / 100;
 
     const total = subtotal - discountAmount + estimatedShipping + estimatedTax;
+
+    // Convert grams to pounds for Shippo (1 lb = 453.592 grams)
+    const totalWeightLbs = Math.round((totalWeightGrams / 453.592) * 100) / 100;
 
     return {
       items: enrichedItems,
@@ -157,75 +174,209 @@ export class CartService {
       estimatedShipping,
       estimatedTax,
       total,
+      totalWeightGrams,
+      totalWeightLbs,
     };
   }
 
   /**
    * Apply discount/promo code to cart
+   * Uses the Discount model with full validation
    */
-  async applyDiscountCode(cart: Cart, code: string): Promise<Cart> {
-    // Lookup discount code in settings or dedicated table
-    const setting = await this.prisma.setting.findUnique({
-      where: { key: `discount_code_${code.toUpperCase()}` },
+  async applyDiscountCode(cart: Cart, code: string, userId?: string): Promise<Cart> {
+    // Lookup discount code in Discount table
+    const discount = await this.prisma.discount.findUnique({
+      where: { code: code.toUpperCase() },
     });
 
-    if (!setting) {
+    if (!discount) {
       throw new BadRequestException('Invalid discount code');
     }
 
-    const discountConfig = JSON.parse(setting.value);
-
-    // Check if code is active and not expired
-    if (discountConfig.expiresAt && new Date(discountConfig.expiresAt) < new Date()) {
-      throw new BadRequestException('Discount code has expired');
+    // Validate discount is active
+    if (discount.status !== DiscountStatus.ACTIVE) {
+      throw new BadRequestException('This discount code is no longer active');
     }
 
+    // Check if discount has started
+    if (discount.startsAt > new Date()) {
+      throw new BadRequestException('This discount code is not yet active');
+    }
+
+    // Check if discount has expired
+    if (discount.expiresAt && discount.expiresAt < new Date()) {
+      throw new BadRequestException('This discount code has expired');
+    }
+
+    // Check usage limit
+    if (discount.usageLimit && discount.usageCount >= discount.usageLimit) {
+      throw new BadRequestException('This discount code has reached its usage limit');
+    }
+
+    // Check per-user limit (if user is logged in)
+    if (userId && discount.perUserLimit) {
+      const userUsageCount = await this.prisma.order.count({
+        where: {
+          userId,
+          discountCode: code.toUpperCase(),
+          status: { notIn: ['CANCELLED', 'REFUNDED'] },
+        },
+      });
+      if (userUsageCount >= discount.perUserLimit) {
+        throw new BadRequestException('You have already used this discount code the maximum number of times');
+      }
+    }
+
+    // Check minimum order amount
+    if (discount.minOrderAmount && cart.subtotal < Number(discount.minOrderAmount)) {
+      throw new BadRequestException(
+        `Minimum order of $${Number(discount.minOrderAmount).toFixed(2)} required for this discount`,
+      );
+    }
+
+    // Check product restrictions (if any)
+    if (discount.productIds && discount.productIds.length > 0) {
+      const eligibleItems = cart.items.filter((item) =>
+        discount.productIds.includes(item.productId),
+      );
+      if (eligibleItems.length === 0) {
+        throw new BadRequestException('This discount code does not apply to items in your cart');
+      }
+    }
+
+    // Check user restrictions (if any)
+    if (discount.userIds && discount.userIds.length > 0) {
+      if (!userId || !discount.userIds.includes(userId)) {
+        throw new BadRequestException('This discount code is not available for your account');
+      }
+    }
+
+    // Calculate discount amount based on type
     let additionalDiscount = 0;
 
-    if (discountConfig.type === 'percent') {
-      additionalDiscount = cart.subtotal * (discountConfig.value / 100);
-    } else if (discountConfig.type === 'fixed') {
-      additionalDiscount = Math.min(discountConfig.value, cart.subtotal);
+    switch (discount.type) {
+      case DiscountType.PERCENTAGE:
+        additionalDiscount = cart.subtotal * (Number(discount.value) / 100);
+        // Apply max discount cap if set
+        if (discount.maxDiscountAmount) {
+          additionalDiscount = Math.min(additionalDiscount, Number(discount.maxDiscountAmount));
+        }
+        break;
+
+      case DiscountType.FIXED_AMOUNT:
+        additionalDiscount = Math.min(Number(discount.value), cart.subtotal);
+        break;
+
+      case DiscountType.FREE_SHIPPING:
+        // For free shipping, set shipping to 0 and return
+        return {
+          ...cart,
+          discountCode: code.toUpperCase(),
+          estimatedShipping: 0,
+          total: cart.subtotal - cart.discountAmount + cart.estimatedTax,
+        };
     }
+
+    // Round to 2 decimal places
+    additionalDiscount = Math.round(additionalDiscount * 100) / 100;
+
+    const newDiscountAmount = cart.discountAmount + additionalDiscount;
+    const newTotal = cart.subtotal - newDiscountAmount + cart.estimatedShipping + cart.estimatedTax;
 
     return {
       ...cart,
       discountCode: code.toUpperCase(),
-      discountAmount: cart.discountAmount + additionalDiscount,
-      total: cart.total - additionalDiscount,
+      discountAmount: newDiscountAmount,
+      total: Math.max(0, newTotal),
     };
   }
 
   /**
+   * Validate discount code without applying it
+   * Returns discount info or throws error if invalid
+   */
+  async validateDiscountCode(code: string, subtotal: number, userId?: string) {
+    const discount = await this.prisma.discount.findUnique({
+      where: { code: code.toUpperCase() },
+    });
+
+    if (!discount) {
+      throw new BadRequestException('Invalid discount code');
+    }
+
+    if (discount.status !== DiscountStatus.ACTIVE) {
+      throw new BadRequestException('This discount code is no longer active');
+    }
+
+    if (discount.startsAt > new Date()) {
+      throw new BadRequestException('This discount code is not yet active');
+    }
+
+    if (discount.expiresAt && discount.expiresAt < new Date()) {
+      throw new BadRequestException('This discount code has expired');
+    }
+
+    if (discount.usageLimit && discount.usageCount >= discount.usageLimit) {
+      throw new BadRequestException('This discount code has reached its usage limit');
+    }
+
+    if (discount.minOrderAmount && subtotal < Number(discount.minOrderAmount)) {
+      throw new BadRequestException(
+        `Minimum order of $${Number(discount.minOrderAmount).toFixed(2)} required`,
+      );
+    }
+
+    return {
+      valid: true,
+      code: discount.code,
+      type: discount.type,
+      value: Number(discount.value),
+      description: discount.description,
+    };
+  }
+
+  /**
+   * Increment discount usage count (call after successful order)
+   */
+  async incrementDiscountUsage(code: string) {
+    await this.prisma.discount.update({
+      where: { code: code.toUpperCase() },
+      data: { usageCount: { increment: 1 } },
+    });
+  }
+
+  /**
    * Get shipping rates for cart
+   * Flat Rate: $20 standard, FREE on orders $500+
+   * Expedited: $50 (2-day delivery)
    */
   async getShippingRates(cart: Cart, destinationZip: string) {
-    // Free shipping for orders over threshold
-    const FREE_SHIPPING_THRESHOLD = 99;
+    const FREE_SHIPPING_THRESHOLD = 500;
+    const STANDARD_SHIPPING_RATE = 20;
+    const EXPEDITED_SHIPPING_RATE = 50;
+
+    const standardPrice = cart.subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING_RATE;
+    const isFreeShipping = cart.subtotal >= FREE_SHIPPING_THRESHOLD;
 
     const rates = [
       {
         id: 'standard',
         name: 'Standard Shipping',
-        description: 'FREE & Fast Shipping (3-5 business days)',
-        price: cart.subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 9.99,
+        description: isFreeShipping
+          ? 'FREE Shipping (3-5 business days)'
+          : `Flat Rate $${STANDARD_SHIPPING_RATE} (3-5 business days)`,
+        price: standardPrice,
         estimatedDays: '3-5',
-        isFree: cart.subtotal >= FREE_SHIPPING_THRESHOLD,
+        isFree: isFreeShipping,
+        freeThreshold: FREE_SHIPPING_THRESHOLD,
+        freeThresholdMessage: `Free shipping on orders over $${FREE_SHIPPING_THRESHOLD}`,
       },
       {
-        id: 'express',
-        name: 'Express Shipping',
-        description: '2-Day Express',
-        price: 19.99,
+        id: 'expedited',
+        name: 'Expedited Shipping',
+        description: '2-Day Express Delivery',
+        price: EXPEDITED_SHIPPING_RATE,
         estimatedDays: '1-2',
-        isFree: false,
-      },
-      {
-        id: 'overnight',
-        name: 'Overnight Shipping',
-        description: 'Next Business Day',
-        price: 39.99,
-        estimatedDays: '1',
         isFree: false,
       },
     ];
@@ -244,6 +395,47 @@ export class CartService {
     };
   }
 
+  /**
+   * Get tax rate from Settings (configurable)
+   * Returns decimal rate (e.g., 0.0825 for 8.25%)
+   * Research chemicals are typically not taxed, default is 0
+   */
+  private async getTaxRate(): Promise<number> {
+    try {
+      const setting = await this.prisma.setting.findUnique({
+        where: { key: 'tax_rate' },
+      });
+
+      if (setting) {
+        const rate = parseFloat(setting.value);
+        // Validate the rate is a reasonable percentage (0-100%)
+        if (!isNaN(rate) && rate >= 0 && rate <= 1) {
+          return rate;
+        }
+      }
+    } catch {
+      // If any error, return default
+    }
+
+    // Default: 0% tax (research materials)
+    return 0;
+  }
+
+  /**
+   * Get tax configuration for admin
+   */
+  async getTaxConfig() {
+    const setting = await this.prisma.setting.findUnique({
+      where: { key: 'tax_rate' },
+    });
+
+    return {
+      taxRate: setting ? parseFloat(setting.value) : 0,
+      taxRatePercent: setting ? parseFloat(setting.value) * 100 : 0,
+      description: 'Tax rate applied to orders (decimal, e.g., 0.0825 = 8.25%)',
+    };
+  }
+
   private emptyCart(): Cart {
     return {
       items: [],
@@ -253,6 +445,8 @@ export class CartService {
       estimatedShipping: 0,
       estimatedTax: 0,
       total: 0,
+      totalWeightGrams: 0,
+      totalWeightLbs: 0,
     };
   }
 }

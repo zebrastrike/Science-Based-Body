@@ -5,6 +5,7 @@ import { APP_GUARD } from '@nestjs/core';
 
 // Core modules
 import { PrismaModule } from './prisma/prisma.module';
+import { EncryptionModule } from './common/encryption.module';
 
 // Feature modules
 import { AuthModule } from './modules/auth/auth.module';
@@ -50,6 +51,7 @@ import { HealthModule } from './health/health.module';
 
     // Core
     PrismaModule,
+    EncryptionModule,
 
     // Features
     AuthModule,

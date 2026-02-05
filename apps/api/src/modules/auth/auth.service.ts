@@ -3,11 +3,13 @@ import {
   UnauthorizedException,
   ConflictException,
   BadRequestException,
+  NotFoundException,
   Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { MailgunService } from '../notifications/mailgun.service';
 import { RegisterDto } from './dto/register.dto';
@@ -195,5 +197,175 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
+  }
+
+  // ===========================================================================
+  // PASSWORD RESET
+  // ===========================================================================
+
+  async forgotPassword(email: string, ipAddress: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+
+    // Always return success to prevent email enumeration
+    if (!user) {
+      this.logger.log(`Password reset requested for non-existent email: ${email}`);
+      return { message: 'If an account exists, a reset link has been sent' };
+    }
+
+    // Generate secure reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    // Store reset token in a Setting (or you could add a dedicated table)
+    await this.prisma.setting.upsert({
+      where: { key: `password_reset_${user.id}` },
+      create: {
+        key: `password_reset_${user.id}`,
+        value: JSON.stringify({ hash: resetTokenHash, expiresAt: expiresAt.toISOString() }),
+        type: 'json',
+        description: 'Password reset token',
+      },
+      update: {
+        value: JSON.stringify({ hash: resetTokenHash, expiresAt: expiresAt.toISOString() }),
+      },
+    });
+
+    // Log audit
+    await this.prisma.auditLog.create({
+      data: {
+        userId: user.id,
+        action: 'UPDATE',
+        resourceType: 'User',
+        resourceId: user.id,
+        ipAddress,
+        metadata: { event: 'password_reset_requested' },
+      },
+    });
+
+    // Send password reset email
+    this.mailgunService
+      .sendPasswordReset(user.email, user.firstName || 'Customer', resetToken)
+      .catch((err) => this.logger.error(`Failed to send password reset email: ${err.message}`));
+
+    return { message: 'If an account exists, a reset link has been sent' };
+  }
+
+  async resetPassword(token: string, newPassword: string, ipAddress: string) {
+    // Hash the provided token
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Find the reset token in settings
+    const settings = await this.prisma.setting.findMany({
+      where: { key: { startsWith: 'password_reset_' } },
+    });
+
+    let foundUserId: string | null = null;
+
+    for (const setting of settings) {
+      try {
+        const data = JSON.parse(setting.value);
+        if (data.hash === tokenHash) {
+          // Check expiration
+          if (new Date(data.expiresAt) < new Date()) {
+            throw new BadRequestException('Reset token has expired');
+          }
+          foundUserId = setting.key.replace('password_reset_', '');
+          break;
+        }
+      } catch (e) {
+        if (e instanceof BadRequestException) throw e;
+        // Invalid JSON, skip
+      }
+    }
+
+    if (!foundUserId) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    // Validate password strength
+    if (newPassword.length < 8) {
+      throw new BadRequestException('Password must be at least 8 characters');
+    }
+
+    // Hash new password
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+
+    // Update user password
+    const user = await this.prisma.user.update({
+      where: { id: foundUserId },
+      data: { passwordHash },
+      select: { id: true, email: true },
+    });
+
+    // Delete the reset token
+    await this.prisma.setting.delete({
+      where: { key: `password_reset_${foundUserId}` },
+    });
+
+    // Log audit
+    await this.prisma.auditLog.create({
+      data: {
+        userId: user.id,
+        action: 'UPDATE',
+        resourceType: 'User',
+        resourceId: user.id,
+        ipAddress,
+        metadata: { event: 'password_reset_completed' },
+      },
+    });
+
+    return { message: 'Password has been reset successfully' };
+  }
+
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+    ipAddress: string,
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!isPasswordValid) {
+      throw new BadRequestException('Current password is incorrect');
+    }
+
+    // Validate new password
+    if (newPassword.length < 8) {
+      throw new BadRequestException('New password must be at least 8 characters');
+    }
+
+    // Hash new password
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+
+    // Update password
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+
+    // Log audit
+    await this.prisma.auditLog.create({
+      data: {
+        userId: user.id,
+        action: 'UPDATE',
+        resourceType: 'User',
+        resourceId: user.id,
+        ipAddress,
+        metadata: { event: 'password_changed' },
+      },
+    });
+
+    return { message: 'Password changed successfully' };
   }
 }

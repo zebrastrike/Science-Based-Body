@@ -59,6 +59,8 @@ export class CartController {
       estimatedShipping: 0,
       estimatedTax: 0,
       total: Number(subtotal) || 0,
+      totalWeightGrams: 0,
+      totalWeightLbs: 0,
     };
     return this.cartService.getShippingRates(cart, zip);
   }

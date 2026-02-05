@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 export interface HeroSlide {
@@ -694,5 +694,239 @@ Our goal is not ubiquity—it is relevance with authority.`,
         text: 'Products are intended for research and educational purposes only. Information provided is not intended to diagnose, treat, cure, or prevent any disease. Medical services, where applicable, are provided independently by licensed professionals through separate clinical platforms.',
       },
     };
+  }
+
+  // ===========================================================================
+  // BLOG CRUD
+  // ===========================================================================
+
+  /**
+   * Get all blog posts (with pagination)
+   */
+  async getBlogPosts(options: {
+    page?: number;
+    limit?: number;
+    published?: boolean;
+  } = {}) {
+    const { page = 1, limit = 10, published } = options;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (published !== undefined) {
+      where.isPublished = published;
+    }
+
+    const [posts, total] = await Promise.all([
+      this.prisma.blog.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
+      }),
+      this.prisma.blog.count({ where }),
+    ]);
+
+    return {
+      posts,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  /**
+   * Get a single blog post by slug
+   */
+  async getBlogPostBySlug(slug: string) {
+    const post = await this.prisma.blog.findUnique({
+      where: { slug },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Blog post not found');
+    }
+
+    return post;
+  }
+
+  /**
+   * Get a single blog post by ID
+   */
+  async getBlogPostById(id: string) {
+    const post = await this.prisma.blog.findUnique({
+      where: { id },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Blog post not found');
+    }
+
+    return post;
+  }
+
+  /**
+   * Create a new blog post (admin only)
+   */
+  async createBlogPost(
+    data: {
+      title: string;
+      slug: string;
+      content: string;
+      excerpt?: string;
+      featuredImage?: string;
+      metaTitle?: string;
+      metaDescription?: string;
+      isPublished?: boolean;
+    },
+    adminId: string,
+  ) {
+    // Validate slug uniqueness
+    const existingPost = await this.prisma.blog.findUnique({
+      where: { slug: data.slug },
+    });
+
+    if (existingPost) {
+      throw new BadRequestException('A blog post with this slug already exists');
+    }
+
+    // Generate slug from title if not provided
+    const slug = data.slug || this.generateSlug(data.title);
+
+    const post = await this.prisma.blog.create({
+      data: {
+        title: data.title,
+        slug,
+        content: data.content,
+        excerpt: data.excerpt,
+        featuredImage: data.featuredImage,
+        metaTitle: data.metaTitle || data.title,
+        metaDescription: data.metaDescription || data.excerpt,
+        isPublished: data.isPublished || false,
+        publishedAt: data.isPublished ? new Date() : null,
+        authorId: adminId,
+      },
+    });
+
+    // Log audit
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'CREATE',
+        resourceType: 'Blog',
+        resourceId: post.id,
+        newState: { title: post.title, slug: post.slug },
+      },
+    });
+
+    return post;
+  }
+
+  /**
+   * Update a blog post (admin only)
+   */
+  async updateBlogPost(
+    id: string,
+    data: {
+      title?: string;
+      slug?: string;
+      content?: string;
+      excerpt?: string;
+      featuredImage?: string;
+      metaTitle?: string;
+      metaDescription?: string;
+      isPublished?: boolean;
+    },
+    adminId: string,
+  ) {
+    const existingPost = await this.prisma.blog.findUnique({
+      where: { id },
+    });
+
+    if (!existingPost) {
+      throw new NotFoundException('Blog post not found');
+    }
+
+    // Check slug uniqueness if changing
+    if (data.slug && data.slug !== existingPost.slug) {
+      const slugExists = await this.prisma.blog.findUnique({
+        where: { slug: data.slug },
+      });
+      if (slugExists) {
+        throw new BadRequestException('A blog post with this slug already exists');
+      }
+    }
+
+    // Handle publish state change
+    const updateData: any = { ...data };
+    if (data.isPublished !== undefined) {
+      if (data.isPublished && !existingPost.isPublished) {
+        updateData.publishedAt = new Date();
+      } else if (!data.isPublished) {
+        updateData.publishedAt = null;
+      }
+    }
+
+    const post = await this.prisma.blog.update({
+      where: { id },
+      data: updateData,
+    });
+
+    // Log audit
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'UPDATE',
+        resourceType: 'Blog',
+        resourceId: post.id,
+        previousState: { title: existingPost.title, isPublished: existingPost.isPublished },
+        newState: { title: post.title, isPublished: post.isPublished },
+      },
+    });
+
+    return post;
+  }
+
+  /**
+   * Delete a blog post (admin only)
+   */
+  async deleteBlogPost(id: string, adminId: string) {
+    const post = await this.prisma.blog.findUnique({
+      where: { id },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Blog post not found');
+    }
+
+    await this.prisma.blog.delete({
+      where: { id },
+    });
+
+    // Log audit
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'DELETE',
+        resourceType: 'Blog',
+        resourceId: id,
+        previousState: { title: post.title, slug: post.slug },
+      },
+    });
+
+    return { success: true, message: 'Blog post deleted' };
+  }
+
+  /**
+   * Generate a URL-friendly slug from a title
+   */
+  private generateSlug(title: string): string {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .substring(0, 100);
   }
 }

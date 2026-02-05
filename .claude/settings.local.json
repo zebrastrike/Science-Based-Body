@@ -31,7 +31,14 @@
       "Bash(powershell -Command \"Stop-Process -Id 56952 -Force\")",
       "Bash(powershell -Command:*)",
       "Bash(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 root@116.203.138.88 \"echo ''Connected successfully!'' && uname -a\")",
-      "Bash(ssh -v -o BatchMode=yes -o ConnectTimeout=15 root@116.203.138.88 \"echo connected\")"
+      "Bash(ssh -v -o BatchMode=yes -o ConnectTimeout=15 root@116.203.138.88 \"echo connected\")",
+      "Bash(npx serve:*)",
+      "Bash(where:*)",
+      "Bash(psql:*)",
+      "Bash(node --version:*)",
+      "Bash(del \"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\logo.svg\")",
+      "Bash(npx tsc:*)",
+      "Bash(cmd.exe /c:*)"
     ]
   }
 }

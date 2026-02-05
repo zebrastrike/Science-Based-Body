@@ -300,6 +300,12 @@ model Product {
   basePrice       Decimal         @db.Decimal(10, 2)
   compareAtPrice  Decimal?        @db.Decimal(10, 2)
 
+  // Shipping
+  weightGrams     Int?            // Weight in grams for shipping calculations
+  lengthMm        Int?            // Dimensions for box size calculations
+  widthMm         Int?
+  heightMm        Int?
+
   // Inventory
   trackInventory  Boolean         @default(true)
 
@@ -342,6 +348,9 @@ model ProductVariant {
   // Variant-specific details
   strength        String?   // "10mg", "20mg"
   quantity        Int?      // Number of vials/units
+
+  // Shipping (overrides product weight if set)
+  weightGrams     Int?      // Weight in grams
 
   isActive        Boolean   @default(true)
   sortOrder       Int       @default(0)
@@ -896,5 +905,117 @@ model LoyaltyTransaction {
   @@index([userId])
   @@index([orderId])
   @@index([type])
+  @@index([createdAt])
+}
+
+// =============================================================================
+// DISCOUNTS & COUPONS
+// =============================================================================
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+  FREE_SHIPPING
+}
+
+enum DiscountStatus {
+  ACTIVE
+  INACTIVE
+  EXPIRED
+}
+
+model Discount {
+  id              String          @id @default(cuid())
+  code            String          @unique
+  description     String?
+
+  type            DiscountType
+  value           Decimal         @db.Decimal(10, 2) // Percentage (0-100) or fixed amount
+
+  // Restrictions
+  minOrderAmount  Decimal?        @db.Decimal(10, 2)
+  maxDiscountAmount Decimal?      @db.Decimal(10, 2) // Cap for percentage discounts
+  usageLimit      Int?            // Total uses allowed
+  usageCount      Int             @default(0)
+  perUserLimit    Int?            // Uses per customer
+
+  // Validity
+  status          DiscountStatus  @default(ACTIVE)
+  startsAt        DateTime        @default(now())
+  expiresAt       DateTime?
+
+  // Targeting (optional)
+  productIds      String[]        // Empty = all products
+  categoryIds     String[]        // Empty = all categories
+  userIds         String[]        // Empty = all users
+
+  // Audit
+  createdById     String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([code])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+// =============================================================================
+// RETURNS & REFUNDS
+// =============================================================================
+
+enum ReturnStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  RECEIVED
+  REFUNDED
+  COMPLETED
+}
+
+enum ReturnReason {
+  DAMAGED
+  WRONG_ITEM
+  NOT_AS_DESCRIBED
+  CHANGED_MIND
+  DEFECTIVE
+  OTHER
+}
+
+model Return {
+  id              String        @id @default(cuid())
+  orderId         String
+  orderNumber     String        // Denormalized for easy lookup
+
+  userId          String
+  customerEmail   String
+  customerName    String?
+
+  status          ReturnStatus  @default(REQUESTED)
+  reason          ReturnReason
+  reasonDetails   String?
+
+  // Items being returned
+  items           Json          // [{orderItemId, productName, quantity, unitPrice}]
+
+  // Amounts
+  subtotalAmount  Decimal       @db.Decimal(10, 2)
+  refundAmount    Decimal?      @db.Decimal(10, 2)
+
+  // Admin handling
+  processedById   String?
+  processedAt     DateTime?
+  adminNotes      String?
+  rejectionReason String?
+
+  // Refund details
+  refundMethod    String?       // Original payment method or store credit
+  refundReference String?       // Transaction ID
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([orderId])
+  @@index([userId])
+  @@index([status])
   @@index([createdAt])
 }

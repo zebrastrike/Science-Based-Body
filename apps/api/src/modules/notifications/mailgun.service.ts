@@ -141,6 +141,87 @@ export class MailgunService {
   }
 
   // ===========================================================================
+  // RETURNS & REFUNDS
+  // ===========================================================================
+
+  async sendReturnApproved(
+    to: string,
+    firstName: string,
+    orderNumber: string,
+    refundAmount: number,
+  ) {
+    const { subject, html, text } = this.templates.returnApproved(
+      firstName,
+      orderNumber,
+      refundAmount,
+    );
+    return this.sendEmail({ to, subject, html, text, tags: ['return', 'approved'] });
+  }
+
+  async sendReturnRejected(
+    to: string,
+    firstName: string,
+    orderNumber: string,
+    reason: string,
+  ) {
+    const { subject, html, text } = this.templates.returnRejected(
+      firstName,
+      orderNumber,
+      reason,
+    );
+    return this.sendEmail({ to, subject, html, text, tags: ['return', 'rejected'] });
+  }
+
+  async sendReturnReceived(
+    to: string,
+    firstName: string,
+    orderNumber: string,
+  ) {
+    const { subject, html, text } = this.templates.returnReceived(
+      firstName,
+      orderNumber,
+    );
+    return this.sendEmail({ to, subject, html, text, tags: ['return', 'received'] });
+  }
+
+  async sendRefundIssued(
+    to: string,
+    firstName: string,
+    orderNumber: string,
+    refundAmount: number,
+    refundMethod: string,
+  ) {
+    const { subject, html, text } = this.templates.refundIssued(
+      firstName,
+      orderNumber,
+      refundAmount,
+      refundMethod,
+    );
+    return this.sendEmail({ to, subject, html, text, tags: ['refund', 'issued'] });
+  }
+
+  async notifyAdminReturnRequest(
+    orderNumber: string,
+    customerEmail: string,
+    reason: string,
+    items: Array<{ name: string; quantity: number }>,
+  ) {
+    const { subject, html, text } = this.templates.adminReturnRequest(
+      orderNumber,
+      customerEmail,
+      reason,
+      items,
+    );
+    return this.sendEmail({
+      to: this.adminEmail,
+      subject,
+      html,
+      text,
+      tags: ['admin', 'return-request'],
+    });
+  }
+
+  // ===========================================================================
   // ADMIN NOTIFICATIONS
   // ===========================================================================
 

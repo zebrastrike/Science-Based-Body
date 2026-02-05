@@ -22,7 +22,7 @@ import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { OrderStatus, UserStatus, ProductCategory } from '@prisma/client';
+import { OrderStatus, UserStatus, ProductCategory, DiscountType, DiscountStatus, ReturnStatus } from '@prisma/client';
 
 interface AuthenticatedRequest {
   user: { id: string; email: string; role: string };
@@ -287,5 +287,288 @@ export class AdminController {
       req.user.id,
       body.notes,
     );
+  }
+
+  // ==========================================================================
+  // ANALYTICS
+  // ==========================================================================
+
+  @Get('analytics')
+  @ApiOperation({ summary: 'Get analytics data' })
+  @ApiQuery({ name: 'period', required: false, description: '7d, 30d, 90d, or custom' })
+  @ApiQuery({ name: 'dateFrom', required: false })
+  @ApiQuery({ name: 'dateTo', required: false })
+  @ApiResponse({ status: 200, description: 'Analytics data' })
+  getAnalytics(
+    @Query('period') period?: string,
+    @Query('dateFrom') dateFrom?: string,
+    @Query('dateTo') dateTo?: string,
+  ) {
+    return this.adminService.getAnalytics({
+      period,
+      dateFrom: dateFrom ? new Date(dateFrom) : undefined,
+      dateTo: dateTo ? new Date(dateTo) : undefined,
+    });
+  }
+
+  @Get('analytics/top-products')
+  @ApiOperation({ summary: 'Get top selling products' })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'period', required: false })
+  @ApiResponse({ status: 200, description: 'Top products' })
+  getTopProducts(
+    @Query('limit') limit?: number,
+    @Query('period') period?: string,
+  ) {
+    return this.adminService.getTopProducts(limit ? Number(limit) : 10, period);
+  }
+
+  @Get('analytics/revenue')
+  @ApiOperation({ summary: 'Get revenue breakdown' })
+  @ApiQuery({ name: 'period', required: false })
+  @ApiResponse({ status: 200, description: 'Revenue data' })
+  getRevenueAnalytics(@Query('period') period?: string) {
+    return this.adminService.getRevenueAnalytics(period);
+  }
+
+  // ==========================================================================
+  // DISCOUNTS
+  // ==========================================================================
+
+  @Get('discounts')
+  @ApiOperation({ summary: 'Get all discount codes' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'status', required: false, enum: DiscountStatus })
+  @ApiResponse({ status: 200, description: 'Discount list' })
+  getDiscounts(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('status') status?: DiscountStatus,
+  ) {
+    return this.adminService.getDiscounts({
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
+      status,
+    });
+  }
+
+  @Get('discounts/:id')
+  @ApiOperation({ summary: 'Get discount details' })
+  @ApiParam({ name: 'id', description: 'Discount ID' })
+  @ApiResponse({ status: 200, description: 'Discount details' })
+  @ApiResponse({ status: 404, description: 'Discount not found' })
+  getDiscountById(@Param('id') id: string) {
+    return this.adminService.getDiscountById(id);
+  }
+
+  @Post('discounts')
+  @ApiOperation({ summary: 'Create discount code' })
+  @ApiResponse({ status: 201, description: 'Discount created' })
+  createDiscount(
+    @Request() req: AuthenticatedRequest,
+    @Body()
+    body: {
+      code: string;
+      description?: string;
+      type: DiscountType;
+      value: number;
+      minOrderAmount?: number;
+      maxDiscountAmount?: number;
+      usageLimit?: number;
+      perUserLimit?: number;
+      startsAt?: string;
+      expiresAt?: string;
+      productIds?: string[];
+      categoryIds?: string[];
+    },
+  ) {
+    return this.adminService.createDiscount(body, req.user.id);
+  }
+
+  @Put('discounts/:id')
+  @ApiOperation({ summary: 'Update discount code' })
+  @ApiParam({ name: 'id', description: 'Discount ID' })
+  @ApiResponse({ status: 200, description: 'Discount updated' })
+  @ApiResponse({ status: 404, description: 'Discount not found' })
+  updateDiscount(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body()
+    body: {
+      description?: string;
+      value?: number;
+      minOrderAmount?: number;
+      maxDiscountAmount?: number;
+      usageLimit?: number;
+      perUserLimit?: number;
+      status?: DiscountStatus;
+      expiresAt?: string;
+    },
+  ) {
+    return this.adminService.updateDiscount(id, body, req.user.id);
+  }
+
+  @Delete('discounts/:id')
+  @ApiOperation({ summary: 'Deactivate discount code' })
+  @ApiParam({ name: 'id', description: 'Discount ID' })
+  @ApiResponse({ status: 200, description: 'Discount deactivated' })
+  deleteDiscount(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
+    return this.adminService.deleteDiscount(id, req.user.id);
+  }
+
+  // ==========================================================================
+  // RETURNS
+  // ==========================================================================
+
+  @Get('returns')
+  @ApiOperation({ summary: 'Get all returns' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'status', required: false, enum: ReturnStatus })
+  @ApiResponse({ status: 200, description: 'Returns list' })
+  getReturns(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('status') status?: ReturnStatus,
+  ) {
+    return this.adminService.getReturns({
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
+      status,
+    });
+  }
+
+  @Get('returns/:id')
+  @ApiOperation({ summary: 'Get return details' })
+  @ApiParam({ name: 'id', description: 'Return ID' })
+  @ApiResponse({ status: 200, description: 'Return details' })
+  @ApiResponse({ status: 404, description: 'Return not found' })
+  getReturnById(@Param('id') id: string) {
+    return this.adminService.getReturnById(id);
+  }
+
+  @Put('returns/:id/approve')
+  @ApiOperation({ summary: 'Approve return request' })
+  @ApiParam({ name: 'id', description: 'Return ID' })
+  @ApiResponse({ status: 200, description: 'Return approved' })
+  approveReturn(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() body: { refundAmount: number; adminNotes?: string },
+  ) {
+    return this.adminService.approveReturn(id, body.refundAmount, req.user.id, body.adminNotes);
+  }
+
+  @Put('returns/:id/reject')
+  @ApiOperation({ summary: 'Reject return request' })
+  @ApiParam({ name: 'id', description: 'Return ID' })
+  @ApiResponse({ status: 200, description: 'Return rejected' })
+  rejectReturn(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() body: { rejectionReason: string },
+  ) {
+    return this.adminService.rejectReturn(id, body.rejectionReason, req.user.id);
+  }
+
+  @Put('returns/:id/complete')
+  @ApiOperation({ summary: 'Mark return as completed (refund issued)' })
+  @ApiParam({ name: 'id', description: 'Return ID' })
+  @ApiResponse({ status: 200, description: 'Return completed' })
+  completeReturn(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() body: { refundReference?: string; refundMethod?: string },
+  ) {
+    return this.adminService.completeReturn(id, req.user.id, body.refundReference, body.refundMethod);
+  }
+
+  // ==========================================================================
+  // AUDIT LOG
+  // ==========================================================================
+
+  @Get('audit-log')
+  @ApiOperation({ summary: 'Get audit log entries' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'action', required: false })
+  @ApiQuery({ name: 'resourceType', required: false })
+  @ApiQuery({ name: 'adminId', required: false })
+  @ApiQuery({ name: 'dateFrom', required: false })
+  @ApiQuery({ name: 'dateTo', required: false })
+  @ApiResponse({ status: 200, description: 'Audit log entries' })
+  getAuditLog(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('action') action?: string,
+    @Query('resourceType') resourceType?: string,
+    @Query('adminId') adminId?: string,
+    @Query('dateFrom') dateFrom?: string,
+    @Query('dateTo') dateTo?: string,
+  ) {
+    return this.adminService.getAuditLog({
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
+      action,
+      resourceType,
+      adminId,
+      dateFrom: dateFrom ? new Date(dateFrom) : undefined,
+      dateTo: dateTo ? new Date(dateTo) : undefined,
+    });
+  }
+
+  // ==========================================================================
+  // SETTINGS
+  // ==========================================================================
+
+  @Get('settings')
+  @ApiOperation({ summary: 'Get all settings' })
+  @ApiQuery({ name: 'category', required: false, description: 'Filter by category prefix' })
+  @ApiResponse({ status: 200, description: 'Settings list' })
+  getSettings(@Query('category') category?: string) {
+    return this.adminService.getSettings(category);
+  }
+
+  @Get('settings/:key')
+  @ApiOperation({ summary: 'Get setting by key' })
+  @ApiParam({ name: 'key', description: 'Setting key' })
+  @ApiResponse({ status: 200, description: 'Setting value' })
+  getSettingByKey(@Param('key') key: string) {
+    return this.adminService.getSettingByKey(key);
+  }
+
+  @Put('settings/:key')
+  @ApiOperation({ summary: 'Update setting' })
+  @ApiParam({ name: 'key', description: 'Setting key' })
+  @ApiResponse({ status: 200, description: 'Setting updated' })
+  updateSetting(
+    @Request() req: AuthenticatedRequest,
+    @Param('key') key: string,
+    @Body() body: { value: string; type?: string; description?: string },
+  ) {
+    return this.adminService.updateSetting(key, body, req.user.id);
+  }
+
+  @Post('settings/bulk')
+  @ApiOperation({ summary: 'Update multiple settings' })
+  @ApiResponse({ status: 200, description: 'Settings updated' })
+  updateSettingsBulk(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: { settings: Array<{ key: string; value: string }> },
+  ) {
+    return this.adminService.updateSettingsBulk(body.settings, req.user.id);
+  }
+
+  // ==========================================================================
+  // SHIPPING (Recent Shipments)
+  // ==========================================================================
+
+  @Get('shipping/recent')
+  @ApiOperation({ summary: 'Get recent shipments' })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiResponse({ status: 200, description: 'Recent shipments' })
+  getRecentShipments(@Query('limit') limit?: number) {
+    return this.adminService.getRecentShipments(limit ? Number(limit) : 20);
   }
 }

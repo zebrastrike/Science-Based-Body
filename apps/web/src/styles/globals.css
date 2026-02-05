@@ -210,7 +210,8 @@
      ============================================================================ */
 
   .product-card {
-    @apply card-hover group cursor-pointer;
+    @apply card-hover cursor-pointer;
+    /* Note: Add 'group' class directly to element in JSX for hover effects */
   }
 
   .product-card-image {

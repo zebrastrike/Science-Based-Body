@@ -3,6 +3,40 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
+// Lightweight helper for admin endpoints that need access tokens on the client.
+export async function adminRequest<T>(
+  endpoint: string,
+  options: RequestInit = {},
+): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+  };
+
+  if (token) {
+    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(url, {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    const error: ApiError = await response.json().catch(() => ({
+      statusCode: response.status,
+      message: response.statusText,
+    }));
+    throw error;
+  }
+
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
+}
+
 // ============================================================================
 // TYPES
 // ============================================================================
