@@ -1,10 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { OrderStatus, UserStatus, ProductCategory, DiscountType, DiscountStatus, ReturnStatus } from '@prisma/client';
+import { OrdersService } from '../orders/orders.service';
 
 @Injectable()
 export class AdminService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => OrdersService))
+    private ordersService: OrdersService,
+  ) {}
 
   // ==========================================================================
   // DASHBOARD
@@ -1372,5 +1377,33 @@ export class AdminService {
       shippedAt: s.shippedAt,
       deliveredAt: s.deliveredAt,
     }));
+  }
+
+  // ==========================================================================
+  // EMAIL RESEND
+  // ==========================================================================
+
+  async resendOrderConfirmation(orderId: string, adminId: string) {
+    const result = await this.ordersService.resendOrderConfirmation(orderId);
+
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'UPDATE',
+        resourceType: 'Order',
+        resourceId: orderId,
+        metadata: { action: 'resent_order_confirmation' },
+      },
+    });
+
+    return result;
+  }
+
+  async resendShippingNotification(orderId: string, adminId: string) {
+    return this.ordersService.resendShippingNotification(orderId, adminId);
+  }
+
+  async resendDeliveryNotification(orderId: string, adminId: string) {
+    return this.ordersService.resendDeliveryNotification(orderId, adminId);
   }
 }

@@ -108,6 +108,44 @@ export class AdminController {
     return this.adminService.updateOrderStatus(id, body.status, req.user.id, body.notes);
   }
 
+  @Post('orders/:id/resend-confirmation')
+  @ApiOperation({ summary: 'Resend order confirmation email to customer' })
+  @ApiParam({ name: 'id', description: 'Order ID' })
+  @ApiResponse({ status: 200, description: 'Email sent' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  resendOrderConfirmation(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    return this.adminService.resendOrderConfirmation(id, req.user.id);
+  }
+
+  @Post('orders/:id/resend-shipping')
+  @ApiOperation({ summary: 'Resend shipping notification email to customer' })
+  @ApiParam({ name: 'id', description: 'Order ID' })
+  @ApiResponse({ status: 200, description: 'Email sent' })
+  @ApiResponse({ status: 400, description: 'Order not shipped yet' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  resendShippingNotification(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    return this.adminService.resendShippingNotification(id, req.user.id);
+  }
+
+  @Post('orders/:id/resend-delivery')
+  @ApiOperation({ summary: 'Resend delivery notification email to customer' })
+  @ApiParam({ name: 'id', description: 'Order ID' })
+  @ApiResponse({ status: 200, description: 'Email sent' })
+  @ApiResponse({ status: 400, description: 'Order not delivered yet' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  resendDeliveryNotification(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    return this.adminService.resendDeliveryNotification(id, req.user.id);
+  }
+
   // ==========================================================================
   // PRODUCTS
   // ==========================================================================

@@ -603,4 +603,168 @@ export class OrdersService {
 
     return { success: true, message: 'Return request cancelled' };
   }
+
+  // ===========================================================================
+  // EMAIL RESEND FUNCTIONALITY
+  // ===========================================================================
+
+  /**
+   * Resend order confirmation email (customer can request)
+   */
+  async resendOrderConfirmation(orderId: string, userId?: string) {
+    const where: any = { id: orderId };
+    if (userId) where.userId = userId;
+
+    const order = await this.prisma.order.findFirst({
+      where,
+      include: {
+        user: { select: { email: true, firstName: true } },
+        items: { include: { product: true } },
+        shippingAddress: true,
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    if (!order.user?.email) {
+      throw new BadRequestException('No email address found for this order');
+    }
+
+    const orderDetails = {
+      orderNumber: order.orderNumber,
+      items: order.items.map((item) => ({
+        name: item.productName + (item.variantName ? ` - ${item.variantName}` : ''),
+        quantity: item.quantity,
+        price: Number(item.totalPrice),
+        sku: item.sku,
+      })),
+      subtotal: Number(order.subtotal),
+      shipping: Number(order.shippingCost),
+      tax: Number(order.taxAmount),
+      discount: Number(order.discountAmount),
+      total: Number(order.totalAmount),
+      shippingAddress: order.shippingAddress
+        ? {
+            name: `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`,
+            street1: order.shippingAddress.street1,
+            street2: order.shippingAddress.street2 || undefined,
+            city: order.shippingAddress.city,
+            state: order.shippingAddress.state,
+            postalCode: order.shippingAddress.postalCode,
+          }
+        : {
+            name: 'Customer',
+            street1: '',
+            city: '',
+            state: '',
+            postalCode: '',
+          },
+    };
+
+    await this.mailgunService.sendOrderConfirmation(
+      order.user.email,
+      order.user.firstName || 'Customer',
+      orderDetails,
+    );
+
+    this.logger.log(`Resent order confirmation email for order ${order.orderNumber}`);
+
+    return { success: true, message: 'Order confirmation email sent' };
+  }
+
+  /**
+   * Resend shipping notification email (admin only)
+   */
+  async resendShippingNotification(orderId: string, adminId: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        user: { select: { email: true, firstName: true } },
+        shipment: true,
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    if (!order.shipment) {
+      throw new BadRequestException('Order has not been shipped yet');
+    }
+
+    if (!order.user?.email) {
+      throw new BadRequestException('No email address found for this order');
+    }
+
+    await this.mailgunService.sendOrderShipped(
+      order.user.email,
+      order.user.firstName || 'Customer',
+      order.orderNumber,
+      order.shipment.trackingNumber || '',
+      order.shipment.trackingUrl || '',
+      order.shipment.carrier || 'USPS',
+    );
+
+    // Log audit
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'UPDATE',
+        resourceType: 'Order',
+        resourceId: orderId,
+        metadata: { action: 'resent_shipping_email', email: order.user.email },
+      },
+    });
+
+    this.logger.log(`Resent shipping notification for order ${order.orderNumber}`);
+
+    return { success: true, message: 'Shipping notification email sent' };
+  }
+
+  /**
+   * Resend delivery notification email (admin only)
+   */
+  async resendDeliveryNotification(orderId: string, adminId: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        user: { select: { email: true, firstName: true } },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    if (order.status !== OrderStatus.DELIVERED) {
+      throw new BadRequestException('Order has not been delivered yet');
+    }
+
+    if (!order.user?.email) {
+      throw new BadRequestException('No email address found for this order');
+    }
+
+    await this.mailgunService.sendOrderDelivered(
+      order.user.email,
+      order.user.firstName || 'Customer',
+      order.orderNumber,
+    );
+
+    // Log audit
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'UPDATE',
+        resourceType: 'Order',
+        resourceId: orderId,
+        metadata: { action: 'resent_delivery_email', email: order.user.email },
+      },
+    });
+
+    this.logger.log(`Resent delivery notification for order ${order.orderNumber}`);
+
+    return { success: true, message: 'Delivery notification email sent' };
+  }
 }

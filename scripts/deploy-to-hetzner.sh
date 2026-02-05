@@ -18,10 +18,22 @@ DOMAIN="api.sciencebasedbody.com"
 # Parse arguments
 BUILD_FLAG=""
 MIGRATE_FLAG=""
+SSL_FLAG=""
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --build) BUILD_FLAG="--build" ;;
         --migrate) MIGRATE_FLAG="true" ;;
+        --ssl) SSL_FLAG="true" ;;
+        --help)
+            echo "Usage: ./scripts/deploy-to-hetzner.sh [OPTIONS]"
+            echo ""
+            echo "Options:"
+            echo "  --build    Rebuild Docker containers"
+            echo "  --migrate  Run database migrations"
+            echo "  --ssl      Request SSL certificate from Let's Encrypt"
+            echo "  --help     Show this help message"
+            exit 0
+            ;;
         *) echo "Unknown parameter: $1"; exit 1 ;;
     esac
     shift
@@ -158,6 +170,21 @@ else
 fi
 
 # =============================================================================
+# SSL Certificate (if requested)
+# =============================================================================
+if [ "$SSL_FLAG" = "true" ]; then
+    echo_step "Requesting SSL certificate from Let's Encrypt..."
+
+    # Request certificate
+    run_remote "cd $REMOTE_DIR && docker compose run --rm certbot certbot certonly --webroot -w /var/www/certbot -d $DOMAIN --non-interactive --agree-tos --email admin@sciencebasedbody.com"
+
+    # Reload nginx to pick up new certs
+    run_remote "cd $REMOTE_DIR && docker compose exec nginx nginx -s reload"
+
+    echo_info "SSL certificate obtained and nginx reloaded"
+fi
+
+# =============================================================================
 # Summary
 # =============================================================================
 echo ""
@@ -174,4 +201,10 @@ echo "  View logs:     docker compose logs -f api"
 echo "  Restart:       docker compose restart api"
 echo "  Shell:         docker compose exec api sh"
 echo "  DB console:    docker compose exec postgres psql -U sbb_user science_based_body"
+echo ""
+echo "First-time deployment:"
+echo "  1. Run setup:  bash scripts/setup-hetzner.sh"
+echo "  2. Copy .env:  cp .env.production.template .env && vim .env"
+echo "  3. Deploy:     ./scripts/deploy-to-hetzner.sh --build --migrate"
+echo "  4. Get SSL:    ./scripts/deploy-to-hetzner.sh --ssl"
 echo ""

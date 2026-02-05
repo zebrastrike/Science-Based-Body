@@ -97,4 +97,19 @@ export class OrdersController {
   ) {
     return this.ordersService.cancelReturn(userId, returnId);
   }
+
+  // ===========================================================================
+  // EMAIL RESEND
+  // ===========================================================================
+
+  @Post(':id/resend-confirmation')
+  @ApiOperation({ summary: 'Resend order confirmation email' })
+  @ApiResponse({ status: 200, description: 'Email sent successfully' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  resendConfirmation(
+    @CurrentUser('id') userId: string,
+    @Param('id') orderId: string,
+  ) {
+    return this.ordersService.resendOrderConfirmation(orderId, userId);
+  }
 }
