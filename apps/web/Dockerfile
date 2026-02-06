@@ -36,6 +36,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_PUBLIC_API_URL=https://api.sbbpeptides.com/api/v1
 ENV NEXT_PUBLIC_SITE_URL=https://sbbpeptides.com
+ENV NEXT_PUBLIC_GA_MEASUREMENT_ID=G-5NLZQKVWBW
 
 # Copy standalone build
 COPY --from=builder /app/.next/standalone ./
