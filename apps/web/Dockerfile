@@ -41,8 +41,10 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-# Copy legacy HTML files to production (for runtime SSR if needed)
+# Copy legacy HTML files and assets to production (for runtime SSR if needed)
 COPY --from=builder /app/*.html ./
+COPY --from=builder /app/styles.css ./
+COPY --from=builder /app/scripts.js ./
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs
