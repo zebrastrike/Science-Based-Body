@@ -12,12 +12,13 @@ RUN npm ci
 # Copy web app source
 COPY apps/web/ ./
 
-# Copy legacy HTML files from repo root
+# Copy legacy HTML files and assets from repo root
 COPY index.html shop.html product.html branded-for-science.html brand-partnerships.html affiliate-program.html ./
 COPY checkout.html about.html support.html faq.html tracking.html ./
 COPY testing-standards.html storage-guidelines.html coa-verification.html ./
 COPY terms.html privacy.html shipping.html returns.html ./
 COPY research-use.html compliance.html cookies.html accessibility.html ./
+COPY styles.css scripts.js ./
 
 # Set build-time environment variables
 ENV NEXT_PUBLIC_API_URL=https://api.sbbpeptides.com/api/v1
