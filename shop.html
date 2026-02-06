@@ -9,6 +9,14 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5NLZQKVWBW"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-5NLZQKVWBW');
+    </script>
   </head>
   <body class="page-shop">
     <div class="bubble-field" aria-hidden="true">
@@ -53,7 +61,7 @@
     <main>
       <section class="section shop-hero">
         <div class="hero-media">
-          <video autoPlay muted loop playsInline>
+          <video autoplay muted loop playsinline webkit-playsinline preload="auto">
             <source src="/media/shop/shop-hero.mp4" type="video/mp4" />
           </video>
         </div>

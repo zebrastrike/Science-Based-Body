@@ -605,7 +605,10 @@ document.addEventListener("DOMContentLoaded", () => {
       bubble.style.left = "0px";
       bubble.style.top = "0px";
       const angle = Math.random() * Math.PI * 2;
-      const speed = 0.6 + Math.random() * 0.8;
+      const isMobile = window.innerWidth <= 768;
+      const speed = isMobile
+        ? 0.2 + Math.random() * 0.3
+        : 0.6 + Math.random() * 0.8;
       bubble.style.transform = `translate3d(${startX}px, ${startY}px, 0)`;
       return {
         el: bubble,
@@ -626,7 +629,10 @@ document.addEventListener("DOMContentLoaded", () => {
       bubble.x = Math.max(0, Math.random() * (width - bubble.size));
       bubble.y = Math.max(0, Math.random() * (height - bubble.size));
       const angle = Math.random() * Math.PI * 2;
-      const speed = 0.6 + Math.random() * 0.8;
+      const mobile = width <= 768;
+      const speed = mobile
+        ? 0.2 + Math.random() * 0.3
+        : 0.6 + Math.random() * 0.8;
       bubble.vx = Math.cos(angle) * speed;
       bubble.vy = Math.sin(angle) * speed;
       bubble.el.style.transform = `translate3d(${bubble.x}px, ${bubble.y}px, 0)`;
@@ -689,8 +695,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const pad = 10;
 
       bubbleState.forEach((bubble) => {
-        const driftX = Math.sin(time / 1400 + bubble.seed) * 0.3;
-        const driftY = Math.cos(time / 1600 + bubble.seed) * 0.3;
+        const mobileScale = window.innerWidth <= 768 ? 0.4 : 1;
+        const driftX = Math.sin(time / 1400 + bubble.seed) * 0.3 * mobileScale;
+        const driftY = Math.cos(time / 1600 + bubble.seed) * 0.3 * mobileScale;
         bubble.x += (bubble.vx + driftX) * dt;
         bubble.y += (bubble.vy + driftY) * dt;
 

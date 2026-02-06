@@ -573,6 +573,14 @@ button.btn {
   height: 100%;
   object-fit: cover;
   filter: saturate(0.95);
+  /* Safari video compatibility */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Fallback background when video fails to load (Safari) */
+.hero-media {
+  background: linear-gradient(135deg, #dde7f2 0%, #e6ecf6 50%, #edf1f4 100%);
 }
 
 .shop-hero {
@@ -3113,4 +3121,57 @@ body.is-ready .reveal {
 .policy-alert p:last-child,
 .policy-alert ul:last-child {
   margin-bottom: 0;
+}
+
+/* ============================================
+   GLASS CARD TEXT READABILITY
+   Dark blue outline on text over glass surfaces
+   ============================================ */
+.hero-copy h1,
+.hero-copy p,
+.hero-copy .label,
+.section-heading h2,
+.section-heading p,
+.shop-hero .hero-copy h1,
+.shop-hero .hero-copy p,
+.shop-hero .hero-copy .label,
+.product-hero-copy h1,
+.product-hero-copy p,
+.product-hero-copy .label {
+  text-shadow:
+    -1px -1px 0 rgba(25, 42, 86, 0.12),
+     1px -1px 0 rgba(25, 42, 86, 0.12),
+    -1px  1px 0 rgba(25, 42, 86, 0.12),
+     1px  1px 0 rgba(25, 42, 86, 0.12),
+     0    0  8px rgba(25, 42, 86, 0.08);
+}
+
+/* Stronger outline on mobile where glass is harder to read */
+@media (max-width: 768px) {
+  .hero-copy h1,
+  .hero-copy p,
+  .hero-copy .label,
+  .section-heading h2,
+  .section-heading p,
+  .shop-hero .hero-copy h1,
+  .shop-hero .hero-copy p,
+  .shop-hero .hero-copy .label,
+  .product-hero-copy h1,
+  .product-hero-copy p,
+  .product-hero-copy .label {
+    text-shadow:
+      -1px -1px 0 rgba(25, 42, 86, 0.22),
+       1px -1px 0 rgba(25, 42, 86, 0.22),
+      -1px  1px 0 rgba(25, 42, 86, 0.22),
+       1px  1px 0 rgba(25, 42, 86, 0.22),
+       0    0  10px rgba(25, 42, 86, 0.15);
+  }
+
+  /* Also boost glass card background opacity on mobile for readability */
+  .hero-copy,
+  .product-hero-copy {
+    --glass-bg-strong: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(48px) saturate(1.8);
+    -webkit-backdrop-filter: blur(48px) saturate(1.8);
+  }
 }
