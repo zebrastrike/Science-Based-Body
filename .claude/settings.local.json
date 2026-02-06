@@ -42,7 +42,8 @@
       "Bash(ssh:*)",
       "Bash(scp:*)",
       "Bash(nslookup:*)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(rsync:*)"
     ]
   }
 }

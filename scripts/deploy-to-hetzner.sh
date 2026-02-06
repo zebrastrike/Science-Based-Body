@@ -114,7 +114,6 @@ rsync -avz --progress \
     --exclude '.next' \
     --exclude '*.log' \
     --exclude 'backups/*' \
-    --exclude 'apps/web' \
     --delete \
     ./ "$SSH_USER@$HETZNER_IP:$REMOTE_DIR/"
 

@@ -1,0 +1,32 @@
+# Git
+.git
+.gitignore
+
+# Node modules (will be installed fresh in container)
+node_modules
+apps/api/node_modules
+apps/web/node_modules
+
+# Build outputs
+apps/web/.next
+apps/api/dist
+.next
+dist
+
+# Development files
+*.log
+.env
+.env.local
+.env.production
+.DS_Store
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Documentation and misc
+*.md
+backups
+coverage
