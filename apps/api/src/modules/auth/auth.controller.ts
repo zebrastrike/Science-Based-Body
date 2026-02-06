@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Get,
   Body,
   Req,
   HttpCode,
@@ -39,6 +40,16 @@ export class AuthController {
     const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
     const userAgent = req.headers['user-agent'];
     return this.authService.login(dto, ipAddress, userAgent);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiResponse({ status: 200, description: 'Returns current user data' })
+  @ApiResponse({ status: 401, description: 'Not authenticated' })
+  async getMe(@CurrentUser() user: any) {
+    return { user };
   }
 
   @Post('refresh')
