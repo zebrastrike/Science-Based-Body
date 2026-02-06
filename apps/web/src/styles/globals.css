@@ -126,6 +126,7 @@
     @apply bg-background-card border border-border-subtle
            rounded-2xl overflow-hidden
            transition-all duration-300;
+    border-width: 1.8pt;
   }
 
   .card-hover {
