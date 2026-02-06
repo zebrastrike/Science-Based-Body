@@ -2862,7 +2862,7 @@ body.is-ready .reveal {
   display: block;
   width: 24px;
   height: 2px;
-  background-color: var(--ink);
+  background-color: #fff;
   position: relative;
   transition: background-color 0.2s ease;
 }
@@ -2873,7 +2873,7 @@ body.is-ready .reveal {
   display: block;
   width: 24px;
   height: 2px;
-  background-color: var(--ink);
+  background-color: #fff;
   position: absolute;
   left: 0;
   transition: transform 0.3s ease, top 0.3s ease;
@@ -2910,7 +2910,7 @@ body.is-ready .reveal {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(31, 42, 54, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   z-index: 99;
   opacity: 0;
   visibility: hidden;
@@ -2943,7 +2943,7 @@ body.is-ready .reveal {
     width: 280px;
     max-width: 85vw;
     height: 100vh;
-    background-color: var(--bone);
+    background-color: rgba(15, 15, 20, 0.95);
     background-image: var(--glass-surface);
     flex-direction: column;
     justify-content: flex-start;
@@ -2951,9 +2951,12 @@ body.is-ready .reveal {
     padding: 100px 24px 40px;
     gap: 0;
     z-index: 100;
-    box-shadow: -4px 0 30px rgba(31, 42, 54, 0.15);
+    box-shadow: -4px 0 30px rgba(0, 0, 0, 0.4);
     transition: right 0.3s ease;
     overflow-y: auto;
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    border-left: 1.8pt solid var(--glass-border);
   }
 
   .site-nav.is-open {
@@ -2964,8 +2967,9 @@ body.is-ready .reveal {
     display: block;
     padding: 16px 0;
     font-size: 1.1rem;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     opacity: 0.9;
+    color: #fff;
   }
 
   .site-nav .nav-link:last-child {
@@ -2984,8 +2988,9 @@ body.is-ready .reveal {
     gap: 12px;
     padding: 16px 0;
     margin-top: 16px;
-    border-top: 1px solid var(--line);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
     font-size: 1rem;
+    color: #fff;
   }
 
   .site-nav .cart-toggle::after {

@@ -37,6 +37,65 @@ export default function LegacyScripts() {
     };
 
     // ============================================
+    // MOBILE NAVIGATION (HAMBURGER MENU)
+    // ============================================
+    const menuToggle = document.querySelector('.menu-toggle');
+    const siteNav = document.querySelector('.site-nav');
+
+    if (menuToggle && siteNav) {
+      let navOverlay = document.querySelector('.nav-overlay');
+      if (!navOverlay) {
+        navOverlay = document.createElement('div');
+        navOverlay.className = 'nav-overlay';
+        document.body.appendChild(navOverlay);
+        cleanups.push(() => navOverlay?.remove());
+      }
+
+      const closeMenu = () => {
+        menuToggle.setAttribute('aria-expanded', 'false');
+        siteNav.classList.remove('is-open');
+        navOverlay?.classList.remove('is-visible');
+        document.body.classList.remove('menu-open');
+      };
+
+      const openMenu = () => {
+        menuToggle.setAttribute('aria-expanded', 'true');
+        siteNav.classList.add('is-open');
+        navOverlay?.classList.add('is-visible');
+        document.body.classList.add('menu-open');
+      };
+
+      const toggleMenu = () => {
+        const isOpen = menuToggle.getAttribute('aria-expanded') === 'true';
+        if (isOpen) closeMenu(); else openMenu();
+      };
+
+      on(menuToggle, 'click', toggleMenu);
+      on(navOverlay, 'click', closeMenu);
+
+      siteNav.querySelectorAll('.nav-link').forEach((link) => {
+        on(link, 'click', () => setTimeout(closeMenu, 100));
+      });
+
+      on(document, 'keydown', ((e: Event) => {
+        if ((e as KeyboardEvent).key === 'Escape' && siteNav.classList.contains('is-open')) {
+          closeMenu();
+        }
+      }) as EventListener);
+
+      let resizeTimer: ReturnType<typeof setTimeout>;
+      const handleResize = () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (window.innerWidth > 768 && siteNav.classList.contains('is-open')) {
+            closeMenu();
+          }
+        }, 100);
+      };
+      on(window, 'resize', handleResize);
+    }
+
+    // ============================================
     // SHOPPING CART MODULE
     // ============================================
     const storageKey = 'sbb_cart';
