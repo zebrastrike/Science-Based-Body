@@ -50,7 +50,8 @@
       "Bash(del \"\\\\?\\\\c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\nul\")",
       "Bash(cmd /c \"del \\\\?\\\\c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\nul\")",
       "Bash(cmd /c \"rd /s /q \\\\?\\\\c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\nul\")",
-      "Bash(cmd /c \"del /f /q \\\\?\\\\c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\nul\")"
+      "Bash(cmd /c \"del /f /q \\\\?\\\\c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\nul\")",
+      "WebFetch(domain:sbbpeptides.com)"
     ]
   }
 }
