@@ -55,7 +55,7 @@ services:
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
       JWT_SECRET: ${JWT_SECRET:?JWT secret required}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:?Encryption key required}
-      CORS_ORIGINS: ${CORS_ORIGINS:-https://sciencebasedbody.com}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://sbbpeptides.com,https://www.sbbpeptides.com,https://sciencebasedbody.com}
       # Cloudflare R2
       R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
       R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}

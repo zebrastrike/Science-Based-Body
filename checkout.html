@@ -141,9 +141,30 @@
                   </div>
                 </div>
 
+                <!-- Shipping Method -->
+                <div class="card checkout-step">
+                  <h2>3. Shipping Method</h2>
+                  <div class="shipping-methods">
+                    <label class="payment-option">
+                      <input type="radio" name="shippingMethod" value="standard" checked />
+                      <span class="payment-label">
+                        <strong>Standard Shipping</strong>
+                        <span id="standard-shipping-label">$20.00 (Free over $500)</span>
+                      </span>
+                    </label>
+                    <label class="payment-option">
+                      <input type="radio" name="shippingMethod" value="expedited" />
+                      <span class="payment-label">
+                        <strong>Expedited Shipping</strong>
+                        <span>$50.00</span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
                 <!-- Payment Method -->
                 <div class="card checkout-step">
-                  <h2>3. Payment Method</h2>
+                  <h2>4. Payment Method</h2>
                   <p class="checkout-note">Select your preferred payment method. A payment link will be sent to your email.</p>
                   <div class="payment-methods">
                     <label class="payment-option">
@@ -179,7 +200,7 @@
 
                 <!-- Compliance Acknowledgments (REQUIRED) -->
                 <div class="card checkout-step compliance-section">
-                  <h2>4. Research Use Acknowledgment</h2>
+                  <h2>5. Research Use Acknowledgment</h2>
                   <p class="compliance-intro">
                     <strong>Important:</strong> All products are sold for research and educational purposes only.
                     You must acknowledge and agree to the following statements to complete your order.
@@ -222,6 +243,9 @@
                   </p>
                 </div>
 
+                <!-- Error Banner -->
+                <div id="checkout-error" style="display:none;background:rgba(220,50,50,0.15);border:1.8pt solid rgba(220,50,50,0.4);color:#ff6b6b;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:0.9rem;"></div>
+
                 <!-- Submit -->
                 <div class="checkout-submit">
                   <button type="submit" class="btn btn-primary btn-large" id="submit-order">
@@ -256,11 +280,14 @@
             <h2>Order Received!</h2>
             <p class="confirmation-order-number">Order #<span id="confirmation-order-id">SBB-XXXXX</span></p>
             <p>Thank you for your order. A payment link has been sent to your email address.</p>
+            <div id="payment-instructions" style="display:none;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:16px;margin:16px 0;text-align:left;">
+              <p style="margin-bottom:8px;"><strong>Payment Instructions:</strong></p>
+              <p id="payment-instructions-text" style="white-space:pre-line;"></p>
+            </div>
             <div class="confirmation-details">
               <p><strong>What happens next:</strong></p>
               <ol>
-                <li>Check your email for the payment link</li>
-                <li>Complete payment using your selected method</li>
+                <li>Complete payment using the instructions above</li>
                 <li>We'll verify and process your order</li>
                 <li>You'll receive tracking info once shipped</li>
               </ol>
@@ -316,117 +343,252 @@
 
     <script src="scripts.js"></script>
     <script>
-      // Checkout page specific functionality
+      // Checkout — wired to backend API
       document.addEventListener('DOMContentLoaded', () => {
-        const checkoutItems = document.getElementById('checkout-items');
+        const API_BASE = window.location.hostname === 'localhost'
+          ? 'http://localhost:3001/api/v1'
+          : 'https://api.sbbpeptides.com/api/v1';
+
+        const checkoutItems  = document.getElementById('checkout-items');
         const checkoutSubtotal = document.getElementById('checkout-subtotal');
-        const checkoutTotal = document.getElementById('checkout-total');
-        const checkoutForm = document.getElementById('checkout-form');
+        const checkoutShipping = document.getElementById('checkout-shipping');
+        const checkoutTotal  = document.getElementById('checkout-total');
+        const checkoutForm   = document.getElementById('checkout-form');
         const complianceWarning = document.getElementById('compliance-warning');
         const confirmationModal = document.getElementById('order-confirmation-modal');
+        const checkoutError  = document.getElementById('checkout-error');
+        const submitBtn      = document.getElementById('submit-order');
 
-        // Load cart items into checkout summary
-        const loadCheckoutItems = () => {
+        let resolvedItems = [];
+        let subtotal = 0;
+
+        /* ── Shipping cost ─────────────────────────────── */
+        const FREE_SHIPPING_THRESHOLD = 500;
+        const STANDARD_SHIPPING = 20;
+        const EXPEDITED_SHIPPING = 50;
+
+        const getShippingCost = () => {
+          const method = document.querySelector('input[name="shippingMethod"]:checked');
+          if (method && method.value === 'expedited') return EXPEDITED_SHIPPING;
+          return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING;
+        };
+
+        const updateTotals = () => {
+          const shipping = getShippingCost();
+          checkoutSubtotal.textContent = '$' + subtotal.toFixed(2);
+          checkoutShipping.textContent = shipping === 0 ? 'FREE' : '$' + shipping.toFixed(2);
+          checkoutTotal.textContent    = '$' + (subtotal + shipping).toFixed(2);
+
+          var stdLabel = document.getElementById('standard-shipping-label');
+          if (stdLabel) {
+            stdLabel.textContent = subtotal >= FREE_SHIPPING_THRESHOLD
+              ? 'FREE (order over $500)'
+              : '$' + STANDARD_SHIPPING.toFixed(2) + ' (Free over $500)';
+          }
+        };
+
+        document.querySelectorAll('input[name="shippingMethod"]').forEach(function (r) {
+          r.addEventListener('change', updateTotals);
+        });
+
+        /* ── Error helper ──────────────────────────────── */
+        const showError = (msg) => {
+          checkoutError.textContent = msg;
+          checkoutError.style.display = 'block';
+          checkoutError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => { checkoutError.style.display = 'none'; }, 12000);
+        };
+
+        /* ── Resolve cart against API ──────────────────── */
+        const loadCheckoutItems = async () => {
           const cart = JSON.parse(localStorage.getItem('sbb_cart') || '[]');
 
           if (cart.length === 0) {
             checkoutItems.innerHTML = '<p class="empty-cart-msg">Your cart is empty. <a href="shop.html">Continue shopping</a></p>';
+            submitBtn.disabled = true;
             return;
           }
 
-          const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+          checkoutItems.innerHTML = '<p>Validating cart items…</p>';
 
-          checkoutItems.innerHTML = cart.map(item => `
-            <div class="checkout-item">
-              <img src="${item.image || '/images/products/vial.png'}" alt="${item.name}" />
-              <div class="checkout-item-details">
-                <h4>${item.name}</h4>
-                ${item.variant ? `<span class="variant">${item.variant}</span>` : ''}
-                <span class="qty">Qty: ${item.quantity}</span>
-              </div>
-              <span class="checkout-item-price">$${(item.price * item.quantity).toFixed(2)}</span>
-            </div>
-          `).join('');
+          try {
+            const res = await fetch(API_BASE + '/checkout/resolve-cart', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                items: cart.map(item => ({
+                  cartId: item.id,
+                  name: item.name,
+                  variant: item.variant || null,
+                  quantity: item.quantity
+                }))
+              })
+            });
 
-          checkoutSubtotal.textContent = `$${subtotal.toFixed(2)}`;
-          checkoutTotal.textContent = `$${subtotal.toFixed(2)}`;
+            if (!res.ok) throw new Error('Failed to validate cart items');
+
+            const data = await res.json();
+            resolvedItems = data.resolvedItems || [];
+
+            if (data.unresolvedItems && data.unresolvedItems.length > 0) {
+              var names = data.unresolvedItems.map(function (u) { return u.name; }).join(', ');
+              showError('Some items could not be found: ' + names);
+            }
+
+            if (resolvedItems.length === 0) {
+              checkoutItems.innerHTML = '<p class="empty-cart-msg">No valid items in cart. <a href="shop.html">Continue shopping</a></p>';
+              submitBtn.disabled = true;
+              return;
+            }
+
+            subtotal = resolvedItems.reduce(function (sum, item) { return sum + item.unitPrice * item.quantity; }, 0);
+
+            checkoutItems.innerHTML = resolvedItems.map(function (item) {
+              return '<div class="checkout-item">' +
+                '<img src="/images/products/vial.png" alt="' + item.productName + '" />' +
+                '<div class="checkout-item-details">' +
+                  '<h4>' + item.productName + '</h4>' +
+                  (item.variantName ? '<span class="variant">' + item.variantName + '</span>' : '') +
+                  '<span class="qty">Qty: ' + item.quantity + '</span>' +
+                '</div>' +
+                '<span class="checkout-item-price">$' + (item.unitPrice * item.quantity).toFixed(2) + '</span>' +
+              '</div>';
+            }).join('');
+
+            updateTotals();
+          } catch (err) {
+            // Fallback: render from localStorage prices
+            console.error('Cart resolution failed:', err);
+            subtotal = cart.reduce(function (sum, item) { return sum + (item.price * item.quantity); }, 0);
+            checkoutItems.innerHTML = cart.map(function (item) {
+              return '<div class="checkout-item">' +
+                '<img src="' + (item.image || '/images/products/vial.png') + '" alt="' + item.name + '" />' +
+                '<div class="checkout-item-details">' +
+                  '<h4>' + item.name + '</h4>' +
+                  (item.variant ? '<span class="variant">' + item.variant + '</span>' : '') +
+                  '<span class="qty">Qty: ' + item.quantity + '</span>' +
+                '</div>' +
+                '<span class="checkout-item-price">$' + (item.price * item.quantity).toFixed(2) + '</span>' +
+              '</div>';
+            }).join('');
+            updateTotals();
+            showError('Could not verify items with server. Prices shown are from your cart.');
+          }
         };
 
         loadCheckoutItems();
 
-        // Form submission
-        checkoutForm.addEventListener('submit', (e) => {
-          e.preventDefault();
+        /* ── Payment method mapping ────────────────────── */
+        var PAYMENT_MAP = {
+          zelle:   'ZELLE',
+          wire:    'WIRE_TRANSFER',
+          cashapp: 'CASHAPP',
+          crypto:  'CRYPTO'
+        };
 
-          // Check all compliance checkboxes
+        /* ── Form submit → API ─────────────────────────── */
+        checkoutForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          checkoutError.style.display = 'none';
+
+          // Validate compliance
           const complianceBoxes = checkoutForm.querySelectorAll('.compliance-checkbox input[type="checkbox"]');
           const allChecked = Array.from(complianceBoxes).every(cb => cb.checked);
-
           if (!allChecked) {
             complianceWarning.style.display = 'block';
             document.querySelector('.compliance-section').scrollIntoView({ behavior: 'smooth' });
             return;
           }
-
           complianceWarning.style.display = 'none';
 
-          // Gather form data
-          const formData = new FormData(checkoutForm);
-          const orderData = {
-            contact: {
-              email: formData.get('email'),
-              phone: formData.get('phone')
-            },
-            shipping: {
-              firstName: formData.get('firstName'),
-              lastName: formData.get('lastName'),
-              company: formData.get('company'),
-              address1: formData.get('address1'),
-              address2: formData.get('address2'),
-              city: formData.get('city'),
-              state: formData.get('state'),
-              zip: formData.get('zip'),
-              country: formData.get('country')
-            },
-            paymentMethod: formData.get('paymentMethod'),
-            compliance: {
-              researchPurposeOnly: formData.get('researchPurposeOnly') === 'on',
-              ageConfirmation: formData.get('ageConfirmation') === 'on',
-              noHumanConsumption: formData.get('noHumanConsumption') === 'on',
-              responsibilityAccepted: formData.get('responsibilityAccepted') === 'on',
-              termsAccepted: formData.get('termsAccepted') === 'on',
-              timestamp: new Date().toISOString()
-            },
-            items: JSON.parse(localStorage.getItem('sbb_cart') || '[]'),
-            orderDate: new Date().toISOString()
-          };
-
-          // Generate order ID
-          const orderId = 'SBB-' + Date.now().toString(36).toUpperCase();
-          orderData.orderId = orderId;
-
-          // Save order to localStorage (for demo - would go to API in production)
-          const orders = JSON.parse(localStorage.getItem('sbb_orders') || '[]');
-          orders.push(orderData);
-          localStorage.setItem('sbb_orders', JSON.stringify(orders));
-
-          // Clear cart
-          localStorage.setItem('sbb_cart', '[]');
-          if (window.SBBCart) {
-            window.SBBCart.items = [];
-            window.SBBCart.updateBadge();
+          if (resolvedItems.length === 0) {
+            showError('No valid items to order. Please add items to your cart.');
+            return;
           }
 
-          // Show confirmation modal
-          document.getElementById('confirmation-order-id').textContent = orderId;
-          confirmationModal.classList.add('is-open');
-          confirmationModal.setAttribute('aria-hidden', 'false');
+          // Disable button while submitting
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Placing Order…';
 
-          // Log for demo purposes
-          console.log('Order submitted:', orderData);
+          const fd = new FormData(checkoutForm);
+          const payRaw = fd.get('paymentMethod');
+
+          const payload = {
+            items: resolvedItems.map(function (item) {
+              var o = { productId: item.productId, quantity: item.quantity };
+              if (item.variantId) o.variantId = item.variantId;
+              return o;
+            }),
+            shippingAddress: {
+              firstName:  fd.get('firstName'),
+              lastName:   fd.get('lastName'),
+              company:    fd.get('company') || undefined,
+              street1:    fd.get('address1'),
+              street2:    fd.get('address2') || undefined,
+              city:       fd.get('city'),
+              state:      fd.get('state'),
+              postalCode: fd.get('zip'),
+              country:    fd.get('country'),
+              phone:      fd.get('phone') || undefined
+            },
+            sameAsShipping:  true,
+            shippingMethod:  fd.get('shippingMethod') || 'standard',
+            paymentMethod:   PAYMENT_MAP[payRaw] || 'ZELLE',
+            compliance: {
+              researchPurposeOnly:   true,
+              ageConfirmation:       true,
+              noHumanConsumption:    true,
+              responsibilityAccepted: true,
+              termsAccepted:         true
+            },
+            guestEmail: fd.get('email')
+          };
+
+          try {
+            const res = await fetch(API_BASE + '/checkout/create-order', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+              var msg = data.message || (data.errors ? data.errors.join(', ') : 'Order submission failed');
+              throw new Error(msg);
+            }
+
+            // Clear cart
+            localStorage.setItem('sbb_cart', '[]');
+            if (window.SBBCart) {
+              window.SBBCart.items = [];
+              window.SBBCart.updateBadge();
+            }
+
+            // Populate confirmation modal
+            var orderNumber = (data.order && data.order.orderNumber) || 'N/A';
+            document.getElementById('confirmation-order-id').textContent = orderNumber;
+
+            // Payment instructions
+            var instrEl   = document.getElementById('payment-instructions');
+            var instrText = document.getElementById('payment-instructions-text');
+            if (data.payment && data.payment.instructions) {
+              instrText.textContent = data.payment.instructions;
+              instrEl.style.display = 'block';
+            }
+
+            confirmationModal.classList.add('is-open');
+            confirmationModal.setAttribute('aria-hidden', 'false');
+          } catch (err) {
+            console.error('Order failed:', err);
+            showError(err.message || 'Something went wrong. Please try again.');
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Place Order & Request Payment Link';
+          }
         });
 
-        // Modal close handlers
+        /* ── Modal close ───────────────────────────────── */
         confirmationModal.querySelectorAll('[data-modal-close]').forEach(el => {
           el.addEventListener('click', () => {
             confirmationModal.classList.remove('is-open');

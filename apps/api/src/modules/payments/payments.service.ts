@@ -95,8 +95,21 @@ export class PaymentsService {
           tag: fallback.cashapp.tag,
           instructions: `Send $[amount] via CashApp to ${fallback.cashapp.tag}. Include order number ${orderNumber} in the note.`,
         };
+      case 'WIRE_TRANSFER':
+        return {
+          method: 'Wire Transfer',
+          instructions: `Contact us at orders@sbbpeptides.com for wire transfer details. Reference order number ${orderNumber}.`,
+        };
+      case 'CRYPTO':
+        return {
+          method: 'Cryptocurrency',
+          instructions: `Contact us at orders@sbbpeptides.com for cryptocurrency payment details (BTC, ETH, USDC accepted). Reference order number ${orderNumber}.`,
+        };
       default:
-        return null;
+        return {
+          method: 'Manual Payment',
+          instructions: `A payment link will be sent to your email. Reference order number ${orderNumber}.`,
+        };
     }
   }
 

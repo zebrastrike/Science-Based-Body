@@ -11,60 +11,9 @@ import { PaymentsService } from '../payments/payments.service';
 import { MailgunService } from '../notifications/mailgun.service';
 import { v4 as uuidv4 } from 'uuid';
 import { PaymentMethod } from '@prisma/client';
+import { CreateOrderDto, ResolveCartItemDto } from './dto/create-order.dto';
 
-export interface CheckoutSession {
-  sessionId: string;
-  cart: Cart;
-  shippingAddress?: any;
-  billingAddress?: any;
-  shippingMethod?: string;
-  shippingCost: number;
-  complianceAcknowledged: boolean;
-  paymentMethod?: PaymentMethod;
-  userId?: string;
-  guestEmail?: string;
-}
-
-export interface CreateOrderDto {
-  items: Array<{ productId: string; variantId?: string; quantity: number }>;
-  shippingAddress: {
-    firstName: string;
-    lastName: string;
-    company?: string;
-    street1: string;
-    street2?: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    country: string;
-    phone?: string;
-  };
-  billingAddress?: {
-    firstName: string;
-    lastName: string;
-    company?: string;
-    street1: string;
-    street2?: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    country: string;
-    phone?: string;
-  };
-  sameAsShipping?: boolean;
-  shippingMethod: string;
-  paymentMethod: PaymentMethod;
-  discountCode?: string;
-  customerNotes?: string;
-  compliance: {
-    researchPurposeOnly: boolean;
-    ageConfirmation: boolean;
-    noHumanConsumption: boolean;
-    responsibilityAccepted: boolean;
-    termsAccepted: boolean;
-  };
-  guestEmail?: string;
-}
+export { CreateOrderDto };
 
 @Injectable()
 export class CheckoutService {
@@ -381,5 +330,93 @@ export class CheckoutService {
         shippingPolicy: '/policies/shipping',
       },
     };
+  }
+
+  /**
+   * Resolve cart items from frontend slugs to database IDs
+   */
+  async resolveCartItems(items: ResolveCartItemDto[]) {
+    const resolved: Array<{
+      productId: string;
+      variantId?: string;
+      quantity: number;
+      productName: string;
+      variantName?: string;
+      unitPrice: number;
+    }> = [];
+    const unresolved: Array<{
+      cartId: string;
+      name: string;
+      reason: string;
+    }> = [];
+
+    for (const item of items) {
+      let product = null;
+
+      // Strategy 1: Exact slug match on cartId
+      product = await this.prisma.product.findFirst({
+        where: { slug: item.cartId, isActive: true },
+        include: { variants: { where: { isActive: true } } },
+      });
+
+      // Strategy 2: Strip variant suffix and try slug match
+      if (!product) {
+        const slugParts = item.cartId.split('-');
+        for (let len = slugParts.length - 1; len >= 1; len--) {
+          const partialSlug = slugParts.slice(0, len).join('-');
+          product = await this.prisma.product.findFirst({
+            where: { slug: partialSlug, isActive: true },
+            include: { variants: { where: { isActive: true } } },
+          });
+          if (product) break;
+        }
+      }
+
+      // Strategy 3: Name match (case-insensitive)
+      if (!product) {
+        product = await this.prisma.product.findFirst({
+          where: {
+            name: { equals: item.name, mode: 'insensitive' },
+            isActive: true,
+          },
+          include: { variants: { where: { isActive: true } } },
+        });
+      }
+
+      if (!product) {
+        unresolved.push({
+          cartId: item.cartId,
+          name: item.name,
+          reason: 'Product not found',
+        });
+        continue;
+      }
+
+      // Find variant if specified
+      let variant = null;
+      if (item.variant && product.variants.length > 0) {
+        variant = product.variants.find(
+          (v) =>
+            v.name.toLowerCase() === item.variant!.toLowerCase() ||
+            v.strength?.toLowerCase() === item.variant!.toLowerCase(),
+        );
+      }
+
+      // If product has variants but none matched, use first variant
+      if (!variant && product.variants.length > 0) {
+        variant = product.variants[0];
+      }
+
+      resolved.push({
+        productId: product.id,
+        variantId: variant?.id,
+        quantity: item.quantity,
+        productName: product.name,
+        variantName: variant?.name,
+        unitPrice: variant ? Number(variant.price) : Number(product.basePrice),
+      });
+    }
+
+    return { resolvedItems: resolved, unresolvedItems: unresolved };
   }
 }

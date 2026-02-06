@@ -8,7 +8,8 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Request } from 'express';
-import { CheckoutService, CreateOrderDto } from './checkout.service';
+import { CheckoutService } from './checkout.service';
+import { CreateOrderDto, ResolveCartDto } from './dto/create-order.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Public } from '../auth/decorators/public.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -41,6 +42,14 @@ export class CheckoutController {
   @ApiResponse({ status: 400, description: 'Invalid cart' })
   async initializeCheckout(@Body() dto: InitCheckoutDto) {
     return this.checkoutService.initializeCheckout(dto.items);
+  }
+
+  @Post('resolve-cart')
+  @Public()
+  @ApiOperation({ summary: 'Resolve cart item slugs to database product IDs' })
+  @ApiResponse({ status: 200, description: 'Cart items resolved' })
+  async resolveCart(@Body() dto: ResolveCartDto) {
+    return this.checkoutService.resolveCartItems(dto.items);
   }
 
   @Post('create-order')
