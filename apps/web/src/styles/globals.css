@@ -135,7 +135,7 @@
 
   .card-glass {
     @apply rounded-2xl;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1.8pt solid rgba(255, 255, 255, 0.2);
     background-color: rgba(255, 255, 255, 0.014);
     background-image: linear-gradient(
       135deg,

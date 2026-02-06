@@ -377,7 +377,7 @@ footer {
   border-radius: var(--radius-md);
   background-color: var(--glass-bg);
   background-image: var(--glass-surface);
-  border: 1px solid var(--glass-border);
+  border: 1.8pt solid var(--glass-border);
   box-shadow: var(--glass-shadow), var(--glass-shine);
   backdrop-filter: blur(32px) saturate(1.6);
   -webkit-backdrop-filter: blur(32px) saturate(1.6);
@@ -404,7 +404,7 @@ button.btn {
 }
 
 .site-header {
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1.8pt solid var(--glass-border);
   background-color: var(--glass-bg-strong);
   background-image: var(--glass-surface);
   box-shadow: var(--glass-shadow), var(--glass-shine);
@@ -474,7 +474,7 @@ button.btn {
   max-width: 560px;
   background-color: var(--glass-bg-strong);
   background-image: var(--glass-surface-strong);
-  border: 1px solid var(--glass-border);
+  border: 1.8pt solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: 48px;
   box-shadow: var(--glass-shadow), var(--glass-shine);
@@ -682,7 +682,7 @@ button.btn {
   background-image: var(--glass-surface);
   border-radius: var(--radius-lg);
   padding: 30px;
-  border: 1px solid var(--glass-border);
+  border: 1.8pt solid var(--glass-border);
   box-shadow: var(--glass-shadow), var(--glass-shine);
   backdrop-filter: blur(32px) saturate(1.6);
   -webkit-backdrop-filter: blur(32px) saturate(1.6);
@@ -706,7 +706,7 @@ button.btn {
   background-image: var(--glass-surface);
   border-radius: var(--radius-lg);
   padding: 28px;
-  border: 1px solid var(--glass-border);
+  border: 1.8pt solid var(--glass-border);
   box-shadow: var(--glass-shadow), var(--glass-shine);
   backdrop-filter: blur(32px) saturate(1.6);
   -webkit-backdrop-filter: blur(32px) saturate(1.6);
@@ -809,7 +809,7 @@ button.btn {
   background-color: var(--glass-bg);
   background-image: var(--glass-surface);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--glass-border);
+  border: 1.8pt solid var(--glass-border);
   padding: 32px;
   box-shadow: var(--glass-shadow), var(--glass-shine);
   backdrop-filter: blur(32px) saturate(1.6);
@@ -839,7 +839,7 @@ button.btn {
   border-radius: var(--radius-lg);
   padding: var(--space-md);
   text-align: center;
-  border: 1px solid var(--glass-border);
+  border: 1.8pt solid var(--glass-border);
   box-shadow: var(--glass-shadow), var(--glass-shine);
   backdrop-filter: blur(32px) saturate(1.6);
   -webkit-backdrop-filter: blur(32px) saturate(1.6);
@@ -853,7 +853,7 @@ button.btn {
   background-color: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(20px) saturate(1.4);
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1.8pt solid var(--glass-border);
   box-shadow: 0 2px 20px rgba(31, 42, 54, 0.06);
   padding: 0;
 }
@@ -1345,7 +1345,7 @@ body.cart-open {
 }
 
 .site-footer {
-  border-top: 1px solid var(--glass-border);
+  border-top: 1.8pt solid var(--glass-border);
   background-color: var(--glass-bg-strong);
   background-image: var(--glass-surface);
   box-shadow: var(--glass-shadow), var(--glass-shine);
@@ -1444,7 +1444,7 @@ body.cart-open {
   align-items: start;
   width: 100%;
   text-align: left;
-  border: 1px solid var(--glass-border);
+  border: 1.8pt solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: 24px;
   background-color: var(--glass-bg);
@@ -1605,7 +1605,7 @@ body.cart-open {
 
 .peptide-card {
   border-radius: var(--radius-lg);
-  border: 1px solid var(--glass-border);
+  border: 1.8pt solid var(--glass-border);
   background-color: var(--glass-bg);
   background-image: var(--glass-surface);
   box-shadow: var(--glass-shadow), var(--glass-shine);
@@ -1775,7 +1775,7 @@ body.cart-open {
   display: block;
   text-align: left;
   width: 100%;
-  border: 1px solid var(--glass-border);
+  border: 1.8pt solid var(--glass-border);
   background-color: var(--glass-bg);
   background-image: var(--glass-surface);
   border-radius: var(--radius-lg);
@@ -1810,7 +1810,7 @@ body.cart-open {
 
 .library-detail {
   border-radius: var(--radius-lg);
-  border: 1px solid var(--glass-border);
+  border: 1.8pt solid var(--glass-border);
   background-color: var(--glass-bg);
   background-image: var(--glass-surface);
   padding: 32px;
@@ -1841,7 +1841,7 @@ body.cart-open {
 
 .library-detail-block {
   border-radius: var(--radius-sm);
-  border: 1px solid var(--glass-border);
+  border: 1.8pt solid var(--glass-border);
   padding: 16px;
   background-color: var(--glass-bg);
   background-image: var(--glass-surface);
@@ -1865,7 +1865,7 @@ body.cart-open {
   border-radius: var(--radius-lg);
   background-color: var(--glass-bg);
   background-image: var(--glass-surface);
-  border: 1px solid var(--glass-border);
+  border: 1.8pt solid var(--glass-border);
   box-shadow: var(--glass-shadow), var(--glass-shine);
   backdrop-filter: blur(32px) saturate(1.6);
   -webkit-backdrop-filter: blur(32px) saturate(1.6);
@@ -1950,7 +1950,7 @@ body.cart-open {
   background-color: var(--glass-bg);
   background-image: var(--glass-surface);
   border-radius: var(--radius-md);
-  border: 1px solid var(--glass-border);
+  border: 1.8pt solid var(--glass-border);
   padding: 0 18px;
   box-shadow: var(--glass-shadow), var(--glass-shine);
   backdrop-filter: blur(32px) saturate(1.6);
@@ -1992,7 +1992,7 @@ body.cart-open {
   width: min(640px, 90%);
   z-index: 1;
   box-shadow: var(--glass-shadow), var(--glass-shine);
-  border: 1px solid var(--glass-border);
+  border: 1.8pt solid var(--glass-border);
   backdrop-filter: blur(40px) saturate(1.7);
   -webkit-backdrop-filter: blur(40px) saturate(1.7);
 }
