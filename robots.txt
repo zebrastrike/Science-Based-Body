@@ -1,5 +1,5 @@
 # Robots.txt for Science Based Body
-# https://sciencebasedbody.com
+# https://sbbpeptides.com
 
 # Allow all crawlers
 User-agent: *
@@ -8,6 +8,8 @@ User-agent: *
 Allow: /
 
 # Disallow admin and private areas
+Disallow: /admin/
+Disallow: /api/
 Disallow: /apps/
 Disallow: /node_modules/
 Disallow: /config/
@@ -25,7 +27,7 @@ Disallow: /*.bak$
 Crawl-delay: 1
 
 # Sitemap location
-Sitemap: https://sciencebasedbody.com/sitemap.xml
+Sitemap: https://sbbpeptides.com/sitemap.xml
 
 # Google specific
 User-agent: Googlebot
