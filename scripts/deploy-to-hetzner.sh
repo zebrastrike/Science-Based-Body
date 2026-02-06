@@ -13,7 +13,7 @@ HETZNER_IP="${HETZNER_SERVER_IP:-YOUR_SERVER_IP}"
 SSH_USER="${HETZNER_SSH_USER:-sbb}"
 SSH_KEY="${HETZNER_SSH_KEY_PATH:-~/.ssh/hetzner_sbb}"
 REMOTE_DIR="/opt/science-based-body"
-DOMAIN="api.sciencebasedbody.com"
+DOMAIN="api.sbbpeptides.com"
 
 # Parse arguments
 BUILD_FLAG=""

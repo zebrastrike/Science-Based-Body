@@ -38,7 +38,11 @@
       "Bash(node --version:*)",
       "Bash(del \"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\logo.svg\")",
       "Bash(npx tsc:*)",
-      "Bash(cmd.exe /c:*)"
+      "Bash(cmd.exe /c:*)",
+      "Bash(ssh:*)",
+      "Bash(scp:*)",
+      "Bash(nslookup:*)",
+      "Bash(ping:*)"
     ]
   }
 }
