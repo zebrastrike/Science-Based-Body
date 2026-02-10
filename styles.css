@@ -480,9 +480,11 @@ button.btn {
 }
 /* Carousel Add-to-Cart button */
 .carousel-atc {
-  background: var(--rose, #e3a7a1) !important;
+  background: rgba(16, 185, 129, 0.18) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: #fff !important;
-  border: none;
+  border: 1.5px solid #1f2a36;
   border-radius: 6px;
   padding: 8px 18px;
   font-size: 0.85rem;
@@ -491,12 +493,14 @@ button.btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  transition: background 0.2s, box-shadow 0.2s;
+  transition: background 0.2s, box-shadow 0.2s, border-color 0.2s;
   margin-top: 6px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
 }
 .carousel-atc:hover {
-  background: #d4908a !important;
-  box-shadow: 0 4px 14px rgba(227,167,161,0.5);
+  background: rgba(16, 185, 129, 0.35) !important;
+  border-color: #10b981;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
 }
 @media (max-width: 768px) {
   .carousel-track .card { flex: 0 0 calc(50% - 0.625rem); }
