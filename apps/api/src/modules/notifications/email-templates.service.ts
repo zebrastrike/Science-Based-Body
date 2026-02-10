@@ -632,6 +632,74 @@ export class EmailTemplatesService {
   }
 
   // ===========================================================================
+  // PARTNER & AFFILIATE APPLICATION AUTO-REPLIES
+  // ===========================================================================
+
+  partnerApplicationReceived(contactName: string, organizationName: string): { subject: string; html: string; text: string } {
+    const subject = 'Thank You for Your Partnership Inquiry - Science Based Body';
+    const html = this.baseTemplate(`
+      <h1 style="margin:0 0 20px 0;font-size:28px;color:${this.ink};font-family:Georgia,'Times New Roman',Times,serif;font-weight:400;">Application Received</h1>
+      <p style="margin:0 0 20px 0;font-size:16px;color:${this.ink};line-height:1.6;">
+        Hi ${contactName},
+      </p>
+      <p style="margin:0 0 20px 0;font-size:16px;color:${this.ink};line-height:1.6;">
+        Thank you for your interest in partnering with Science Based Body! We've received your brand partnership application for <strong>${organizationName}</strong>.
+      </p>
+
+      <div style="background:${this.bone};border-left:4px solid ${this.sage};padding:20px;margin:20px 0;border-radius:0 8px 8px 0;">
+        <p style="margin:0;font-size:15px;color:${this.ink};line-height:1.6;">
+          A member of our team will review your submission and reach out to you soon. We typically respond within 2-3 business days.
+        </p>
+      </div>
+
+      <p style="margin:0 0 20px 0;font-size:16px;color:${this.ink};line-height:1.6;">
+        In the meantime, feel free to explore our product catalog and learn more about what we offer.
+      </p>
+      <p style="margin:0 0 30px 0;text-align:center;">
+        ${this.button('Explore Our Products', 'https://sbbpeptides.com/shop')}
+      </p>
+      <p style="margin:0;font-size:14px;color:#6b7280;">
+        Questions? Reach us at <a href="mailto:sales@sbbpeptides.com" style="color:${this.rose};text-decoration:none;">sales@sbbpeptides.com</a>
+      </p>
+    `, 'Thank you for your interest in partnering with SBB');
+
+    const text = `Hi ${contactName},\n\nThank you for your interest in partnering with Science Based Body! We've received your brand partnership application for ${organizationName}.\n\nA member of our team will review your submission and reach out to you soon. We typically respond within 2-3 business days.\n\nThank you for your interest in SBB!\n\nScience Based Body`;
+    return { subject, html, text };
+  }
+
+  affiliateApplicationReceived(fullName: string): { subject: string; html: string; text: string } {
+    const subject = 'Thank You for Your Affiliate Application - Science Based Body';
+    const html = this.baseTemplate(`
+      <h1 style="margin:0 0 20px 0;font-size:28px;color:${this.ink};font-family:Georgia,'Times New Roman',Times,serif;font-weight:400;">Application Received</h1>
+      <p style="margin:0 0 20px 0;font-size:16px;color:${this.ink};line-height:1.6;">
+        Hi ${fullName},
+      </p>
+      <p style="margin:0 0 20px 0;font-size:16px;color:${this.ink};line-height:1.6;">
+        Thank you for applying to the Science Based Body Affiliate Program! We're excited about the possibility of working together.
+      </p>
+
+      <div style="background:${this.bone};border-left:4px solid ${this.sage};padding:20px;margin:20px 0;border-radius:0 8px 8px 0;">
+        <p style="margin:0;font-size:15px;color:${this.ink};line-height:1.6;">
+          A member of our brand team will review your application and reach out soon. We typically respond within 2-3 business days.
+        </p>
+      </div>
+
+      <p style="margin:0 0 20px 0;font-size:16px;color:${this.ink};line-height:1.6;">
+        Once approved, you'll receive your unique referral link and start earning <strong>5% commission</strong> on every referred sale.
+      </p>
+      <p style="margin:0 0 30px 0;text-align:center;">
+        ${this.button('Learn More About Our Program', 'https://sbbpeptides.com/affiliate-program')}
+      </p>
+      <p style="margin:0;font-size:14px;color:#6b7280;">
+        Questions? Reach us at <a href="mailto:sales@sbbpeptides.com" style="color:${this.rose};text-decoration:none;">sales@sbbpeptides.com</a>
+      </p>
+    `, 'Thank you for applying to the SBB Affiliate Program');
+
+    const text = `Hi ${fullName},\n\nThank you for applying to the Science Based Body Affiliate Program!\n\nA member of our brand team will review your application and reach out soon. We typically respond within 2-3 business days.\n\nOnce approved, you'll receive your unique referral link and start earning 5% commission on every referred sale.\n\nScience Based Body`;
+    return { subject, html, text };
+  }
+
+  // ===========================================================================
   // NEWSLETTER
   // ===========================================================================
 

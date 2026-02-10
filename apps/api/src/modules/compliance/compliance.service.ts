@@ -12,7 +12,7 @@ export class ComplianceService {
     private prisma: PrismaService,
     private config: ConfigService,
   ) {
-    this.minimumAge = this.config.get('MINIMUM_AGE', 21);
+    this.minimumAge = this.config.get('MINIMUM_AGE', 18);
     this.checkboxVersion = this.config.get('COMPLIANCE_CHECKBOX_VERSION', '1.0.0');
   }
 

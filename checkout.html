@@ -120,6 +120,16 @@
 
             <!-- Checkout Form -->
             <div class="checkout-form-container">
+              <!-- Login/Register prompt for guests -->
+              <div id="checkout-auth-banner" class="card checkout-step" style="display:none;text-align:center;padding:20px 28px;">
+                <p style="margin:0 0 12px 0;font-size:0.95rem;color:var(--ink);">
+                  Already have an account? <a href="login.html?redirect=checkout" style="color:var(--rose);font-weight:600;">Sign in</a> for faster checkout.
+                </p>
+                <p style="margin:0;font-size:0.85rem;color:#6b7280;">
+                  Or continue as a guest &mdash; we'll create an account for you automatically.
+                </p>
+              </div>
+
               <form id="checkout-form" class="checkout-form">
                 <!-- Contact Information -->
                 <div class="card checkout-step">
@@ -262,7 +272,7 @@
                     <label class="compliance-checkbox">
                       <input type="checkbox" id="compliance2" name="ageConfirmation" required />
                       <span class="checkbox-mark"></span>
-                      <span class="checkbox-text">I confirm I am <strong>21 years of age or older</strong>.</span>
+                      <span class="checkbox-text">I confirm I am <strong>18 years of age or older</strong>.</span>
                     </label>
 
                     <label class="compliance-checkbox">
@@ -391,6 +401,7 @@
     <script>
       // Checkout — wired to backend API
       document.addEventListener('DOMContentLoaded', () => {
+        window.scrollTo(0, 0);
         const API_BASE = window.location.hostname === 'localhost'
           ? 'http://localhost:3001/api/v1'
           : 'https://api.sbbpeptides.com/api/v1';
@@ -410,7 +421,7 @@
         let subtotal = 0;
         let taxAmount = 0;
 
-        /* ── Pre-fill from logged-in user ──────────── */
+        /* ── Pre-fill from logged-in user or show auth banner ── */
         try {
           var savedUser = JSON.parse(localStorage.getItem('sbb_user'));
           if (savedUser && localStorage.getItem('accessToken')) {
@@ -418,8 +429,14 @@
             if (savedUser.phone) document.getElementById('phone').value = savedUser.phone;
             if (savedUser.firstName) document.getElementById('firstName').value = savedUser.firstName;
             if (savedUser.lastName) document.getElementById('lastName').value = savedUser.lastName;
+          } else {
+            var authBanner = document.getElementById('checkout-auth-banner');
+            if (authBanner) authBanner.style.display = 'block';
           }
-        } catch (e) {}
+        } catch (e) {
+          var authBanner = document.getElementById('checkout-auth-banner');
+          if (authBanner) authBanner.style.display = 'block';
+        }
 
         /* ── Master compliance "Agree to All" toggle ── */
         const masterCheckbox = document.getElementById('compliance-all');

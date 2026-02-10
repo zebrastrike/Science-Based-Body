@@ -328,7 +328,7 @@ export class SupportService {
           },
           {
             question: 'Do I need a license to purchase?',
-            answer: 'Individual researchers do not typically need a specific license for personal research purchases. However, you must be at least 21 years old and acknowledge our terms of service, including agreement not to use products for human consumption.',
+            answer: 'Individual researchers do not typically need a specific license for personal research purchases. However, you must be at least 18 years old and acknowledge our terms of service, including agreement not to use products for human consumption.',
           },
           {
             question: 'Why do I need to check compliance boxes at checkout?',

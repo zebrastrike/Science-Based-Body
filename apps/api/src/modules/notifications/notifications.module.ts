@@ -15,6 +15,6 @@ import { EmailTemplatesService } from './email-templates.service';
     { provide: MailgunService, useExisting: SmtpService },
     ResendService,
   ],
-  exports: [SmtpService, MailgunService, ResendService],
+  exports: [SmtpService, MailgunService, ResendService, EmailTemplatesService],
 })
 export class NotificationsModule {}

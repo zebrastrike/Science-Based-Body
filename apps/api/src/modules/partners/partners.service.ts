@@ -2,6 +2,7 @@ import { Injectable, Logger, BadRequestException, NotFoundException } from '@nes
 import { PrismaService } from '../../prisma/prisma.service';
 import { LocalStorageService } from '../files/local-storage.service';
 import { MailgunService } from '../notifications/mailgun.service';
+import { EmailTemplatesService } from '../notifications/email-templates.service';
 import { ApplyPartnerDto } from './dto/apply-partner.dto';
 import { v4 as uuidv4 } from 'uuid';
 import * as bcrypt from 'bcrypt';
@@ -14,6 +15,7 @@ export class PartnersService {
     private prisma: PrismaService,
     private storage: LocalStorageService,
     private mailService: MailgunService,
+    private emailTemplates: EmailTemplatesService,
   ) {}
 
   /**
@@ -79,6 +81,18 @@ export class PartnersService {
         attachments,
       })
       .catch((err) => this.logger.error('Failed to notify admin of partner application:', err));
+
+    // Send auto-reply confirmation to applicant (non-blocking)
+    const autoReply = this.emailTemplates.partnerApplicationReceived(dto.contactName, dto.organizationName);
+    this.mailService
+      .sendEmail({
+        to: dto.email,
+        subject: autoReply.subject,
+        html: autoReply.html,
+        text: autoReply.text,
+        tags: ['partner', 'auto-reply'],
+      })
+      .catch((err) => this.logger.error('Failed to send partner application auto-reply:', err));
 
     return { id: application.id, message: 'Application submitted successfully' };
   }

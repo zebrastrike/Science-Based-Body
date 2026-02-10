@@ -281,6 +281,10 @@
           pageTitle.textContent = 'Sign In';
         });
 
+        /* ── Check for ?redirect= param ── */
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectParam = urlParams.get('redirect');
+
         /* ── Role-based redirect ───────── */
         const ROLE_REDIRECTS = {
           SUPER_ADMIN:   '/admin',
@@ -369,10 +373,14 @@
             const user = await fetchProfile(data.accessToken);
             localStorage.setItem('sbb_user', JSON.stringify(user));
 
-            // Redirect based on role
-            const role = user.role || 'CLIENT';
-            const redirect = ROLE_REDIRECTS[role] || '/shop';
-            window.location.href = redirect;
+            // Redirect: honor ?redirect= param, else role-based
+            if (redirectParam) {
+              window.location.href = '/' + redirectParam;
+            } else {
+              const role = user.role || 'CLIENT';
+              const redirect = ROLE_REDIRECTS[role] || '/shop';
+              window.location.href = redirect;
+            }
 
           } catch (err) {
             showError(err.message || 'Invalid email or password.');
@@ -420,7 +428,7 @@
             const user = await fetchProfile(data.accessToken);
             localStorage.setItem('sbb_user', JSON.stringify(user));
 
-            window.location.href = '/shop';
+            window.location.href = redirectParam ? '/' + redirectParam : '/shop';
 
           } catch (err) {
             showError(err.message || 'Could not create account. Please try again.');
