@@ -364,21 +364,21 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       };
 
-      // Add to cart buttons
+      // Add to cart buttons (event delegation so dynamic carousel buttons work too)
       ensureAddToCartButtons();
-      document.querySelectorAll("[data-add-to-cart]").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          const product = {
-            id: btn.dataset.productId || btn.dataset.addToCart,
-            name: btn.dataset.productName || "Product",
-            variant: btn.dataset.productVariant || "",
-            price: btn.dataset.productPrice || 0,
-            quantity: parseInt(btn.dataset.productQty, 10) || 1,
-            image: btn.dataset.productImage || "/images/products/vial.png"
-          };
-          this.add(product);
-        });
+      document.body.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-add-to-cart]");
+        if (!btn) return;
+        e.preventDefault();
+        const product = {
+          id: btn.dataset.productId || btn.dataset.addToCart,
+          name: btn.dataset.productName || "Product",
+          variant: btn.dataset.productVariant || "",
+          price: btn.dataset.productPrice || 0,
+          quantity: parseInt(btn.dataset.productQty, 10) || 1,
+          image: btn.dataset.productImage || "/images/products/vial.png"
+        };
+        SBBCart.add(product);
       });
     },
 
