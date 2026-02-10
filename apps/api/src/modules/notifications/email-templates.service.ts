@@ -23,6 +23,7 @@ interface OrderDetails {
     state: string;
     postalCode: string;
   };
+  paymentMethod?: string;
 }
 
 @Injectable()
@@ -271,6 +272,7 @@ export class EmailTemplatesService {
       </p>
 
       <div style="background:linear-gradient(135deg, rgba(227,167,161,0.08), rgba(199,215,230,0.08));border-radius:10px;padding:24px;margin-bottom:20px;border:1px solid rgba(185,203,182,0.3);">
+        ${!order.paymentMethod || order.paymentMethod === 'ZELLE' ? `
         <!-- Zelle -->
         <table role="presentation" style="width:100%;margin-bottom:18px;">
           <tr>
@@ -284,7 +286,9 @@ export class EmailTemplatesService {
             </td>
           </tr>
         </table>
+        ` : ''}
 
+        ${!order.paymentMethod || order.paymentMethod === 'VENMO' ? `
         <!-- Venmo -->
         <table role="presentation" style="width:100%;margin-bottom:18px;">
           <tr>
@@ -298,6 +302,7 @@ export class EmailTemplatesService {
             </td>
           </tr>
         </table>
+        ` : ''}
 
       </div>
 
@@ -367,7 +372,12 @@ export class EmailTemplatesService {
       </p>
     `, `Order #${order.orderNumber} received - Please complete payment`);
 
-    const text = `Thank You for Your Order - #${order.orderNumber}\n\nTotal Due: $${order.total.toFixed(2)}\n\nPlease send payment via one of the following:\n\nZelle: HEALTH SBB - 702-686-5343\nVenmo: @healthsbb - 702-686-5343\n\nIMPORTANT: Include invoice #${order.orderNumber} in the payment note.\n\nOnce payment is received, your order will be processed and shipped.\n\nView order: https://sciencebasedbody.com/account/orders/${order.orderNumber}`;
+    const paymentText = order.paymentMethod === 'VENMO'
+      ? 'Venmo: @healthsbb - 702-686-5343'
+      : order.paymentMethod === 'ZELLE'
+        ? 'Zelle: HEALTH SBB - 702-686-5343'
+        : 'Zelle: HEALTH SBB - 702-686-5343\nVenmo: @healthsbb - 702-686-5343';
+    const text = `Thank You for Your Order - #${order.orderNumber}\n\nTotal Due: $${order.total.toFixed(2)}\n\nPlease send payment via:\n\n${paymentText}\n\nIMPORTANT: Include invoice #${order.orderNumber} in the payment note.\n\nOnce payment is received, your order will be processed and shipped.\n\nView order: https://sciencebasedbody.com/account/orders/${order.orderNumber}`;
     return { subject, html, text };
   }
 

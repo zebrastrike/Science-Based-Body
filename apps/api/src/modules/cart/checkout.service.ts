@@ -278,6 +278,7 @@ export class CheckoutService {
       discount: cart.discountAmount,
       total: totalAmount,
       shippingAddress: dto.shippingAddress,
+      paymentMethod: dto.paymentMethod,
     };
 
     const firstName = dto.shippingAddress.firstName;
