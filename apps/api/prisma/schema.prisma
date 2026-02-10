@@ -158,6 +158,9 @@ model User {
   dateOfBirth       String?     // Encrypted
   governmentId      String?     // Encrypted
 
+  // Admin notes (internal only)
+  adminNotes      String?
+
   // Loyalty
   loyaltyPoints         Int       @default(0)
   lifetimeLoyaltyPoints Int       @default(0)

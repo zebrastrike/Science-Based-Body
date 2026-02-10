@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Delete,
   Param,
   Query,
@@ -355,6 +356,19 @@ export class AdminController {
     @Body() body: { status: UserStatus; reason?: string },
   ) {
     return this.adminService.updateUserStatus(id, body.status, req.user.id, body.reason);
+  }
+
+  @Patch('users/:id')
+  @ApiOperation({ summary: 'Patch user fields (status, adminNotes)' })
+  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiResponse({ status: 200, description: 'User updated' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  patchUser(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() body: { status?: UserStatus; adminNotes?: string },
+  ) {
+    return this.adminService.patchUser(id, body, req.user.id);
   }
 
   // ==========================================================================

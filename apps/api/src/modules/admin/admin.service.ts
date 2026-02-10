@@ -658,6 +658,53 @@ export class AdminService {
     return { success: true, status: updatedUser.status };
   }
 
+  async patchUser(userId: string, data: { status?: UserStatus; adminNotes?: string }, adminId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const updateData: Record<string, any> = {};
+    const previousState: Record<string, any> = {};
+    const newState: Record<string, any> = {};
+
+    if (data.status !== undefined) {
+      previousState.status = user.status;
+      newState.status = data.status;
+      updateData.status = data.status;
+    }
+
+    if (data.adminNotes !== undefined) {
+      previousState.adminNotes = user.adminNotes;
+      newState.adminNotes = data.adminNotes;
+      updateData.adminNotes = data.adminNotes;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return { success: true };
+    }
+
+    const [updatedUser] = await this.prisma.$transaction([
+      this.prisma.user.update({ where: { id: userId }, data: updateData }),
+      this.prisma.auditLog.create({
+        data: {
+          adminId,
+          action: 'UPDATE',
+          resourceType: 'User',
+          resourceId: userId,
+          previousState,
+          newState,
+        },
+      }),
+    ]);
+
+    return {
+      success: true,
+      status: updatedUser.status,
+      adminNotes: updatedUser.adminNotes,
+    };
+  }
+
   // ==========================================================================
   // INVENTORY
   // ==========================================================================
