@@ -277,14 +277,15 @@ PAYMENT_VENMO_EMAIL=sales@sbbpeptides.com
 # Epicor Propello (enable when ready)
 EPICOR_PROPELLO_ENABLED=false
 
-# Shippo Shipping
-SHIPPO_API_KEY=<your-live-shippo-key>
-SHIPPO_RETURN_NAME=SBB Health
-SHIPPO_RETURN_STREET=<your-warehouse-street>
-SHIPPO_RETURN_CITY=Gilbert
-SHIPPO_RETURN_STATE=AZ
-SHIPPO_RETURN_ZIP=<your-zip>
-SHIPPO_RETURN_COUNTRY=US
+# EasyPost Shipping
+EASYPOST_API_KEY=<your-live-easypost-key>
+RETURN_ADDRESS_NAME=SBB Health
+RETURN_ADDRESS_STREET=<your-warehouse-street>
+RETURN_ADDRESS_CITY=Gilbert
+RETURN_ADDRESS_STATE=AZ
+RETURN_ADDRESS_ZIP=<your-zip>
+RETURN_ADDRESS_COUNTRY=US
+RETURN_ADDRESS_PHONE=<your-phone>
 
 # TaxJar (Sales Tax)
 TAXJAR_API_KEY=<your-live-taxjar-key>

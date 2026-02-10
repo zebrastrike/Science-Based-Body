@@ -668,10 +668,10 @@ model Shipment {
   carrier         String?       // "USPS", "FEDEX", "UPS"
   serviceLevel    String?       // "Priority Mail", "Ground", etc.
 
-  // Shippo
-  shippoShipmentId String?
-  shippoRateId    String?
-  shippoTransactionId String?
+  // Shipping provider IDs (EasyPost)
+  externalShipmentId    String?  @map("shippoShipmentId")
+  externalRateId        String?  @map("shippoRateId")
+  externalTransactionId String?  @map("shippoTransactionId")
 
   // Tracking
   trackingNumber  String?

@@ -40,6 +40,10 @@ export class TaxService {
   private readonly fromZip: string;
   private readonly fromCountry: string;
 
+  // Arizona flat-rate fallback when TaxJar is unavailable
+  // AZ TPT: 5.6% state + 0.7% Maricopa County + 1.5% Gilbert = 7.8%
+  private readonly ARIZONA_TAX_RATE = 0.078;
+
   constructor(private config: ConfigService) {
     this.apiKey = this.config.get('TAXJAR_API_KEY', '');
     this.isEnabled = !!this.apiKey;
@@ -50,13 +54,45 @@ export class TaxService {
     this.fromCountry = this.config.get('TAXJAR_FROM_COUNTRY', 'US');
 
     if (!this.isEnabled) {
-      this.logger.warn('TaxJar is not configured - tax will be $0');
+      this.logger.warn('TaxJar not configured — using AZ flat-rate fallback (7.8%)');
     }
+  }
+
+  /**
+   * Flat-rate Arizona tax fallback for when TaxJar is unavailable.
+   * Only applies to AZ shipping destinations (our only nexus state).
+   * Non-AZ orders get $0 tax until proper nexus analysis via TaxJar.
+   */
+  private calculateFallbackTax(
+    toState: string,
+    lineItems: TaxLineItem[],
+  ): TaxCalculationResult {
+    const lineItemTotal = lineItems.reduce(
+      (sum, item) => sum + item.unitPrice * item.quantity,
+      0,
+    );
+
+    if (toState?.toUpperCase() !== 'AZ') {
+      return { taxAmount: 0, taxRate: 0, taxableAmount: lineItemTotal };
+    }
+
+    const taxAmount = Math.round(lineItemTotal * this.ARIZONA_TAX_RATE * 100) / 100;
+    return {
+      taxAmount,
+      taxRate: this.ARIZONA_TAX_RATE,
+      taxableAmount: lineItemTotal,
+      breakdown: {
+        stateTax: Math.round(lineItemTotal * 0.056 * 100) / 100,
+        countyTax: Math.round(lineItemTotal * 0.007 * 100) / 100,
+        cityTax: Math.round(lineItemTotal * 0.015 * 100) / 100,
+        specialTax: 0,
+      },
+    };
   }
 
   async calculateTax(request: TaxCalculationRequest): Promise<TaxCalculationResult> {
     if (!this.isEnabled) {
-      return { taxAmount: 0, taxRate: 0, taxableAmount: 0 };
+      return this.calculateFallbackTax(request.toState, request.lineItems);
     }
 
     const lineItemTotal = request.lineItems.reduce(
@@ -95,8 +131,8 @@ export class TaxService {
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
-        this.logger.error(`TaxJar error: ${response.status} ${JSON.stringify(err)}`);
-        return { taxAmount: 0, taxRate: 0, taxableAmount: lineItemTotal };
+        this.logger.error(`TaxJar error: ${response.status} ${JSON.stringify(err)} — using AZ fallback`);
+        return this.calculateFallbackTax(request.toState, request.lineItems);
       }
 
       const data = await response.json();
@@ -116,8 +152,8 @@ export class TaxService {
           : undefined,
       };
     } catch (error) {
-      this.logger.error(`Tax calculation failed: ${error.message}`);
-      return { taxAmount: 0, taxRate: 0, taxableAmount: lineItemTotal };
+      this.logger.error(`Tax calculation failed: ${error.message} — using AZ fallback`);
+      return this.calculateFallbackTax(request.toState, request.lineItems);
     }
   }
 

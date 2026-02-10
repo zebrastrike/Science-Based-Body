@@ -14,7 +14,7 @@ You are responsible for:
 - API endpoints and business logic (NestJS)
 - Authentication and authorization (JWT)
 - Payment processing integration (Epicor Propello)
-- Shipping integration (Shippo)
+- Shipping integration (EasyPost)
 - File storage (Cloudflare R2)
 - Email notifications (Mailgun)
 - Compliance backend logic
@@ -143,7 +143,7 @@ See `.env.example` for complete list. Critical variables:
 - `ENCRYPTION_KEY` - PII encryption (64 hex chars)
 - `R2_*` - Cloudflare R2 credentials
 - `EPICOR_*` - Payment processor credentials
-- `SHIPPO_API_KEY` - Shipping integration
+- `EASYPOST_API_KEY` - Shipping integration
 - `MAILGUN_*` - Email service
 
 ## Compliance Checkboxes (Required at Checkout)
@@ -159,5 +159,5 @@ See `.env.example` for complete list. Critical variables:
 1. **Hetzner** - Database (PostgreSQL) + API hosting
 2. **Cloudflare R2** - File storage (COAs, KYC documents)
 3. **Epicor Propello** - Payment processing
-4. **Shippo** - Shipping labels and tracking
+4. **EasyPost** - Shipping labels and tracking
 5. **Mailgun** - Transactional emails

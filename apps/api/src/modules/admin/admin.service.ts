@@ -1901,7 +1901,7 @@ export class AdminService {
   }
 
   // ==========================================================================
-  // ORDER FULFILLMENT (Shippo + Manual Payment Approval)
+  // ORDER FULFILLMENT (EasyPost + Manual Payment Approval)
   // ==========================================================================
 
   /**
@@ -1954,7 +1954,7 @@ export class AdminService {
   }
 
   /**
-   * Get live shipping rates from Shippo for an order
+   * Get live shipping rates from EasyPost for an order
    */
   async getShippingRates(orderId: string) {
     const order = await this.prisma.order.findUnique({
@@ -1994,11 +1994,11 @@ export class AdminService {
         where: { orderId },
         create: {
           orderId,
-          shippoShipmentId: result.shipmentId,
+          externalShipmentId: result.shipmentId,
           shippingCost: 0,
         },
         update: {
-          shippoShipmentId: result.shipmentId,
+          externalShipmentId: result.shipmentId,
         },
       });
     }
@@ -2018,7 +2018,7 @@ export class AdminService {
   }
 
   /**
-   * Create shipping label from a selected Shippo rate
+   * Create shipping label from a selected rate
    */
   async createShippingLabel(orderId: string, rateId: string, adminId: string) {
     const order = await this.prisma.order.findUnique({
@@ -2032,12 +2032,13 @@ export class AdminService {
 
     if (!order) throw new NotFoundException('Order not found');
 
-    // Create label via Shippo
-    const transaction = await this.shippoService.createLabel(rateId);
+    // Create label via EasyPost (pass cached shipment ID for resilience)
+    const shipmentId = order.shipment?.externalShipmentId || undefined;
+    const transaction = await this.shippoService.createLabel(rateId, shipmentId);
 
     if (transaction.status !== 'SUCCESS') {
       throw new BadRequestException(
-        `Shippo label creation failed: ${JSON.stringify(transaction.messages || transaction.status)}`,
+        `Shipping label creation failed: ${JSON.stringify(transaction.messages || transaction.status)}`,
       );
     }
 
@@ -2053,8 +2054,8 @@ export class AdminService {
         trackingNumber: transaction.tracking_number,
         trackingUrl: transaction.tracking_url_provider,
         labelUrl: transaction.label_url,
-        shippoTransactionId: transaction.object_id,
-        shippoRateId: rateId,
+        externalTransactionId: transaction.object_id,
+        externalRateId: rateId,
         shippingCost: rateAmount,
         shippedAt: new Date(),
       },
@@ -2065,8 +2066,8 @@ export class AdminService {
         trackingNumber: transaction.tracking_number,
         trackingUrl: transaction.tracking_url_provider,
         labelUrl: transaction.label_url,
-        shippoTransactionId: transaction.object_id,
-        shippoRateId: rateId,
+        externalTransactionId: transaction.object_id,
+        externalRateId: rateId,
         shippingCost: rateAmount,
         shippedAt: new Date(),
       },
@@ -2135,7 +2136,7 @@ export class AdminService {
     if (!ratesResult.rates || ratesResult.rates.length === 0) {
       return {
         ...paymentResult,
-        shipping: { error: 'No shipping rates available from Shippo' },
+        shipping: { error: 'No shipping rates available' },
       };
     }
 
