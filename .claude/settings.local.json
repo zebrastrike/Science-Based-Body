@@ -51,7 +51,20 @@
       "Bash(cmd /c \"del \\\\?\\\\c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\nul\")",
       "Bash(cmd /c \"rd /s /q \\\\?\\\\c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\nul\")",
       "Bash(cmd /c \"del /f /q \\\\?\\\\c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\nul\")",
-      "WebFetch(domain:sbbpeptides.com)"
+      "WebFetch(domain:sbbpeptides.com)",
+      "Bash(docker:*)",
+      "Bash(pg_isready:*)",
+      "Bash(\"c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body\\\\_update_bubbles.ps1\" << 'SCRIPTEOF'\n$files = @\\(\n    'testing-standards.html',\n    'coa-verification.html',\n    'brand-partnerships.html',\n    'accessibility.html',\n    'cookies.html',\n    'compliance.html',\n    'research-use.html',\n    'returns.html',\n    'shipping.html',\n    'privacy.html',\n    'terms.html',\n    'storage-guidelines.html',\n    'tracking.html',\n    'faq.html',\n    'support.html',\n    'about.html',\n    'affiliate-program.html',\n    'branded-for-science.html',\n    'product.html'\n\\)\n\n$base = 'c:\\\\Users\\\\keyse_pt9dxr4\\\\Science-Based-Body\\\\Science-Based-Body'\n\n$oldText = \"      <span class=`\"bubble bubble-10`\"></span>`r`n    </div>\"\n\n$newText = @\"\n      <span class=\"bubble bubble-10\"></span>\n      <span class=\"bubble bubble-11\"></span>\n      <span class=\"bubble bubble-12\"></span>\n      <span class=\"bubble bubble-13\"></span>\n      <span class=\"bubble bubble-14\"></span>\n      <span class=\"bubble bubble-15\"></span>\n      <span class=\"bubble bubble-16\"></span>\n      <span class=\"bubble bubble-17\"></span>\n      <span class=\"bubble bubble-18\"></span>\n      <span class=\"bubble bubble-19\"></span>\n      <span class=\"bubble bubble-20\"></span>\n    </div>\n\"@\n\nforeach \\($f in $files\\) {\n    $path = Join-Path $base $f\n    if \\(Test-Path $path\\) {\n        $content = [System.IO.File]::ReadAllText\\($path\\)\n        if \\($content.Contains\\('bubble-11'\\)\\) {\n            Write-Host \"SKIPPED \\(already updated\\): $f\"\n        } elseif \\($content.Contains\\($oldText\\)\\) {\n            $content = $content.Replace\\($oldText, $newText\\)\n            [System.IO.File]::WriteAllText\\($path, $content\\)\n            Write-Host \"UPDATED: $f\"\n        } else {\n            Write-Host \"PATTERN NOT FOUND: $f\"\n        }\n    } else {\n        Write-Host \"FILE NOT FOUND: $f\"\n    }\n}\nSCRIPTEOF)",
+      "Bash(powershell -ExecutionPolicy Bypass -File:*)",
+      "Bash(pip install:*)",
+      "Bash(wmic process where \"name=''node.exe''\" get processid,commandline)",
+      "Bash(python:*)",
+      "Bash(npx nest build:*)",
+      "Bash(git status:*)",
+      "Bash(find:*)",
+      "Bash(python3:*)",
+      "Bash(node -e:*)",
+      "Bash(wmic process where \"name=''node.exe''\" get ProcessId,CommandLine)"
     ]
   }
 }

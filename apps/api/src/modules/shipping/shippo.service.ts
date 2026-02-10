@@ -39,7 +39,7 @@ export class ShippoService {
     return data.rates || [];
   }
 
-  async createLabel(rateId: string) {
+  async createLabel(rateId: string, shipmentId?: string) {
     const response = await fetch('https://api.goshippo.com/transactions/', {
       method: 'POST',
       headers: {
