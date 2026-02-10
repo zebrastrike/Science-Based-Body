@@ -1,0 +1,14 @@
+# robots.txt for sbbpeptides.com
+User-agent: *
+Allow: /
+
+# Disallow private/admin areas
+Disallow: /admin
+Disallow: /admin/
+Disallow: /checkout
+Disallow: /tracking
+Disallow: /api/
+Disallow: /_next/
+
+# Sitemap
+Sitemap: https://sbbpeptides.com/sitemap.xml
