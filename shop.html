@@ -201,6 +201,28 @@
           </div>
           <div class="shop-grid">
 
+            <!-- Retatrutide (displayed first - flagship metabolic) -->
+            <article class="card product-card reveal">
+              <img class="product-image" src="/images/products/vial.png" alt="Retatrutide" />
+              <div class="product-body">
+                <span class="label">METABOLIC</span>
+                <h3>Retatrutide</h3>
+                <p>Triple agonist (GLP-1/GIP/Glucagon) for metabolic research.</p>
+                <span class="price">From $250.00</span>
+                <select class="variant-select" data-product-slug="retatrutide">
+                  <option value="retatrutide-10mg" data-price="250.00">10mg - $250.00</option>
+                  <option value="retatrutide-15mg" data-price="275.00">15mg - $275.00</option>
+                  <option value="retatrutide-20mg" data-price="325.00">20mg - $325.00</option>
+                  <option value="retatrutide-30mg" data-price="350.00">30mg - $350.00</option>
+                  <option value="retatrutide-40mg" data-price="400.00">40mg - $400.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="retatrutide-10mg" data-product-name="Retatrutide" data-product-variant="10mg" data-product-price="250.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+
             <!-- Semaglutide -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Semaglutide" />
@@ -243,28 +265,6 @@
                   <option value="tirzepatide-60mg" data-price="260.00">60mg - $260.00</option>
                 </select>
                 <button type="button" class="btn-add-cart" data-add-to-cart="tirzepatide-5mg" data-product-name="Tirzepatide" data-product-variant="5mg" data-product-price="50.00">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
-                  Add to Cart
-                </button>
-              </div>
-            </article>
-
-            <!-- Retatrutide (NO 5mg - wholesale only) -->
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="Retatrutide" />
-              <div class="product-body">
-                <span class="label">METABOLIC</span>
-                <h3>Retatrutide</h3>
-                <p>Triple agonist (GLP-1/GIP/Glucagon) for metabolic research.</p>
-                <span class="price">From $250.00</span>
-                <select class="variant-select" data-product-slug="retatrutide">
-                  <option value="retatrutide-10mg" data-price="250.00">10mg - $250.00</option>
-                  <option value="retatrutide-15mg" data-price="275.00">15mg - $275.00</option>
-                  <option value="retatrutide-20mg" data-price="325.00">20mg - $325.00</option>
-                  <option value="retatrutide-30mg" data-price="350.00">30mg - $350.00</option>
-                  <option value="retatrutide-40mg" data-price="400.00">40mg - $400.00</option>
-                </select>
-                <button type="button" class="btn-add-cart" data-add-to-cart="retatrutide-10mg" data-product-name="Retatrutide" data-product-variant="10mg" data-product-price="250.00">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
                   Add to Cart
                 </button>
@@ -1822,8 +1822,11 @@
             var maxIdx = Math.max(0, inStockProducts.length - perPage);
             function slideTo(i) {
               idx = Math.max(0, Math.min(i, maxIdx));
-              var pct = idx * (100 / perPage);
-              track.style.transform = 'translateX(-' + pct + '%)';
+              if (track.children.length === 0) return;
+              var card = track.children[0];
+              var gap = parseFloat(getComputedStyle(track).gap) || 20;
+              var offset = idx * (card.offsetWidth + gap);
+              track.style.transform = 'translateX(-' + offset + 'px)';
             }
             var wrap = track.parentElement;
             var prevBtn = wrap.querySelector('.carousel-prev');
