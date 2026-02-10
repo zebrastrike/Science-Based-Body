@@ -149,6 +149,7 @@ export class CatalogService {
         ? product.inventory.quantity > product.inventory.reservedQuantity
         : true,
       stockQuantity: product.inventory?.quantity || 0,
+      leadTimeDays: product.inventory?.leadTimeDays || null,
       isFeatured: product.isFeatured,
     }));
 
@@ -245,6 +246,8 @@ export class CatalogService {
       inStock: product.inventory
         ? product.inventory.quantity > product.inventory.reservedQuantity
         : true,
+      stockQuantity: product.inventory?.quantity || 0,
+      leadTimeDays: product.inventory?.leadTimeDays || null,
     };
   }
 

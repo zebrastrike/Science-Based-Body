@@ -396,6 +396,29 @@ button.btn {
   text-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 0 14px rgba(59, 130, 246, 0.7), 0 0 32px rgba(59, 130, 246, 0.35);
 }
 
+/* Stock availability badges */
+.stock-badge {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  margin: 6px 0 2px;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+.stock-in {
+  color: #166534;
+  background: rgba(22, 163, 74, 0.15);
+  border: 1px solid rgba(22, 163, 74, 0.3);
+}
+.stock-special {
+  color: #92400e;
+  background: rgba(217, 119, 6, 0.12);
+  border: 1px solid rgba(217, 119, 6, 0.3);
+  font-size: 0.72rem;
+}
+
 .site-header {
   border-bottom: 1px solid var(--glass-border);
   background-color: var(--glass-bg-strong);

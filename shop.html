@@ -1713,5 +1713,44 @@
     <div id="marketing-popup-root"></div>
 
     <script src="scripts.js"></script>
+    <script>
+      // Dynamic stock badge injection — fetches live inventory from API
+      (function() {
+        var API = window.SBB_CONFIG ? window.SBB_CONFIG.API_URL : 'https://api.sbbpeptides.com/api/v1';
+        fetch(API + '/catalog/products?limit=100')
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            var products = data.products || [];
+            var stockMap = {};
+            products.forEach(function(p) {
+              stockMap[p.slug] = { inStock: p.inStock, qty: p.stockQuantity || 0, lead: p.leadTimeDays };
+            });
+            document.querySelectorAll('.variant-select[data-product-slug]').forEach(function(sel) {
+              var slug = sel.getAttribute('data-product-slug');
+              var info = stockMap[slug];
+              var card = sel.closest('.product-card');
+              if (!card) return;
+              // Remove any existing badge
+              var old = card.querySelector('.stock-badge');
+              if (old) old.remove();
+              var badge = document.createElement('span');
+              if (info && info.qty > 0) {
+                badge.className = 'stock-badge stock-in';
+                badge.textContent = 'In Stock';
+              } else {
+                badge.className = 'stock-badge stock-special';
+                var days = (info && info.lead) ? info.lead : 7;
+                badge.textContent = 'Special Order \u2014 Ships in ' + days + ' business days';
+              }
+              // Insert badge after the price
+              var priceEl = card.querySelector('.price');
+              if (priceEl && priceEl.parentNode) {
+                priceEl.parentNode.insertBefore(badge, priceEl.nextSibling);
+              }
+            });
+          })
+          .catch(function(err) { console.warn('Stock badge fetch failed:', err); });
+      })();
+    </script>
   </body>
 </html>
