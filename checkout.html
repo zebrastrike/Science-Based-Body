@@ -364,6 +364,7 @@
             </div>
             <h2>Order Received!</h2>
             <p class="confirmation-order-number">Order #<span id="confirmation-order-id">SBB-XXXXX</span></p>
+            <p style="font-size:1.3rem;font-weight:700;margin:8px 0;">Total: <span id="confirmation-total">$0.00</span></p>
             <p>Thank you for your order. A payment link has been sent to your email address.</p>
             <div id="payment-instructions" style="display:none;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:16px;margin:16px 0;text-align:left;">
               <p style="margin-bottom:8px;"><strong>Payment Instructions:</strong></p>
@@ -903,6 +904,8 @@
             // Populate confirmation modal
             var orderNumber = (data.order && data.order.orderNumber) || 'N/A';
             document.getElementById('confirmation-order-id').textContent = orderNumber;
+            var orderTotal = (data.order && data.order.totalAmount) ? parseFloat(data.order.totalAmount).toFixed(2) : '0.00';
+            document.getElementById('confirmation-total').textContent = '$' + orderTotal;
 
             // Payment instructions
             var instrEl   = document.getElementById('payment-instructions');

@@ -72,15 +72,16 @@ export class PaymentsService {
     // For manual payment methods, return payment info
     return {
       payment,
-      instructions: this.getPaymentInstructions(method, order.orderNumber),
+      instructions: this.getPaymentInstructions(method, order.orderNumber, amount),
     };
   }
 
   /**
    * Get payment instructions for manual methods
    */
-  private getPaymentInstructions(method: PaymentMethod, orderNumber: string) {
+  private getPaymentInstructions(method: PaymentMethod, orderNumber: string, amount: number) {
     const fallback = this.propello.getFallbackPaymentMethods();
+    const formattedAmount = amount.toFixed(2);
 
     switch (method) {
       case 'ZELLE':
@@ -88,14 +89,14 @@ export class PaymentsService {
           method: 'Zelle',
           name: fallback.zelle.name,
           phone: fallback.zelle.phone,
-          instructions: `Send $[amount] via Zelle to HEALTH SBB (${fallback.zelle.phone}). Include invoice number ${orderNumber} in the memo.`,
+          instructions: `Send $${formattedAmount} via Zelle to HEALTH SBB (${fallback.zelle.phone}). Include invoice number ${orderNumber} in the memo.`,
         };
       case 'VENMO':
         return {
           method: 'Venmo',
           username: fallback.venmo.username,
           phone: fallback.venmo.phone,
-          instructions: `Send $[amount] via Venmo to ${fallback.venmo.username} (${fallback.venmo.phone}). Include invoice number ${orderNumber} in the note.`,
+          instructions: `Send $${formattedAmount} via Venmo to ${fallback.venmo.username} (${fallback.venmo.phone}). Include invoice number ${orderNumber} in the note.`,
         };
       case 'WIRE_TRANSFER':
         return {
