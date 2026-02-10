@@ -37,9 +37,11 @@ RUN npx prisma generate
 # Copy built application
 COPY --from=builder /app/dist ./dist
 
-# Create non-root user
+# Create uploads directory and non-root user
+RUN mkdir -p /app/uploads/affiliates /app/uploads/partners
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nestjs -u 1001
+RUN chown -R nestjs:nodejs /app/uploads
 USER nestjs
 
 # Expose port

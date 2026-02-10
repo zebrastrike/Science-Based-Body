@@ -21,9 +21,13 @@ export class LocalStorageService {
     const subdirs = ['affiliates', 'partners'];
     for (const sub of subdirs) {
       const dir = path.join(this.uploadDir, sub);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-        this.logger.log(`Created upload directory: ${dir}`);
+      try {
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+          this.logger.log(`Created upload directory: ${dir}`);
+        }
+      } catch (err) {
+        this.logger.warn(`Could not create upload directory ${dir}: ${err.message}. File uploads to this path will fail.`);
       }
     }
   }
