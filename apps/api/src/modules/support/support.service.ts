@@ -13,6 +13,7 @@ interface ContactFormDto {
 
 interface NewsletterDto {
   email: string;
+  source?: string;
 }
 
 @Injectable()
@@ -68,8 +69,32 @@ export class SupportService {
       throw new BadRequestException('Valid email address is required');
     }
 
-    // Check if already subscribed (you'd want a Newsletter model in schema)
-    // For now, we'll handle this simply
+    // Upsert subscriber — reactivate if previously unsubscribed
+    const existing = await this.prisma.newsletterSubscriber.findUnique({
+      where: { email: dto.email.toLowerCase() },
+    });
+
+    if (existing && existing.isActive) {
+      // Already subscribed — return success silently
+      return {
+        success: true,
+        message: 'Thank you for subscribing! Check your inbox for a confirmation.',
+      };
+    }
+
+    await this.prisma.newsletterSubscriber.upsert({
+      where: { email: dto.email.toLowerCase() },
+      create: {
+        email: dto.email.toLowerCase(),
+        source: dto.source || 'unknown',
+        isActive: true,
+      },
+      update: {
+        isActive: true,
+        source: dto.source || existing?.source || 'unknown',
+        unsubscribedAt: null,
+      },
+    });
 
     // Send welcome email
     await this.mailgun.sendNewsletterWelcome(dto.email);
@@ -85,13 +110,56 @@ export class SupportService {
       throw new BadRequestException('Valid email address is required');
     }
 
-    // Handle unsubscribe logic
-    // In production, you'd update a database record
+    await this.prisma.newsletterSubscriber.updateMany({
+      where: { email: email.toLowerCase(), isActive: true },
+      data: { isActive: false, unsubscribedAt: new Date() },
+    });
 
     return {
       success: true,
       message: 'You have been unsubscribed from our newsletter.',
     };
+  }
+
+  // ===========================================================================
+  // MARKETING POPUP
+  // ===========================================================================
+
+  async getActivePopup(page?: string) {
+    const now = new Date();
+    const popups = await this.prisma.marketingPopup.findMany({
+      where: {
+        isActive: true,
+        OR: [
+          { startsAt: null },
+          { startsAt: { lte: now } },
+        ],
+      },
+      orderBy: { priority: 'desc' },
+    });
+
+    for (const popup of popups) {
+      if (popup.expiresAt && popup.expiresAt < now) continue;
+      if (popup.showOnPages.length > 0 && page && !popup.showOnPages.includes(page)) continue;
+
+      // Increment impressions (non-blocking)
+      this.prisma.marketingPopup.update({
+        where: { id: popup.id },
+        data: { impressions: { increment: 1 } },
+      }).catch(() => {});
+
+      return popup;
+    }
+
+    return null;
+  }
+
+  async recordPopupConversion(id: string) {
+    await this.prisma.marketingPopup.update({
+      where: { id },
+      data: { conversions: { increment: 1 } },
+    }).catch(() => {});
+    return { success: true };
   }
 
   // ===========================================================================
@@ -260,7 +328,7 @@ export class SupportService {
           },
           {
             question: 'Do I need a license to purchase?',
-            answer: 'Individual researchers do not typically need a specific license for personal research purchases. However, you must be at least 21 years old and acknowledge our terms of service, including agreement not to use products for human consumption.',
+            answer: 'Individual researchers do not typically need a specific license for personal research purchases. However, you must be at least 18 years old and acknowledge our terms of service, including agreement not to use products for human consumption.',
           },
           {
             question: 'Why do I need to check compliance boxes at checkout?',

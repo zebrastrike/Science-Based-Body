@@ -80,8 +80,8 @@ export class OrdersService {
       });
     }
 
-    // Calculate shipping - flat rate: $20 standard, FREE over $500
-    const shippingCost = subtotal >= 500 ? 0 : 20;
+    // Calculate shipping - $25 standard, FREE over $500
+    const shippingCost = subtotal >= 500 ? 0 : 25;
     const totalAmount = subtotal + shippingCost;
 
     // Get shipping address for email
@@ -209,6 +209,18 @@ export class OrdersService {
         include: {
           items: true,
           payments: true,
+          shipment: {
+            select: {
+              id: true,
+              status: true,
+              carrier: true,
+              trackingNumber: true,
+              trackingUrl: true,
+              estimatedDelivery: true,
+              shippedAt: true,
+              deliveredAt: true,
+            },
+          },
         },
       }),
       this.prisma.order.count({ where: { userId } }),
@@ -524,6 +536,16 @@ export class OrdersService {
     });
 
     this.logger.log(`Return request created: ${returnRequest.id} for order ${order.orderNumber}`);
+
+    // Notify admin of new return request (non-blocking)
+    this.mailgunService
+      .notifyAdminReturnRequest(
+        order.orderNumber,
+        order.user.email,
+        `${data.reason}${data.reasonDetails ? ': ' + data.reasonDetails : ''}`,
+        returnItems.map((ri) => ({ name: ri.productName + (ri.variantName ? ` (${ri.variantName})` : ''), quantity: ri.quantity })),
+      )
+      .catch((err) => this.logger.error('Failed to send admin return notification:', err));
 
     return returnRequest;
   }

@@ -3,7 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Testing Standards | Science Based Body</title>
+    <title>Quality Assurance | Science Based Body</title>
+    <meta name="description" content="American-made research peptides with HPLC + Mass Spectrometry dual-method purity verification, independent microbial testing, and COA documentation for every batch." />
     <link
       href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400&family=Sora:wght@300;400;500&display=swap"
       rel="stylesheet"
@@ -30,14 +31,34 @@
       <span class="bubble bubble-8"></span>
       <span class="bubble bubble-9"></span>
       <span class="bubble bubble-10"></span>
+      <span class="bubble bubble-11"></span>
+      <span class="bubble bubble-12"></span>
+      <span class="bubble bubble-13"></span>
+      <span class="bubble bubble-14"></span>
+      <span class="bubble bubble-15"></span>
+      <span class="bubble bubble-16"></span>
+      <span class="bubble bubble-17"></span>
+      <span class="bubble bubble-18"></span>
+      <span class="bubble bubble-19"></span>
+      <span class="bubble bubble-20"></span>
     </div>
     <header class="site-header">
       <div class="container header-grid">
         <a class="logo" href="index.html">
           <img src="/logo.png" alt="Science Based Body" />
         </a>
+        <div class="site-search" id="site-search">
+          <input type="text" class="site-search-input" id="search-input" placeholder="Search peptides..." autocomplete="off" aria-label="Search products" />
+          <button type="button" class="site-search-btn" aria-label="Search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          </button>
+          <div class="search-results" id="search-results"></div>
+        </div>
         <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
           <span class="menu-icon"></span>
+        </button>
+        <button type="button" class="mobile-search-toggle" id="mobile-search-toggle" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         </button>
         <nav class="site-nav">
           <a href="index.html" class="nav-link">Home</a>
@@ -50,34 +71,199 @@
     </header>
 
     <main>
+      <!-- HERO -->
       <section class="section">
         <div class="container">
           <div class="section-heading reveal">
-            <span class="label">TESTING STANDARDS</span>
-            <h1>Testing Standards</h1>
+            <span class="label">QUALITY ASSURANCE</span>
+            <h1>Our Quality Promise</h1>
             <p>
-              How we verify identity and purity for research batches.
+              Every batch of research material we supply is American-made, independently tested, and documented with full traceability. Here is how we verify identity and purity.
             </p>
+          </div>
+
+          <!-- TRUST BADGES -->
+          <div class="quality-badge-strip reveal">
+            <a href="#american-made" class="quality-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L3 7v6c0 5.25 3.75 10.13 9 11.25C17.25 23.13 21 18.25 21 13V7l-9-5z"/><path d="M9 12l2 2 4-4"/></svg>
+              <span>American Made</span>
+            </a>
+            <a href="#purity" class="quality-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 3h6v4H9z"/><path d="M12 7v7"/><circle cx="12" cy="17" r="3"/><path d="M6 21h12"/></svg>
+              <span>HPLC + MS Verified</span>
+            </a>
+            <a href="#microbial" class="quality-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/><path d="M4.5 4.5l2 2"/><path d="M19.5 4.5l-2 2"/></svg>
+              <span>Independent Microbial Lab</span>
+            </a>
+            <a href="#coa" class="quality-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
+              <span>COA Every Batch</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- AMERICAN MADE -->
+      <section class="section" id="american-made">
+        <div class="container">
+          <div class="section-heading reveal">
+            <span class="label">ORIGIN</span>
+            <h2>American Made</h2>
           </div>
           <div class="split-grid">
             <div class="card reveal">
-              <span class="label">Analytical methods</span>
-              <p>Testing methods vary by batch and compound.</p>
+              <span class="label">Manufacturing</span>
+              <p>
+                All Science Based Body research materials are manufactured domestically in the United States. Our operations are based in Montana with fulfillment from Gilbert, Arizona.
+              </p>
               <ul>
-                <li>HPLC purity analysis</li>
-                <li>Mass spectrometry identification</li>
-                <li>Batch level COA documentation</li>
+                <li>US-based manufacturing and synthesis</li>
+                <li>Domestic sourcing of raw materials where available</li>
+                <li>Fulfillment from our Gilbert, AZ facility</li>
               </ul>
             </div>
             <div class="card reveal">
-              <span class="label">Documentation</span>
-              <p>Documentation is tied to batch IDs.</p>
+              <span class="label">Supply chain</span>
+              <p>
+                We maintain a transparent, traceable supply chain from raw material sourcing through final packaging. No outsourced production to unverified overseas facilities.
+              </p>
               <ul>
-                <li>COAs tied to batch IDs</li>
-                <li>Retention of testing records</li>
-                <li>Replace with your exact lab methods</li>
+                <li>Direct relationships with US manufacturers</li>
+                <li>Complete chain of custody documentation</li>
+                <li>No anonymous intermediaries or repackaging</li>
               </ul>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DUAL-METHOD PURITY VERIFICATION -->
+      <section class="section" id="purity">
+        <div class="container">
+          <div class="section-heading reveal">
+            <span class="label">ANALYTICAL METHODS</span>
+            <h2>Dual-Method Purity Verification</h2>
+          </div>
+          <div class="split-grid">
+            <div class="card reveal">
+              <span class="label">HPLC Analysis</span>
+              <p>
+                High-Performance Liquid Chromatography (HPLC) is the gold standard for verifying peptide purity. This method separates a sample into its individual components and measures the concentration of the target compound.
+              </p>
+              <ul>
+                <li>Quantitative purity percentage per batch</li>
+                <li>Detection of impurities and degradation products</li>
+                <li>Industry-standard analytical method for peptide research materials</li>
+              </ul>
+            </div>
+            <div class="card reveal">
+              <span class="label">Mass Spectrometry</span>
+              <p>
+                Mass Spectrometry (MS) confirms the molecular identity of each batch by measuring molecular weight. This ensures the material matches the expected compound structure — not just purity, but correct identity.
+              </p>
+              <ul>
+                <li>Confirms exact molecular weight and structure</li>
+                <li>Verifies compound identity independent of HPLC</li>
+                <li>Two methods, one conclusion — dual confirmation</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- INDEPENDENT MICROBIAL TESTING -->
+      <section class="section" id="microbial">
+        <div class="container">
+          <div class="section-heading reveal">
+            <span class="label">STERILITY</span>
+            <h2>Independent Microbial Testing</h2>
+          </div>
+          <div class="split-grid">
+            <div class="card reveal">
+              <span class="label">Third-party lab</span>
+              <p>
+                Microbial testing is performed by an independent laboratory — not by the manufacturer and not in-house. This separation ensures unbiased results with no conflict of interest.
+              </p>
+              <ul>
+                <li>Independent third-party microbial laboratory</li>
+                <li>Endotoxin screening per batch</li>
+                <li>Sterility and bioburden assessment</li>
+              </ul>
+            </div>
+            <div class="card reveal">
+              <span class="label">What we test</span>
+              <p>
+                Every batch is screened for microbial contamination before release. Results are documented and included with batch records.
+              </p>
+              <ul>
+                <li>Bacterial endotoxin levels (LAL testing)</li>
+                <li>Total aerobic microbial count</li>
+                <li>Yeast and mold screening</li>
+                <li>Results documented in batch records</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CERTIFICATE OF ANALYSIS -->
+      <section class="section" id="coa">
+        <div class="container">
+          <div class="section-heading reveal">
+            <span class="label">DOCUMENTATION</span>
+            <h2>Certificate of Analysis</h2>
+          </div>
+          <div class="split-grid">
+            <div class="card reveal">
+              <span class="label">What's in a COA</span>
+              <p>
+                Every order ships with a Certificate of Analysis tied to the specific batch. Each COA contains the analytical data needed to verify the identity and purity of your research materials.
+              </p>
+              <ul>
+                <li>Unique batch number for traceability</li>
+                <li>HPLC purity percentage result</li>
+                <li>Mass spectrometry molecular weight confirmation</li>
+                <li>Test date, method, and lab identifier</li>
+                <li>Manufacturing and expiration dates</li>
+              </ul>
+            </div>
+            <div class="card reveal">
+              <span class="label">Verification</span>
+              <p>
+                Every batch is traceable from source material to your shipment. If you need to verify a COA or request a replacement, our support team can assist.
+              </p>
+              <ul>
+                <li>Match your batch ID to the COA document</li>
+                <li>Verify lab identifier and test methods</li>
+                <li><a href="coa-verification.html" class="text-link">How to read your COA →</a></li>
+                <li><a href="support.html" class="text-link">Contact support for verification →</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BOTTOM BADGE STRIP -->
+      <section class="section">
+        <div class="container">
+          <div class="quality-badge-strip reveal">
+            <a href="#american-made" class="quality-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L3 7v6c0 5.25 3.75 10.13 9 11.25C17.25 23.13 21 18.25 21 13V7l-9-5z"/><path d="M9 12l2 2 4-4"/></svg>
+              <span>American Made</span>
+            </a>
+            <a href="#purity" class="quality-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 3h6v4H9z"/><path d="M12 7v7"/><circle cx="12" cy="17" r="3"/><path d="M6 21h12"/></svg>
+              <span>HPLC + MS Verified</span>
+            </a>
+            <a href="#microbial" class="quality-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/><path d="M4.5 4.5l2 2"/><path d="M19.5 4.5l-2 2"/></svg>
+              <span>Independent Microbial Lab</span>
+            </a>
+            <a href="#coa" class="quality-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
+              <span>COA Every Batch</span>
+            </a>
           </div>
         </div>
       </section>
@@ -92,7 +278,7 @@
             </a>
             <span class="label">SCIENCE BASED BODY</span>
           </div>
-          <p>Research peptide supply with transparent batch standards.</p>
+          <p>American-made research peptides with dual-method purity verification.</p>
         </div>
         <div class="footer-links">
           <a href="about.html" class="text-link">About</a>
@@ -105,7 +291,7 @@
           <a href="privacy.html" class="text-link">Privacy</a>
           <a href="cookies.html" class="text-link">Cookies</a>
           <a href="accessibility.html" class="text-link">Accessibility</a>
-          <a href="testing-standards.html" class="text-link">Testing Standards</a>
+          <a href="testing-standards.html" class="text-link">Quality Assurance</a>
           <a href="storage-guidelines.html" class="text-link">Storage Guidelines</a>
           <a href="coa-verification.html" class="text-link">COA Verification</a>
           <a href="research-use.html" class="text-link">Research Use Only</a>

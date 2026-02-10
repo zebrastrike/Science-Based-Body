@@ -49,7 +49,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Returns current user data' })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
   async getMe(@CurrentUser() user: any) {
-    return { user };
+    return user;
   }
 
   @Post('refresh')

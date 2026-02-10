@@ -6,9 +6,10 @@ import { CheckoutController } from './checkout.controller';
 import { ComplianceModule } from '../compliance/compliance.module';
 import { PaymentsModule } from '../payments/payments.module';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { TaxModule } from '../tax/tax.module';
 
 @Module({
-  imports: [ComplianceModule, PaymentsModule, NotificationsModule],
+  imports: [ComplianceModule, PaymentsModule, NotificationsModule, TaxModule],
   controllers: [CartController, CheckoutController],
   providers: [CartService, CheckoutService],
   exports: [CartService, CheckoutService],

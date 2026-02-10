@@ -116,6 +116,14 @@ export class CreateOrderDto {
   @IsOptional()
   @IsString()
   guestEmail?: string;
+
+  @IsOptional()
+  @IsNumber()
+  taxAmount?: number;
+
+  @IsOptional()
+  @IsString()
+  affiliateReferralCode?: string;
 }
 
 export class ResolveCartItemDto {

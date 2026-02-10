@@ -10,8 +10,9 @@ set -e
 
 # Configuration
 HETZNER_IP="${HETZNER_SERVER_IP:-YOUR_SERVER_IP}"
-SSH_USER="${HETZNER_SSH_USER:-sbb}"
-SSH_KEY="${HETZNER_SSH_KEY_PATH:-~/.ssh/hetzner_sbb}"
+SSH_USER="${HETZNER_SSH_USER:-root}"
+SSH_KEY="${HETZNER_SSH_KEY_PATH:-~/.ssh/id_ed25519_sbbpep_hetzner}"
+SSH_PORT="${HETZNER_SSH_PORT:-2222}"
 REMOTE_DIR="/opt/science-based-body"
 DOMAIN="api.sbbpeptides.com"
 
@@ -56,7 +57,7 @@ echo -e "${GREEN}═════════════════════
 echo -e "${GREEN}  Science Based Body - Production Deployment${NC}"
 echo -e "${GREEN}════════════════════════════════════════════════════${NC}"
 echo ""
-echo -e "Server:  ${YELLOW}$SSH_USER@$HETZNER_IP${NC}"
+echo -e "Server:  ${YELLOW}$SSH_USER@$HETZNER_IP:$SSH_PORT${NC}"
 echo -e "Path:    ${YELLOW}$REMOTE_DIR${NC}"
 echo -e "Domain:  ${YELLOW}$DOMAIN${NC}"
 echo ""
@@ -73,12 +74,12 @@ SSH_KEY="${SSH_KEY/#\~/$HOME}"
 
 # Function to run remote commands
 run_remote() {
-    ssh -i "$SSH_KEY" -o StrictHostKeyChecking=accept-new "$SSH_USER@$HETZNER_IP" "$1"
+    ssh -i "$SSH_KEY" -p "$SSH_PORT" -o StrictHostKeyChecking=accept-new "$SSH_USER@$HETZNER_IP" "$1"
 }
 
 # Function to copy files
 copy_to_remote() {
-    scp -i "$SSH_KEY" -r "$1" "$SSH_USER@$HETZNER_IP:$2"
+    scp -i "$SSH_KEY" -P "$SSH_PORT" -r "$1" "$SSH_USER@$HETZNER_IP:$2"
 }
 
 # =============================================================================
@@ -104,7 +105,7 @@ fi
 echo_step "Syncing files to server..."
 
 rsync -avz --progress \
-    -e "ssh -i $SSH_KEY" \
+    -e "ssh -i $SSH_KEY -p $SSH_PORT" \
     --exclude 'node_modules' \
     --exclude '.git' \
     --exclude '.env' \

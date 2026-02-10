@@ -7,14 +7,19 @@ import { ToastStack, useToasts } from '@/components/admin/Toast';
 interface Discount {
   id: string;
   code: string;
-  type: 'PERCENTAGE' | 'FIXED' | 'FREE_SHIPPING';
+  description?: string;
+  type: 'PERCENTAGE' | 'FIXED_AMOUNT' | 'FREE_SHIPPING';
   value: number;
   usageCount: number;
   usageLimit?: number;
+  perUserLimit?: number;
   minOrderAmount?: number;
-  expiryDate?: string;
+  maxDiscountAmount?: number;
+  startsAt?: string;
+  expiresAt?: string;
   status: 'ACTIVE' | 'INACTIVE';
-  appliesToProducts?: string[];
+  productIds?: string[];
+  categoryIds?: string[];
 }
 
 const statusColors: Record<string, string> = {
@@ -57,7 +62,7 @@ export default function DiscountsPage() {
           usageCount: 12,
           usageLimit: 100,
           minOrderAmount: 100,
-          expiryDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
+          expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
           status: 'ACTIVE',
         },
         {
@@ -93,17 +98,33 @@ export default function DiscountsPage() {
 
   const handleSave = async () => {
     try {
+      const payload: Record<string, unknown> = {
+        code: formState.code,
+        description: formState.description || undefined,
+        type: formState.type,
+        value: formState.value,
+        minOrderAmount: formState.minOrderAmount || undefined,
+        maxDiscountAmount: formState.maxDiscountAmount || undefined,
+        usageLimit: formState.usageLimit || undefined,
+        perUserLimit: formState.perUserLimit || undefined,
+        startsAt: formState.startsAt || undefined,
+        expiresAt: formState.expiresAt || undefined,
+        productIds: formState.productIds?.length ? formState.productIds : undefined,
+        categoryIds: formState.categoryIds?.length ? formState.categoryIds : undefined,
+      };
+
       if (formState.id) {
+        const { code, type, ...updatePayload } = payload;
         await adminRequest(`/admin/discounts/${formState.id}`, {
           method: 'PUT',
-          body: JSON.stringify(formState),
+          body: JSON.stringify(updatePayload),
         });
         setDiscounts((prev) => prev.map((disc) => (disc.id === formState.id ? formState : disc)));
         push('Discount updated.');
       } else {
         const response = await adminRequest<Discount>('/admin/discounts', {
           method: 'POST',
-          body: JSON.stringify(formState),
+          body: JSON.stringify(payload),
         });
         setDiscounts((prev) => [response || { ...formState, id: `new-${Date.now()}` }, ...prev]);
         push('Discount created.');
@@ -125,8 +146,7 @@ export default function DiscountsPage() {
     if (!confirmDeactivate) return;
     try {
       await adminRequest(`/admin/discounts/${confirmDeactivate.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status: 'INACTIVE' }),
+        method: 'DELETE',
       });
       setDiscounts((prev) =>
         prev.map((disc) => (disc.id === confirmDeactivate.id ? { ...disc, status: 'INACTIVE' } : disc)),
@@ -155,7 +175,7 @@ export default function DiscountsPage() {
 
   const formatValue = (discount: Discount) => {
     if (discount.type === 'PERCENTAGE') return `${discount.value}%`;
-    if (discount.type === 'FIXED') return `$${discount.value}`;
+    if (discount.type === 'FIXED_AMOUNT') return `$${discount.value}`;
     return 'Free Shipping';
   };
 
@@ -216,7 +236,7 @@ export default function DiscountsPage() {
                       {discount.usageCount}
                       {discount.usageLimit ? ` / ${discount.usageLimit}` : ''}
                     </td>
-                    <td className="px-4 py-3 text-zinc-400">{formatDate(discount.expiryDate)}</td>
+                    <td className="px-4 py-3 text-zinc-400">{formatDate(discount.expiresAt)}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${statusColors[discount.status]}`}>
                         {discount.status}
@@ -268,6 +288,7 @@ export default function DiscountsPage() {
                     onChange={(e) => setFormState({ ...formState, code: e.target.value.toUpperCase() })}
                     className="w-full px-4 py-2.5 bg-background-secondary border border-border rounded-lg text-white"
                     placeholder="RESEARCH10"
+                    disabled={!!formState.id}
                   />
                 </div>
                 <div>
@@ -276,29 +297,57 @@ export default function DiscountsPage() {
                     value={formState.type}
                     onChange={(e) => setFormState({ ...formState, type: e.target.value as Discount['type'] })}
                     className="w-full px-4 py-2.5 bg-background-secondary border border-border rounded-lg text-white"
+                    disabled={!!formState.id}
                   >
                     <option value="PERCENTAGE">Percentage off</option>
-                    <option value="FIXED">Fixed amount</option>
+                    <option value="FIXED_AMOUNT">Fixed amount</option>
                     <option value="FREE_SHIPPING">Free shipping</option>
                   </select>
                 </div>
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-zinc-400 mb-2">Description</label>
+                <input
+                  type="text"
+                  value={formState.description || ''}
+                  onChange={(e) => setFormState({ ...formState, description: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-background-secondary border border-border rounded-lg text-white"
+                  placeholder="e.g. 10% off for new customers"
+                />
+              </div>
+
               {formState.type !== 'FREE_SHIPPING' && (
-                <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-2">Value</label>
-                  <input
-                    type="number"
-                    value={formState.value}
-                    onChange={(e) => setFormState({ ...formState, value: Number(e.target.value) })}
-                    className="w-full px-4 py-2.5 bg-background-secondary border border-border rounded-lg text-white"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-400 mb-2">
+                      {formState.type === 'PERCENTAGE' ? 'Percentage (%)' : 'Amount ($)'}
+                    </label>
+                    <input
+                      type="number"
+                      value={formState.value}
+                      onChange={(e) => setFormState({ ...formState, value: Number(e.target.value) })}
+                      className="w-full px-4 py-2.5 bg-background-secondary border border-border rounded-lg text-white"
+                    />
+                  </div>
+                  {formState.type === 'PERCENTAGE' && (
+                    <div>
+                      <label className="block text-sm font-medium text-zinc-400 mb-2">Max Discount Cap ($)</label>
+                      <input
+                        type="number"
+                        value={formState.maxDiscountAmount || 0}
+                        onChange={(e) => setFormState({ ...formState, maxDiscountAmount: Number(e.target.value) })}
+                        className="w-full px-4 py-2.5 bg-background-secondary border border-border rounded-lg text-white"
+                        placeholder="0 = no cap"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-2">Min Order Amount</label>
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">Min Order Amount ($)</label>
                   <input
                     type="number"
                     value={formState.minOrderAmount || 0}
@@ -307,38 +356,78 @@ export default function DiscountsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-2">Usage Limit</label>
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">Usage Limit (total)</label>
                   <input
                     type="number"
                     value={formState.usageLimit || 0}
                     onChange={(e) => setFormState({ ...formState, usageLimit: Number(e.target.value) })}
+                    className="w-full px-4 py-2.5 bg-background-secondary border border-border rounded-lg text-white"
+                    placeholder="0 = unlimited"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">Per-User Limit</label>
+                  <input
+                    type="number"
+                    value={formState.perUserLimit || 0}
+                    onChange={(e) => setFormState({ ...formState, perUserLimit: Number(e.target.value) })}
+                    className="w-full px-4 py-2.5 bg-background-secondary border border-border rounded-lg text-white"
+                    placeholder="0 = unlimited"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">Starts At</label>
+                  <input
+                    type="date"
+                    value={formState.startsAt?.slice(0, 10) || ''}
+                    onChange={(e) => setFormState({ ...formState, startsAt: e.target.value })}
                     className="w-full px-4 py-2.5 bg-background-secondary border border-border rounded-lg text-white"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-2">Expiry Date</label>
+                <label className="block text-sm font-medium text-zinc-400 mb-2">Expires At</label>
                 <input
                   type="date"
-                  value={formState.expiryDate?.slice(0, 10) || ''}
-                  onChange={(e) => setFormState({ ...formState, expiryDate: e.target.value })}
+                  value={formState.expiresAt?.slice(0, 10) || ''}
+                  onChange={(e) => setFormState({ ...formState, expiresAt: e.target.value })}
                   className="w-full px-4 py-2.5 bg-background-secondary border border-border rounded-lg text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-2">Specific Products (comma separated)</label>
+                <label className="block text-sm font-medium text-zinc-400 mb-2">Restrict to Product IDs (comma separated)</label>
                 <input
                   type="text"
-                  value={formState.appliesToProducts?.join(', ') || ''}
+                  value={formState.productIds?.join(', ') || ''}
                   onChange={(e) =>
                     setFormState({
                       ...formState,
-                      appliesToProducts: e.target.value.split(',').map((item) => item.trim()).filter(Boolean),
+                      productIds: e.target.value.split(',').map((item) => item.trim()).filter(Boolean),
                     })
                   }
                   className="w-full px-4 py-2.5 bg-background-secondary border border-border rounded-lg text-white"
+                  placeholder="Leave empty for all products"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-400 mb-2">Restrict to Categories (comma separated)</label>
+                <input
+                  type="text"
+                  value={formState.categoryIds?.join(', ') || ''}
+                  onChange={(e) =>
+                    setFormState({
+                      ...formState,
+                      categoryIds: e.target.value.split(',').map((item) => item.trim()).filter(Boolean),
+                    })
+                  }
+                  className="w-full px-4 py-2.5 bg-background-secondary border border-border rounded-lg text-white"
+                  placeholder="e.g. PEPTIDES, RESEARCH_CHEMICALS"
                 />
               </div>
             </div>

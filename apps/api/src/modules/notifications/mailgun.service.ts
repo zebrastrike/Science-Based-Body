@@ -9,6 +9,7 @@ interface SendEmailOptions {
   text?: string;
   replyTo?: string;
   tags?: string[];
+  attachments?: Array<{ filename: string; content: Buffer | string; contentType?: string }>;
 }
 
 @Injectable()
@@ -115,6 +116,11 @@ export class MailgunService {
   async sendOrderConfirmation(to: string, firstName: string, orderDetails: any) {
     const { subject, html, text } = this.templates.orderConfirmation(firstName, orderDetails);
     return this.sendEmail({ to, subject, html, text, tags: ['order', 'confirmation'] });
+  }
+
+  async sendPaymentConfirmed(to: string, firstName: string, orderNumber: string, amount: number) {
+    const { subject, html, text } = this.templates.paymentConfirmed(firstName, orderNumber, amount);
+    return this.sendEmail({ to, subject, html, text, tags: ['order', 'payment-confirmed'] });
   }
 
   async sendOrderShipped(

@@ -9,6 +9,7 @@ import { CartService, Cart } from './cart.service';
 import { ComplianceService } from '../compliance/compliance.service';
 import { PaymentsService } from '../payments/payments.service';
 import { MailgunService } from '../notifications/mailgun.service';
+import { TaxService } from '../tax/tax.service';
 import { v4 as uuidv4 } from 'uuid';
 import { PaymentMethod } from '@prisma/client';
 import { CreateOrderDto, ResolveCartItemDto } from './dto/create-order.dto';
@@ -25,6 +26,7 @@ export class CheckoutService {
     private complianceService: ComplianceService,
     private paymentsService: PaymentsService,
     private mailgunService: MailgunService,
+    private taxService: TaxService,
     private config: ConfigService,
   ) {
     this.minimumAge = this.config.get('MINIMUM_AGE', 18);
@@ -59,12 +61,12 @@ export class CheckoutService {
     // 1. Validate compliance acknowledgment
     this.validateComplianceCheckboxes(dto.compliance);
 
-    // 2. Validate and enrich cart
-    let cart = await this.cartService.validateAndEnrichCart(dto.items);
+    // 2. Validate and enrich cart (passes userId for wholesale pricing)
+    let cart = await this.cartService.validateAndEnrichCart(dto.items, userId || undefined);
 
     // 3. Apply discount code if provided
     if (dto.discountCode) {
-      cart = await this.cartService.applyDiscountCode(cart, dto.discountCode);
+      cart = await this.cartService.applyDiscountCode(cart, dto.discountCode, userId || undefined);
     }
 
     // 4. Calculate shipping
@@ -75,7 +77,23 @@ export class CheckoutService {
     }
 
     const shippingCost = selectedRate.price;
-    const totalAmount = cart.subtotal - cart.discountAmount + shippingCost;
+
+    // 4b. Calculate sales tax via TaxJar
+    const taxResult = await this.taxService.calculateTax({
+      toState: dto.shippingAddress.state,
+      toZip: dto.shippingAddress.postalCode,
+      toCity: dto.shippingAddress.city,
+      toCountry: dto.shippingAddress.country || 'US',
+      shipping: shippingCost,
+      lineItems: cart.items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      })),
+    });
+    const taxAmount = taxResult.taxAmount;
+
+    const totalAmount = cart.subtotal - cart.discountAmount + shippingCost + taxAmount;
 
     // 5. Generate order number
     const orderNumber = this.generateOrderNumber();
@@ -139,6 +157,7 @@ export class CheckoutService {
           billingAddressId: billingAddr.id,
           subtotal: cart.subtotal,
           shippingCost,
+          taxAmount,
           discountAmount: cart.discountAmount,
           totalAmount,
           discountCode: dto.discountCode,
@@ -213,6 +232,11 @@ export class CheckoutService {
       return newOrder;
     });
 
+    // 6b. Increment discount usage count
+    if (dto.discountCode) {
+      await this.cartService.incrementDiscountUsage(dto.discountCode);
+    }
+
     // 7. Create payment
     const email = dto.guestEmail || (await this.getUserEmail(userId!));
     const paymentResult = await this.paymentsService.createPayment(
@@ -233,6 +257,7 @@ export class CheckoutService {
       })),
       subtotal: cart.subtotal,
       shipping: shippingCost,
+      tax: taxAmount,
       discount: cart.discountAmount,
       total: totalAmount,
       shippingAddress: dto.shippingAddress,
@@ -249,6 +274,34 @@ export class CheckoutService {
     this.mailgunService
       .notifyAdminNewOrder(orderDetails, email)
       .catch((err) => console.error('Failed to send admin notification:', err));
+
+    // 10. Track affiliate referral (non-blocking)
+    if (dto.affiliateReferralCode) {
+      this.trackAffiliateConversion(dto.affiliateReferralCode, order.id, totalAmount).catch(
+        (err) => console.error('Failed to track affiliate referral:', err),
+      );
+    }
+
+    // 11. Record tax transaction in TaxJar (non-blocking)
+    if (taxAmount > 0) {
+      this.taxService
+        .recordTransaction({
+          orderId: order.id,
+          orderDate: new Date().toISOString().split('T')[0],
+          toState: dto.shippingAddress.state,
+          toZip: dto.shippingAddress.postalCode,
+          toCity: dto.shippingAddress.city,
+          toCountry: dto.shippingAddress.country || 'US',
+          shipping: shippingCost,
+          salesTax: taxAmount,
+          lineItems: cart.items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+          })),
+        })
+        .catch((err) => console.error('Failed to record TaxJar transaction:', err));
+    }
 
     return {
       order: {
@@ -418,5 +471,51 @@ export class CheckoutService {
     }
 
     return { resolvedItems: resolved, unresolvedItems: unresolved };
+  }
+
+  /**
+   * Track affiliate referral conversion
+   */
+  private async trackAffiliateConversion(
+    referralCode: string,
+    orderId: string,
+    orderAmount: number,
+  ) {
+    const affiliate = await this.prisma.affiliate.findUnique({
+      where: { referralCode, isActive: true },
+    });
+
+    if (!affiliate) return;
+
+    const commissionAmount =
+      Math.round(orderAmount * Number(affiliate.commissionRate) * 100) / 100;
+
+    await this.prisma.$transaction([
+      // Create referral record
+      this.prisma.affiliateReferral.create({
+        data: {
+          affiliateId: affiliate.id,
+          orderId,
+          convertedAt: new Date(),
+          orderAmount,
+          commissionAmount,
+        },
+      }),
+      // Update affiliate stats
+      this.prisma.affiliate.update({
+        where: { id: affiliate.id },
+        data: {
+          totalOrders: { increment: 1 },
+          totalRevenue: { increment: orderAmount },
+          totalCommission: { increment: commissionAmount },
+          pendingPayout: { increment: commissionAmount },
+        },
+      }),
+      // Store referral code on order
+      this.prisma.order.update({
+        where: { id: orderId },
+        data: { affiliateReferralCode: referralCode },
+      }),
+    ]);
   }
 }

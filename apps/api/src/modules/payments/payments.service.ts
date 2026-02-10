@@ -86,14 +86,22 @@ export class PaymentsService {
       case 'ZELLE':
         return {
           method: 'Zelle',
-          email: fallback.zelle.email,
-          instructions: `Send $[amount] via Zelle to ${fallback.zelle.email}. Include order number ${orderNumber} in the memo.`,
+          name: fallback.zelle.name,
+          phone: fallback.zelle.phone,
+          instructions: `Send $[amount] via Zelle to HEALTH SBB (${fallback.zelle.phone}). Include invoice number ${orderNumber} in the memo.`,
+        };
+      case 'VENMO':
+        return {
+          method: 'Venmo',
+          username: fallback.venmo.username,
+          phone: fallback.venmo.phone,
+          instructions: `Send $[amount] via Venmo to ${fallback.venmo.username} (${fallback.venmo.phone}). Include invoice number ${orderNumber} in the note.`,
         };
       case 'CASHAPP':
         return {
           method: 'CashApp',
           tag: fallback.cashapp.tag,
-          instructions: `Send $[amount] via CashApp to ${fallback.cashapp.tag}. Include order number ${orderNumber} in the note.`,
+          instructions: `Send $[amount] via CashApp to ${fallback.cashapp.tag}. Include invoice number ${orderNumber} in the note.`,
         };
       case 'WIRE_TRANSFER':
         return {
@@ -357,6 +365,15 @@ export class PaymentsService {
       methods.push({
         id: 'ZELLE',
         name: 'Zelle',
+        type: 'manual',
+        enabled: true,
+      });
+    }
+
+    if (fallback.venmo.enabled) {
+      methods.push({
+        id: 'VENMO',
+        name: 'Venmo',
         type: 'manual',
         enabled: true,
       });

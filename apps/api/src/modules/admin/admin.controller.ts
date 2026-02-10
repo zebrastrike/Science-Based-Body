@@ -147,6 +147,62 @@ export class AdminController {
   }
 
   // ==========================================================================
+  // ORDER FULFILLMENT (Shippo + Manual Payment Approval)
+  // ==========================================================================
+
+  @Post('orders/:id/approve-payment')
+  @ApiOperation({ summary: 'Approve Zelle/CashApp payment for an order' })
+  @ApiParam({ name: 'id', description: 'Order ID' })
+  @ApiResponse({ status: 200, description: 'Payment approved' })
+  @ApiResponse({ status: 400, description: 'Payment already verified or no payment found' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  approvePayment(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() body: { notes?: string },
+  ) {
+    return this.adminService.approvePayment(id, req.user.id, body?.notes);
+  }
+
+  @Get('orders/:id/shipping-rates')
+  @ApiOperation({ summary: 'Get live Shippo shipping rates for an order' })
+  @ApiParam({ name: 'id', description: 'Order ID' })
+  @ApiResponse({ status: 200, description: 'Shipping rates from Shippo' })
+  @ApiResponse({ status: 400, description: 'Order has no shipping address' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  getShippingRates(@Param('id') id: string) {
+    return this.adminService.getShippingRates(id);
+  }
+
+  @Post('orders/:id/create-label')
+  @ApiOperation({ summary: 'Create Shippo shipping label for a selected rate' })
+  @ApiParam({ name: 'id', description: 'Order ID' })
+  @ApiResponse({ status: 200, description: 'Label created with tracking info' })
+  @ApiResponse({ status: 400, description: 'Label creation failed' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  createShippingLabel(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() body: { rateId: string },
+  ) {
+    return this.adminService.createShippingLabel(id, body.rateId, req.user.id);
+  }
+
+  @Post('orders/:id/fulfill')
+  @ApiOperation({ summary: 'One-click fulfillment: approve payment + cheapest rate + label' })
+  @ApiParam({ name: 'id', description: 'Order ID' })
+  @ApiResponse({ status: 200, description: 'Order fully fulfilled' })
+  @ApiResponse({ status: 400, description: 'Fulfillment step failed' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  fulfillOrder(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() body: { notes?: string },
+  ) {
+    return this.adminService.fulfillOrder(id, req.user.id, body?.notes);
+  }
+
+  // ==========================================================================
   // PRODUCTS
   // ==========================================================================
 
@@ -447,6 +503,13 @@ export class AdminController {
     return this.adminService.updateDiscount(id, body, req.user.id);
   }
 
+  @Post('discounts/expire')
+  @ApiOperation({ summary: 'Auto-expire discounts past their expiry date' })
+  @ApiResponse({ status: 200, description: 'Number of expired discounts' })
+  expireDiscounts() {
+    return this.adminService.expireDiscounts();
+  }
+
   @Delete('discounts/:id')
   @ApiOperation({ summary: 'Deactivate discount code' })
   @ApiParam({ name: 'id', description: 'Discount ID' })
@@ -599,6 +662,91 @@ export class AdminController {
   }
 
   // ==========================================================================
+  // PRICE LISTS (Wholesale)
+  // ==========================================================================
+
+  @Get('price-lists')
+  @ApiOperation({ summary: 'Get all price lists' })
+  @ApiResponse({ status: 200, description: 'Price list data' })
+  getPriceLists() {
+    return this.adminService.getPriceLists();
+  }
+
+  @Get('price-lists/:id')
+  @ApiOperation({ summary: 'Get price list details with items' })
+  @ApiParam({ name: 'id', description: 'PriceList ID' })
+  @ApiResponse({ status: 200, description: 'Price list details' })
+  @ApiResponse({ status: 404, description: 'Price list not found' })
+  getPriceListById(@Param('id') id: string) {
+    return this.adminService.getPriceListById(id);
+  }
+
+  @Post('price-lists')
+  @ApiOperation({ summary: 'Create price list' })
+  @ApiResponse({ status: 201, description: 'Price list created' })
+  createPriceList(
+    @Request() req: AuthenticatedRequest,
+    @Body()
+    body: {
+      name: string;
+      description?: string;
+      discountPercent?: number;
+      organizationId?: string;
+    },
+  ) {
+    return this.adminService.createPriceList(body, req.user.id);
+  }
+
+  @Put('price-lists/:id')
+  @ApiOperation({ summary: 'Update price list' })
+  @ApiParam({ name: 'id', description: 'PriceList ID' })
+  @ApiResponse({ status: 200, description: 'Price list updated' })
+  @ApiResponse({ status: 404, description: 'Price list not found' })
+  updatePriceList(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body()
+    body: {
+      name?: string;
+      description?: string;
+      discountPercent?: number;
+      isActive?: boolean;
+    },
+  ) {
+    return this.adminService.updatePriceList(id, body, req.user.id);
+  }
+
+  @Post('price-lists/:id/items')
+  @ApiOperation({ summary: 'Add or update product pricing in price list' })
+  @ApiParam({ name: 'id', description: 'PriceList ID' })
+  @ApiResponse({ status: 200, description: 'Price list item saved' })
+  upsertPriceListItem(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body()
+    body: {
+      productId: string;
+      customPrice?: number;
+      discountPercent?: number;
+    },
+  ) {
+    return this.adminService.upsertPriceListItem(id, body, req.user.id);
+  }
+
+  @Delete('price-lists/:id/items/:itemId')
+  @ApiOperation({ summary: 'Remove product from price list' })
+  @ApiParam({ name: 'id', description: 'PriceList ID' })
+  @ApiParam({ name: 'itemId', description: 'PriceListItem ID' })
+  @ApiResponse({ status: 200, description: 'Price list item removed' })
+  deletePriceListItem(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Param('itemId') itemId: string,
+  ) {
+    return this.adminService.deletePriceListItem(id, itemId, req.user.id);
+  }
+
+  // ==========================================================================
   // SHIPPING (Recent Shipments)
   // ==========================================================================
 
@@ -608,5 +756,91 @@ export class AdminController {
   @ApiResponse({ status: 200, description: 'Recent shipments' })
   getRecentShipments(@Query('limit') limit?: number) {
     return this.adminService.getRecentShipments(limit ? Number(limit) : 20);
+  }
+
+  // ==========================================================================
+  // MARKETING POPUPS
+  // ==========================================================================
+
+  @Get('popups')
+  @ApiOperation({ summary: 'List all marketing popups' })
+  @ApiResponse({ status: 200, description: 'Marketing popups list' })
+  getPopups() {
+    return this.adminService.getPopups();
+  }
+
+  @Get('popups/:id')
+  @ApiOperation({ summary: 'Get marketing popup by ID' })
+  @ApiParam({ name: 'id', description: 'Popup ID' })
+  @ApiResponse({ status: 200, description: 'Marketing popup details' })
+  getPopupById(@Param('id') id: string) {
+    return this.adminService.getPopupById(id);
+  }
+
+  @Post('popups')
+  @ApiOperation({ summary: 'Create a new marketing popup' })
+  @ApiResponse({ status: 201, description: 'Marketing popup created' })
+  createPopup(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: {
+      name: string;
+      headline: string;
+      subtitle?: string;
+      bodyHtml?: string;
+      ctaText?: string;
+      ctaLink?: string;
+      discountCode?: string;
+      discountCode2?: string;
+      tier1Label?: string;
+      tier1Value?: string;
+      tier2Label?: string;
+      tier2Value?: string;
+      showEmailCapture?: boolean;
+      successHeadline?: string;
+      successMessage?: string;
+      delayMs?: number;
+      showOnPages?: string[];
+      showFrequency?: string;
+      startsAt?: string;
+      expiresAt?: string;
+      priority?: number;
+      isActive?: boolean;
+    },
+  ) {
+    return this.adminService.createPopup(body, req.user.id);
+  }
+
+  @Put('popups/:id')
+  @ApiOperation({ summary: 'Update a marketing popup' })
+  @ApiParam({ name: 'id', description: 'Popup ID' })
+  @ApiResponse({ status: 200, description: 'Marketing popup updated' })
+  updatePopup(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() body: Record<string, any>,
+  ) {
+    return this.adminService.updatePopup(id, body, req.user.id);
+  }
+
+  @Delete('popups/:id')
+  @ApiOperation({ summary: 'Delete a marketing popup' })
+  @ApiParam({ name: 'id', description: 'Popup ID' })
+  @ApiResponse({ status: 200, description: 'Marketing popup deleted' })
+  deletePopup(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    return this.adminService.deletePopup(id, req.user.id);
+  }
+
+  @Post('popups/:id/toggle')
+  @ApiOperation({ summary: 'Toggle popup active/inactive' })
+  @ApiParam({ name: 'id', description: 'Popup ID' })
+  @ApiResponse({ status: 200, description: 'Popup toggled' })
+  togglePopup(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    return this.adminService.togglePopup(id, req.user.id);
   }
 }

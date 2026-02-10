@@ -24,8 +24,18 @@
         <a class="logo" href="index.html">
           <img src="/logo.png" alt="Science Based Body" />
         </a>
+        <div class="site-search" id="site-search">
+          <input type="text" class="site-search-input" id="search-input" placeholder="Search peptides..." autocomplete="off" aria-label="Search products" />
+          <button type="button" class="site-search-btn" aria-label="Search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          </button>
+          <div class="search-results" id="search-results"></div>
+        </div>
         <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
           <span class="menu-icon"></span>
+        </button>
+        <button type="button" class="mobile-search-toggle" id="mobile-search-toggle" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         </button>
         <nav class="site-nav">
           <a href="index.html" class="nav-link">Home</a>
@@ -52,6 +62,33 @@
             <h1>Complete Your Order</h1>
           </div>
 
+          <!-- 3-Step Process -->
+          <div class="checkout-steps">
+            <div class="checkout-step">
+              <div class="checkout-step-number">1</div>
+              <div class="checkout-step-content">
+                <strong>Place Your Order</strong>
+                <p>Fill in shipping details, select payment method, and submit your order.</p>
+              </div>
+            </div>
+            <div class="checkout-step-divider"></div>
+            <div class="checkout-step">
+              <div class="checkout-step-number">2</div>
+              <div class="checkout-step-content">
+                <strong>Send Payment</strong>
+                <p>You'll receive an email with payment instructions. Send via Zelle, Venmo, or CashApp.</p>
+              </div>
+            </div>
+            <div class="checkout-step-divider"></div>
+            <div class="checkout-step">
+              <div class="checkout-step-number">3</div>
+              <div class="checkout-step-content">
+                <strong>Track Your Shipment</strong>
+                <p>Once payment is confirmed, we ship your order and email you tracking info.</p>
+              </div>
+            </div>
+          </div>
+
           <div class="checkout-grid">
             <!-- Order Summary -->
             <div class="checkout-summary">
@@ -68,6 +105,10 @@
                   <div class="checkout-row">
                     <span>Shipping</span>
                     <span id="checkout-shipping">Calculated at next step</span>
+                  </div>
+                  <div class="checkout-row">
+                    <span>Tax</span>
+                    <span id="checkout-tax">$0.00</span>
                   </div>
                   <div class="checkout-row checkout-total">
                     <span>Total</span>
@@ -86,11 +127,15 @@
                   <div class="form-grid">
                     <div class="form-group">
                       <label for="email">Email Address *</label>
-                      <input type="email" id="email" name="email" required placeholder="your@email.com" />
+                      <input type="email" id="email" name="email" required placeholder="your@email.com"
+                        pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" />
+                      <span class="field-error" id="email-error"></span>
                     </div>
                     <div class="form-group">
                       <label for="phone">Phone Number *</label>
-                      <input type="tel" id="phone" name="phone" required placeholder="(555) 123-4567" />
+                      <input type="tel" id="phone" name="phone" required placeholder="(555) 123-4567"
+                        pattern="[\d\s\(\)\-\+]{7,}" />
+                      <span class="field-error" id="phone-error"></span>
                     </div>
                   </div>
                 </div>
@@ -101,11 +146,13 @@
                   <div class="form-grid">
                     <div class="form-group">
                       <label for="firstName">First Name *</label>
-                      <input type="text" id="firstName" name="firstName" required />
+                      <input type="text" id="firstName" name="firstName" required minlength="2" />
+                      <span class="field-error" id="firstName-error"></span>
                     </div>
                     <div class="form-group">
                       <label for="lastName">Last Name *</label>
-                      <input type="text" id="lastName" name="lastName" required />
+                      <input type="text" id="lastName" name="lastName" required minlength="2" />
+                      <span class="field-error" id="lastName-error"></span>
                     </div>
                     <div class="form-group form-group-full">
                       <label for="company">Company / Institution (Optional)</label>
@@ -113,7 +160,8 @@
                     </div>
                     <div class="form-group form-group-full">
                       <label for="address1">Street Address *</label>
-                      <input type="text" id="address1" name="address1" required />
+                      <input type="text" id="address1" name="address1" required minlength="3" />
+                      <span class="field-error" id="address1-error"></span>
                     </div>
                     <div class="form-group form-group-full">
                       <label for="address2">Apt, Suite, Unit (Optional)</label>
@@ -121,15 +169,20 @@
                     </div>
                     <div class="form-group">
                       <label for="city">City *</label>
-                      <input type="text" id="city" name="city" required />
+                      <input type="text" id="city" name="city" required minlength="2" />
+                      <span class="field-error" id="city-error"></span>
                     </div>
                     <div class="form-group">
                       <label for="state">State / Province *</label>
-                      <input type="text" id="state" name="state" required />
+                      <input type="text" id="state" name="state" required maxlength="2" minlength="2" placeholder="AZ"
+                        pattern="[A-Za-z]{2}" style="text-transform: uppercase;" />
+                      <span class="field-error" id="state-error"></span>
                     </div>
                     <div class="form-group">
                       <label for="zip">ZIP / Postal Code *</label>
-                      <input type="text" id="zip" name="zip" required />
+                      <input type="text" id="zip" name="zip" required placeholder="85234"
+                        pattern="\d{5}(-\d{4})?|[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d" />
+                      <span class="field-error" id="zip-error"></span>
                     </div>
                     <div class="form-group">
                       <label for="country">Country *</label>
@@ -149,7 +202,7 @@
                       <input type="radio" name="shippingMethod" value="standard" checked />
                       <span class="payment-label">
                         <strong>Standard Shipping</strong>
-                        <span id="standard-shipping-label">$20.00 (Free over $500)</span>
+                        <span id="standard-shipping-label">$25.00 (Free over $500)</span>
                       </span>
                     </label>
                     <label class="payment-option">
@@ -165,34 +218,27 @@
                 <!-- Payment Method -->
                 <div class="card checkout-step">
                   <h2>4. Payment Method</h2>
-                  <p class="checkout-note">Select your preferred payment method. A payment link will be sent to your email.</p>
+                  <p class="checkout-note">Select your preferred payment method. Payment details will be included in your order confirmation email.</p>
                   <div class="payment-methods">
                     <label class="payment-option">
                       <input type="radio" name="paymentMethod" value="zelle" checked />
                       <span class="payment-label">
                         <strong>Zelle</strong>
-                        <span>Send to our Zelle ID</span>
+                        <span>HEALTH SBB &middot; 702-686-5343</span>
                       </span>
                     </label>
                     <label class="payment-option">
-                      <input type="radio" name="paymentMethod" value="wire" />
+                      <input type="radio" name="paymentMethod" value="venmo" />
                       <span class="payment-label">
-                        <strong>Wire Transfer</strong>
-                        <span>Bank wire transfer</span>
+                        <strong>Venmo</strong>
+                        <span>@healthsbb &middot; 702-686-5343</span>
                       </span>
                     </label>
                     <label class="payment-option">
                       <input type="radio" name="paymentMethod" value="cashapp" />
                       <span class="payment-label">
                         <strong>CashApp</strong>
-                        <span>Pay via CashApp</span>
-                      </span>
-                    </label>
-                    <label class="payment-option">
-                      <input type="radio" name="paymentMethod" value="crypto" />
-                      <span class="payment-label">
-                        <strong>Cryptocurrency</strong>
-                        <span>BTC, ETH, USDC</span>
+                        <span>$ScienceBasedBody</span>
                       </span>
                     </label>
                   </div>
@@ -216,7 +262,7 @@
                     <label class="compliance-checkbox">
                       <input type="checkbox" id="compliance2" name="ageConfirmation" required />
                       <span class="checkbox-mark"></span>
-                      <span class="checkbox-text">I confirm I am <strong>21 years of age or older</strong>.</span>
+                      <span class="checkbox-text">I confirm I am <strong>18 years of age or older</strong>.</span>
                     </label>
 
                     <label class="compliance-checkbox">
@@ -352,6 +398,7 @@
         const checkoutItems  = document.getElementById('checkout-items');
         const checkoutSubtotal = document.getElementById('checkout-subtotal');
         const checkoutShipping = document.getElementById('checkout-shipping');
+        const checkoutTax    = document.getElementById('checkout-tax');
         const checkoutTotal  = document.getElementById('checkout-total');
         const checkoutForm   = document.getElementById('checkout-form');
         const complianceWarning = document.getElementById('compliance-warning');
@@ -361,10 +408,112 @@
 
         let resolvedItems = [];
         let subtotal = 0;
+        let taxAmount = 0;
+
+        /* ── Field validation ────────────────────────────── */
+        const validators = {
+          email: {
+            test: v => /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(v),
+            msg: 'Please enter a valid email address'
+          },
+          phone: {
+            test: v => /[\d]{7,}/.test(v.replace(/\D/g, '')),
+            msg: 'Please enter a valid phone number (at least 7 digits)'
+          },
+          firstName: {
+            test: v => v.trim().length >= 2,
+            msg: 'First name must be at least 2 characters'
+          },
+          lastName: {
+            test: v => v.trim().length >= 2,
+            msg: 'Last name must be at least 2 characters'
+          },
+          address1: {
+            test: v => v.trim().length >= 3,
+            msg: 'Please enter a valid street address'
+          },
+          city: {
+            test: v => v.trim().length >= 2,
+            msg: 'Please enter a valid city'
+          },
+          state: {
+            test: v => /^[A-Za-z]{2}$/.test(v.trim()),
+            msg: 'Enter a 2-letter state code (e.g. AZ, CA)'
+          },
+          zip: {
+            test: v => /^\d{5}(-\d{4})?$/.test(v.trim()) || /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/.test(v.trim()),
+            msg: 'Enter a valid ZIP (e.g. 85234) or postal code'
+          }
+        };
+
+        function showFieldError(fieldId, msg) {
+          var el = document.getElementById(fieldId);
+          var errEl = document.getElementById(fieldId + '-error');
+          if (el) el.classList.add('field-invalid');
+          if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; }
+        }
+
+        function clearFieldError(fieldId) {
+          var el = document.getElementById(fieldId);
+          var errEl = document.getElementById(fieldId + '-error');
+          if (el) el.classList.remove('field-invalid');
+          if (errEl) { errEl.textContent = ''; errEl.style.display = 'none'; }
+        }
+
+        function validateField(fieldId) {
+          var el = document.getElementById(fieldId);
+          if (!el) return true;
+          var v = el.value;
+          var rule = validators[fieldId];
+          if (!rule) return true;
+          if (!v && el.required) { showFieldError(fieldId, 'This field is required'); return false; }
+          if (v && !rule.test(v)) { showFieldError(fieldId, rule.msg); return false; }
+          clearFieldError(fieldId);
+          return true;
+        }
+
+        function validateAllFields() {
+          var valid = true;
+          Object.keys(validators).forEach(function (fieldId) {
+            if (!validateField(fieldId)) valid = false;
+          });
+          return valid;
+        }
+
+        // Live validation on blur
+        Object.keys(validators).forEach(function (fieldId) {
+          var el = document.getElementById(fieldId);
+          if (el) {
+            el.addEventListener('blur', function () { validateField(fieldId); });
+            el.addEventListener('input', function () {
+              if (el.classList.contains('field-invalid')) validateField(fieldId);
+            });
+          }
+        });
+
+        // Phone auto-format: (555) 123-4567
+        var phoneInput = document.getElementById('phone');
+        if (phoneInput) {
+          phoneInput.addEventListener('input', function () {
+            var digits = this.value.replace(/\D/g, '').substring(0, 10);
+            if (digits.length === 0) { this.value = ''; return; }
+            if (digits.length <= 3) { this.value = '(' + digits; }
+            else if (digits.length <= 6) { this.value = '(' + digits.slice(0, 3) + ') ' + digits.slice(3); }
+            else { this.value = '(' + digits.slice(0, 3) + ') ' + digits.slice(3, 6) + '-' + digits.slice(6); }
+          });
+        }
+
+        // State uppercase
+        var stateInput = document.getElementById('state');
+        if (stateInput) {
+          stateInput.addEventListener('input', function () {
+            this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').substring(0, 2);
+          });
+        }
 
         /* ── Shipping cost ─────────────────────────────── */
         const FREE_SHIPPING_THRESHOLD = 500;
-        const STANDARD_SHIPPING = 20;
+        const STANDARD_SHIPPING = 25;
         const EXPEDITED_SHIPPING = 50;
 
         const getShippingCost = () => {
@@ -377,7 +526,8 @@
           const shipping = getShippingCost();
           checkoutSubtotal.textContent = '$' + subtotal.toFixed(2);
           checkoutShipping.textContent = shipping === 0 ? 'FREE' : '$' + shipping.toFixed(2);
-          checkoutTotal.textContent    = '$' + (subtotal + shipping).toFixed(2);
+          checkoutTax.textContent      = taxAmount > 0 ? '$' + taxAmount.toFixed(2) : '$0.00';
+          checkoutTotal.textContent    = '$' + (subtotal + shipping + taxAmount).toFixed(2);
 
           var stdLabel = document.getElementById('standard-shipping-label');
           if (stdLabel) {
@@ -398,6 +548,49 @@
           checkoutError.scrollIntoView({ behavior: 'smooth', block: 'center' });
           setTimeout(() => { checkoutError.style.display = 'none'; }, 12000);
         };
+
+        /* ── Tax calculation (TaxJar via API) ─────────── */
+        let taxTimer = null;
+        const calculateTax = async () => {
+          if (resolvedItems.length === 0 || subtotal === 0) { taxAmount = 0; updateTotals(); return; }
+          var state = document.getElementById('state').value;
+          var zip   = document.getElementById('zip').value;
+          var city  = document.getElementById('city').value;
+          var country = document.getElementById('country').value;
+          if (!state || !zip || !city) return;
+
+          try {
+            var res = await fetch(API_BASE + '/tax/calculate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                toState: state, toZip: zip, toCity: city, toCountry: country,
+                shipping: getShippingCost(),
+                lineItems: resolvedItems.map(function (item) {
+                  return { productId: item.productId, quantity: item.quantity, unitPrice: item.unitPrice };
+                })
+              })
+            });
+            if (res.ok) {
+              var data = await res.json();
+              taxAmount = data.taxAmount || 0;
+            } else {
+              taxAmount = 0;
+            }
+          } catch (e) {
+            taxAmount = 0;
+          }
+          updateTotals();
+        };
+
+        // Debounce tax calc when address changes
+        ['state', 'zip', 'city', 'country'].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) el.addEventListener('change', function () {
+            clearTimeout(taxTimer);
+            taxTimer = setTimeout(calculateTax, 600);
+          });
+        });
 
         /* ── Resolve cart against API ──────────────────── */
         const loadCheckoutItems = async () => {
@@ -476,20 +669,29 @@
           }
         };
 
-        loadCheckoutItems();
+        loadCheckoutItems().then(function () {
+          // Trigger initial tax calculation once items are resolved
+          calculateTax();
+        });
 
         /* ── Payment method mapping ────────────────────── */
         var PAYMENT_MAP = {
           zelle:   'ZELLE',
-          wire:    'WIRE_TRANSFER',
-          cashapp: 'CASHAPP',
-          crypto:  'CRYPTO'
+          venmo:   'VENMO',
+          cashapp: 'CASHAPP'
         };
 
         /* ── Form submit → API ─────────────────────────── */
         checkoutForm.addEventListener('submit', async (e) => {
           e.preventDefault();
           checkoutError.style.display = 'none';
+
+          // Validate all form fields
+          if (!validateAllFields()) {
+            var firstInvalid = document.querySelector('.field-invalid');
+            if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+          }
 
           // Validate compliance
           const complianceBoxes = checkoutForm.querySelectorAll('.compliance-checkbox input[type="checkbox"]');
@@ -535,13 +737,15 @@
             shippingMethod:  fd.get('shippingMethod') || 'standard',
             paymentMethod:   PAYMENT_MAP[payRaw] || 'ZELLE',
             compliance: {
-              researchPurposeOnly:   true,
-              ageConfirmation:       true,
-              noHumanConsumption:    true,
-              responsibilityAccepted: true,
-              termsAccepted:         true
+              researchPurposeOnly:   !!fd.get('researchPurposeOnly'),
+              ageConfirmation:       !!fd.get('ageConfirmation'),
+              noHumanConsumption:    !!fd.get('noHumanConsumption'),
+              responsibilityAccepted: !!fd.get('responsibilityAccepted'),
+              termsAccepted:         !!fd.get('termsAccepted')
             },
-            guestEmail: fd.get('email')
+            guestEmail: fd.get('email'),
+            taxAmount: taxAmount,
+            affiliateReferralCode: (document.cookie.match(/sbb_ref=([^;]+)/) || [])[1] || undefined
           };
 
           try {

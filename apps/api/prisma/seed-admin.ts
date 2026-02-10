@@ -27,6 +27,44 @@ async function main() {
   });
 
   console.log(`Admin user created/updated: ${admin.email}`);
+
+  // Seed default settings
+  const defaultSettings = [
+    {
+      key: 'wholesale_minimum_order',
+      value: '30000',
+      type: 'number',
+      description: 'Minimum order amount ($) for wholesale/brand-partner checkout',
+    },
+    {
+      key: 'shipping_flat_rate',
+      value: '25',
+      type: 'number',
+      description: 'Standard flat-rate shipping cost ($)',
+    },
+    {
+      key: 'shipping_free_threshold',
+      value: '500',
+      type: 'number',
+      description: 'Order subtotal ($) at which shipping becomes free',
+    },
+    {
+      key: 'shipping_expedited_rate',
+      value: '50',
+      type: 'number',
+      description: 'Expedited shipping cost ($)',
+    },
+  ];
+
+  for (const setting of defaultSettings) {
+    await prisma.setting.upsert({
+      where: { key: setting.key },
+      update: {},  // Don't overwrite if admin already changed it
+      create: setting,
+    });
+  }
+
+  console.log(`Seeded ${defaultSettings.length} default settings`);
   console.log('');
   console.log('='.repeat(50));
   console.log('IMPORTANT: Change the admin password after first login!');

@@ -51,10 +51,36 @@ export class CartService {
   /**
    * Validate and enrich cart items with product data
    * Returns fully computed cart with pricing
+   * If userId is provided, checks for wholesale PriceList pricing
    */
-  async validateAndEnrichCart(items: Array<{ productId: string; variantId?: string; quantity: number }>): Promise<Cart> {
+  async validateAndEnrichCart(items: Array<{ productId: string; variantId?: string; quantity: number }>, userId?: string): Promise<Cart> {
     if (!items || items.length === 0) {
       return this.emptyCart();
+    }
+
+    // Load wholesale price list if user has one
+    let priceList: { discountPercent: number | null; items: Map<string, { customPrice: number | null; discountPercent: number | null }> } | null = null;
+    if (userId) {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { priceListId: true },
+      });
+      if (user?.priceListId) {
+        const pl = await this.prisma.priceList.findUnique({
+          where: { id: user.priceListId },
+          include: { items: true },
+        });
+        if (pl && pl.isActive) {
+          const itemsMap = new Map<string, { customPrice: number | null; discountPercent: number | null }>();
+          for (const item of pl.items) {
+            itemsMap.set(item.productId, {
+              customPrice: item.customPrice ? Number(item.customPrice) : null,
+              discountPercent: item.discountPercent,
+            });
+          }
+          priceList = { discountPercent: pl.discountPercent, items: itemsMap };
+        }
+      }
     }
 
     const enrichedItems: CartItem[] = [];
@@ -86,6 +112,22 @@ export class CartService {
       let variant = null;
       // Get weight: variant weight overrides product weight
       let itemWeightGrams = product.weightGrams || 0;
+
+      // Apply wholesale pricing if available
+      if (priceList) {
+        const plItem = priceList.items.get(item.productId);
+        if (plItem?.customPrice != null) {
+          // Product-specific custom price
+          unitPrice = plItem.customPrice;
+        } else if (plItem?.discountPercent != null) {
+          // Product-specific discount percent
+          unitPrice = unitPrice * (1 - plItem.discountPercent / 100);
+        } else if (priceList.discountPercent != null) {
+          // Global price list discount
+          unitPrice = unitPrice * (1 - priceList.discountPercent / 100);
+        }
+        unitPrice = Math.round(unitPrice * 100) / 100;
+      }
 
       if (item.variantId) {
         variant = product.variants.find((v) => v.id === item.variantId);
@@ -152,9 +194,9 @@ export class CartService {
       }
     }
 
-    // Free shipping threshold: $500+ = FREE, otherwise $20 flat rate
+    // Free shipping threshold: $500+ = FREE, otherwise $25 flat rate
     const FREE_SHIPPING_THRESHOLD = 500;
-    const STANDARD_SHIPPING = 20;
+    const STANDARD_SHIPPING = 25;
     const estimatedShipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING;
 
     // Tax calculation - configurable via Settings
@@ -241,6 +283,21 @@ export class CartService {
       );
       if (eligibleItems.length === 0) {
         throw new BadRequestException('This discount code does not apply to items in your cart');
+      }
+    }
+
+    // Check category restrictions (if any)
+    if (discount.categoryIds && discount.categoryIds.length > 0) {
+      const cartProductIds = cart.items.map((item) => item.productId);
+      const products = await this.prisma.product.findMany({
+        where: { id: { in: cartProductIds } },
+        select: { id: true, category: true },
+      });
+      const eligibleProducts = products.filter((p) =>
+        discount.categoryIds.includes(p.category),
+      );
+      if (eligibleProducts.length === 0) {
+        throw new BadRequestException('This discount does not apply to product categories in your cart');
       }
     }
 
@@ -347,12 +404,12 @@ export class CartService {
 
   /**
    * Get shipping rates for cart
-   * Flat Rate: $20 standard, FREE on orders $500+
+   * Flat Rate: $25 standard, FREE on orders $500+
    * Expedited: $50 (2-day delivery)
    */
   async getShippingRates(cart: Cart, destinationZip: string) {
     const FREE_SHIPPING_THRESHOLD = 500;
-    const STANDARD_SHIPPING_RATE = 20;
+    const STANDARD_SHIPPING_RATE = 25;
     const EXPEDITED_SHIPPING_RATE = 50;
 
     const standardPrice = cart.subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING_RATE;

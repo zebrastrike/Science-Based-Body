@@ -22,6 +22,8 @@ enum UserRole {
   CLIENT
   CLINIC
   DISTRIBUTOR
+  AFFILIATE
+  BRAND_PARTNER
   ADMIN
   SUPER_ADMIN
 }
@@ -49,6 +51,7 @@ enum PaymentMethod {
   WIRE_TRANSFER
   ZELLE
   CASHAPP
+  VENMO
   CRYPTO
 }
 
@@ -111,6 +114,18 @@ enum AuditAction {
   PAYMENT_LINK_RESENT
   PAYMENT_LINK_CANCELLED
   PAYMENT_LINK_MARKED_PAID
+  AFFILIATE_APPLY
+  AFFILIATE_APPROVE
+  AFFILIATE_REJECT
+  PARTNER_APPLY
+  PARTNER_APPROVE
+  PARTNER_REJECT
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum LoyaltyPointType {
@@ -157,6 +172,9 @@ model User {
   stockNotifications StockNotification[]
   loyaltyTransactions LoyaltyTransaction[]
   paymentLinksCreated PaymentLink[] @relation("PaymentLinksCreated")
+
+  // Affiliate
+  affiliate         Affiliate?
 
   // Wholesale/B2B
   organizationId    String?
@@ -313,6 +331,12 @@ model Product {
   isActive        Boolean         @default(true)
   isFeatured      Boolean         @default(false)
 
+  // Catalog flags
+  costPerUnit     Decimal?        @db.Decimal(10, 2)  // Internal CPU — admin-only, never public
+  wholesaleOnly   Boolean         @default(false)      // Hidden from public shop (gray rows)
+  comingSoon      Boolean         @default(false)      // Shown with badge, cart disabled (blue rows)
+  subcategory     String?                              // Shop section ID: "metabolic", "cosmetic", etc.
+
   // SEO
   metaTitle       String?
   metaDescription String?
@@ -332,6 +356,8 @@ model Product {
   @@index([slug])
   @@index([category])
   @@index([isActive])
+  @@index([wholesaleOnly])
+  @@index([subcategory])
 }
 
 model ProductVariant {
@@ -351,6 +377,10 @@ model ProductVariant {
 
   // Shipping (overrides product weight if set)
   weightGrams     Int?      // Weight in grams
+
+  // Catalog flags
+  costPerUnit     Decimal?  @db.Decimal(10, 2)  // Variant-level CPU
+  wholesaleOnly   Boolean   @default(false)      // Per-variant wholesale flag
 
   isActive        Boolean   @default(true)
   sortOrder       Int       @default(0)
@@ -432,6 +462,7 @@ model Inventory {
   lowStockThreshold Int           @default(10)
 
   lastRestockedAt DateTime?
+  leadTimeDays    Int?            // Days to restock if orderable but not on-hand
 
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
@@ -481,6 +512,9 @@ model Order {
 
   // Discount/Promo
   discountCode    String?
+
+  // Affiliate tracking
+  affiliateReferralCode String?
 
   // Notes
   customerNotes   String?
@@ -1018,4 +1052,159 @@ model Return {
   @@index([userId])
   @@index([status])
   @@index([createdAt])
+}
+
+// =============================================================================
+// AFFILIATE PROGRAM
+// =============================================================================
+
+model AffiliateApplication {
+  id                String            @id @default(cuid())
+  fullName          String
+  email             String
+  phone             String?
+  primaryPlatform   String            // instagram, tiktok, youtube, blog, etc.
+  socialLinks       Json              // { instagram: "...", tiktok: "...", youtube: "...", website: "..." }
+  audienceSize      String?           // "1k-10k", "10k-50k", "50k-100k", "100k+"
+  contentFocus      String?           // fitness, wellness, biohacking, etc.
+  whyPartner        String?           // free-text motivation
+  resumePath        String?           // local file path for uploaded resume
+  status            ApplicationStatus @default(PENDING)
+  reviewedById      String?
+  reviewedAt        DateTime?
+  rejectionReason   String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Affiliate {
+  id                String            @id @default(cuid())
+  userId            String            @unique
+  user              User              @relation(fields: [userId], references: [id])
+  referralCode      String            @unique
+  commissionRate    Decimal           @default(0.05) @db.Decimal(5, 4) // 5%
+  isActive          Boolean           @default(true)
+
+  // Stats (denormalized for dashboard performance)
+  totalClicks       Int               @default(0)
+  totalOrders       Int               @default(0)
+  totalRevenue      Decimal           @default(0) @db.Decimal(12, 2)
+  totalCommission   Decimal           @default(0) @db.Decimal(12, 2)
+  pendingPayout     Decimal           @default(0) @db.Decimal(12, 2)
+
+  referrals         AffiliateReferral[]
+
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([referralCode])
+  @@index([isActive])
+}
+
+model AffiliateReferral {
+  id                String            @id @default(cuid())
+  affiliateId       String
+  affiliate         Affiliate         @relation(fields: [affiliateId], references: [id])
+  orderId           String?
+  clickedAt         DateTime          @default(now())
+  convertedAt       DateTime?
+  orderAmount       Decimal?          @db.Decimal(10, 2)
+  commissionAmount  Decimal?          @db.Decimal(10, 2)
+  paidOut           Boolean           @default(false)
+  paidOutAt         DateTime?
+
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([affiliateId])
+  @@index([orderId])
+  @@index([paidOut])
+}
+
+// =============================================================================
+// BRAND PARTNER PROGRAM
+// =============================================================================
+
+model BrandPartnerApplication {
+  id                  String            @id @default(cuid())
+  organizationName    String
+  contactName         String
+  email               String
+  phone               String?
+  orgType             String            // retailer, clinic, distributor, gym, other
+  website             String?
+  location            String?           // city/state
+  partnershipFocus    String?           // wholesale, white-label, co-branding, research
+  partnershipOverview String?           // free-text description of partnership goals
+  documentPaths       Json?             // array of uploaded document file paths
+  status              ApplicationStatus @default(PENDING)
+  reviewedById        String?
+  reviewedAt          DateTime?
+  rejectionReason     String?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// =============================================================================
+// NEWSLETTER SUBSCRIBERS
+// =============================================================================
+
+model NewsletterSubscriber {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  source        String?   // promo_popup, footer, checkout, manual
+  isActive      Boolean   @default(true)
+  subscribedAt  DateTime  @default(now())
+  unsubscribedAt DateTime?
+  ipAddress     String?
+
+  @@index([email])
+  @@index([isActive])
+  @@index([subscribedAt])
+}
+
+// =============================================================================
+// MARKETING POPUPS (Admin-controlled)
+// =============================================================================
+
+model MarketingPopup {
+  id              String    @id @default(cuid())
+  name            String                          // internal name for admin reference
+  isActive        Boolean   @default(false)       // toggle on/off from admin
+  headline        String                          // e.g. "Welcome to SBB"
+  subtitle        String?                         // supporting text
+  bodyHtml        String?                         // optional rich content
+  ctaText         String    @default("Unlock")    // button label
+  ctaLink         String?                         // optional redirect after submit
+  discountCode    String?                         // shown after email capture
+  discountCode2   String?                         // second tier code (optional)
+  tier1Label      String?                         // e.g. "10% off orders under $500"
+  tier1Value      String?                         // e.g. "10%"
+  tier2Label      String?                         // e.g. "15% off orders $500+"
+  tier2Value      String?                         // e.g. "15%"
+  showEmailCapture Boolean  @default(true)        // show email form or just message
+  successHeadline String?                         // e.g. "You're In!"
+  successMessage  String?                         // shown after submit
+  delayMs         Int       @default(3500)        // delay before showing (ms)
+  showOnPages     String[]                        // empty = all pages, or ["index.html","shop.html"]
+  showFrequency   String    @default("once")      // once, every_visit, every_session
+  startsAt        DateTime?                       // schedule start (null = immediate)
+  expiresAt       DateTime?                       // schedule end (null = indefinite)
+  priority        Int       @default(0)           // higher = shown first if multiple active
+  impressions     Int       @default(0)           // times shown
+  conversions     Int       @default(0)           // emails captured
+  createdById     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([isActive])
+  @@index([priority])
 }

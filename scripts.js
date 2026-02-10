@@ -2,6 +2,22 @@ document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("is-ready");
 
   // ============================================
+  // AFFILIATE TRACKING (capture ?ref= param)
+  // ============================================
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    var ref = params.get("ref");
+    if (ref) {
+      // Set sbb_ref cookie for 30 days
+      var expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+      document.cookie = "sbb_ref=" + encodeURIComponent(ref) + ";expires=" + expires + ";path=/;SameSite=Lax";
+      // Track click via API (non-blocking)
+      var apiBase = window.SBB_API_BASE || "https://api.sbbpeptides.com/api/v1";
+      fetch(apiBase + "/affiliates/track/" + encodeURIComponent(ref)).catch(function() {});
+    }
+  })();
+
+  // ============================================
   // MOBILE NAVIGATION (HAMBURGER MENU)
   // ============================================
   const menuToggle = document.querySelector(".menu-toggle");
@@ -333,6 +349,39 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     },
 
+    /* ------ Variant selector handler ------ */
+    initVariantSelectors() {
+      document.querySelectorAll(".variant-select").forEach((select) => {
+        select.addEventListener("change", function () {
+          const card = this.closest(".product-card");
+          if (!card) return;
+
+          const opt = this.options[this.selectedIndex];
+          const price = opt.dataset.price;
+          const variantId = opt.value;
+          const variantName = opt.dataset.variant || opt.textContent.split(" - ")[0];
+
+          // Update displayed price
+          const priceEl = card.querySelector(".price");
+          if (priceEl && price) {
+            priceEl.textContent = "$" + parseFloat(price).toFixed(2);
+          }
+
+          // Update add-to-cart button data attributes
+          const btn = card.querySelector("[data-add-to-cart]");
+          if (btn && price) {
+            btn.dataset.addToCart = variantId;
+            btn.dataset.productId = variantId;
+            btn.dataset.productPrice = price;
+            btn.dataset.productVariant = variantName;
+          }
+        });
+
+        // Trigger initial selection to sync price with first variant
+        select.dispatchEvent(new Event("change"));
+      });
+    },
+
     showNotification(message) {
       // Create toast notification
       let toast = document.getElementById("cart-toast");
@@ -354,6 +403,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize cart
   Cart.init();
+  Cart.initVariantSelectors();
 
   // Expose cart globally for debugging/external use
   window.SBBCart = Cart;
@@ -568,7 +618,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const obstacleSelectors = [
       ".hero-copy",
       ".section-heading",
-      ".card",
+      ".card:not(.product-card)",
       ".product-hero-copy",
       ".subscription-block",
       ".accordion-panel",
@@ -598,27 +648,39 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("resize", scheduleRefresh, { passive: true });
     window.addEventListener("scroll", scheduleRefresh, { passive: true });
 
-    const bubbleState = bubbleEls.map((bubble) => {
+    const bubbleState = bubbleEls.map((bubble, index) => {
       const size = bubble.offsetWidth;
-      const startX = bubble.offsetLeft;
-      const startY = bubble.offsetTop;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      // Alternate left/right edges for visible two-sided cascade
+      const fromLeft = index % 2 === 0;
+      // Start just barely off-screen so entry is immediate
+      const startX = fromLeft ? -size : width;
+      // Spread vertically across upper 60% with stagger
+      const startY = (index / bubbleEls.length) * height * 0.55 + Math.random() * height * 0.1;
       bubble.style.left = "0px";
       bubble.style.top = "0px";
-      const angle = Math.random() * Math.PI * 2;
-      const isMobile = window.innerWidth <= 768;
+      const isMobile = width <= 768;
       const speed = isMobile
-        ? 0.2 + Math.random() * 0.3
-        : 0.6 + Math.random() * 0.8;
+        ? 0.3 + Math.random() * 0.4
+        : 0.9 + Math.random() * 1.0;
+      const vx = fromLeft ? speed : -speed;
+      const vy = 0.12 + Math.random() * 0.2;
+      // Stagger spawn: each bubble enters 120ms after the previous
+      const spawnDelay = index * 120;
+      bubble.style.opacity = "0";
       bubble.style.transform = `translate3d(${startX}px, ${startY}px, 0)`;
       return {
         el: bubble,
         size,
         x: startX,
         y: startY,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
+        vx: vx,
+        vy: vy,
         seed: Math.random() * Math.PI * 2,
-        isPopping: false
+        isPopping: false,
+        spawnDelay: spawnDelay,
+        hasEntered: false
       };
     });
 
@@ -626,15 +688,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const respawnBubble = (bubble) => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      bubble.x = Math.max(0, Math.random() * (width - bubble.size));
-      bubble.y = Math.max(0, Math.random() * (height - bubble.size));
-      const angle = Math.random() * Math.PI * 2;
+      const fromLeft = Math.random() < 0.5;
+      // Respawn just off-screen on left or right edge
+      bubble.x = fromLeft ? -bubble.size : width;
+      bubble.y = Math.random() * height * 0.5; // upper half
       const mobile = width <= 768;
       const speed = mobile
-        ? 0.2 + Math.random() * 0.3
-        : 0.6 + Math.random() * 0.8;
-      bubble.vx = Math.cos(angle) * speed;
-      bubble.vy = Math.sin(angle) * speed;
+        ? 0.3 + Math.random() * 0.4
+        : 0.9 + Math.random() * 1.0;
+      bubble.vx = fromLeft ? speed : -speed;
+      bubble.vy = 0.12 + Math.random() * 0.2;
+      bubble.hasEntered = false;
       bubble.el.style.transform = `translate3d(${bubble.x}px, ${bubble.y}px, 0)`;
     };
 
@@ -678,11 +742,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.addEventListener("pointerdown", handleBubblePop, { passive: true });
 
-    let lastTime = performance.now();
+    const animStart = performance.now();
+    let lastTime = animStart;
     const animateBubbles = (time) => {
       const delta = Math.min(40, time - lastTime);
       const dt = delta / 16.67;
       lastTime = time;
+      const elapsed = time - animStart;
 
       if (needsRefresh || time - lastRefresh > 1200) {
         refreshObstacles();
@@ -695,69 +761,93 @@ document.addEventListener("DOMContentLoaded", () => {
       const pad = 10;
 
       bubbleState.forEach((bubble) => {
+        // Staggered spawn: skip until this bubble's delay has passed
+        if (elapsed < bubble.spawnDelay) return;
+        // Fade in on first visible frame
+        if (bubble.el.style.opacity === "0") {
+          bubble.el.style.opacity = "";
+        }
+
         const mobileScale = window.innerWidth <= 768 ? 0.4 : 1;
         const driftX = Math.sin(time / 1400 + bubble.seed) * 0.3 * mobileScale;
         const driftY = Math.cos(time / 1600 + bubble.seed) * 0.3 * mobileScale;
+        // Gentle gravity — bubbles drift downward
+        bubble.vy += 0.002 * dt;
         bubble.x += (bubble.vx + driftX) * dt;
         bubble.y += (bubble.vy + driftY) * dt;
 
-        if (bubble.x <= 0) {
-          bubble.x = 0;
-          bubble.vx = Math.abs(bubble.vx);
+        // Check if bubble has fully entered the viewport
+        if (!bubble.hasEntered) {
+          if (bubble.x >= 0 && bubble.x + bubble.size <= width) {
+            bubble.hasEntered = true;
+          }
         }
-        if (bubble.x + bubble.size >= width) {
-          bubble.x = width - bubble.size;
-          bubble.vx = -Math.abs(bubble.vx);
+
+        // Side walls: bounce (only after bubble has entered the viewport)
+        if (bubble.hasEntered) {
+          if (bubble.x <= 0) {
+            bubble.x = 0;
+            bubble.vx = Math.abs(bubble.vx);
+          }
+          if (bubble.x + bubble.size >= width) {
+            bubble.x = width - bubble.size;
+            bubble.vx = -Math.abs(bubble.vx);
+          }
         }
+        // Top wall: bounce
         if (bubble.y <= 0) {
           bubble.y = 0;
           bubble.vy = Math.abs(bubble.vy);
         }
-        if (bubble.y + bubble.size >= height) {
-          bubble.y = height - bubble.size;
-          bubble.vy = -Math.abs(bubble.vy);
+        // Bottom: respawn from a side edge (falling back in)
+        if (bubble.y > height + bubble.size) {
+          respawnBubble(bubble);
+          return;
         }
 
-        for (let i = 0; i < obstacles.length; i += 1) {
-          const rect = obstacles[i];
-          const left = rect.left - pad;
-          const right = rect.right + pad;
-          const top = rect.top - pad;
-          const bottom = rect.bottom + pad;
+        // Obstacle avoidance (only when fully inside viewport)
+        if (bubble.hasEntered) {
+          for (let i = 0; i < obstacles.length; i += 1) {
+            const rect = obstacles[i];
+            const left = rect.left - pad;
+            const right = rect.right + pad;
+            const top = rect.top - pad;
+            const bottom = rect.bottom + pad;
 
-          if (
-            bubble.x + bubble.size > left &&
-            bubble.x < right &&
-            bubble.y + bubble.size > top &&
-            bubble.y < bottom
-          ) {
-            const overlapX = Math.min(
-              bubble.x + bubble.size - left,
-              right - bubble.x
-            );
-            const overlapY = Math.min(
-              bubble.y + bubble.size - top,
-              bottom - bubble.y
-            );
+            if (
+              bubble.x + bubble.size > left &&
+              bubble.x < right &&
+              bubble.y + bubble.size > top &&
+              bubble.y < bottom
+            ) {
+              const overlapX = Math.min(
+                bubble.x + bubble.size - left,
+                right - bubble.x
+              );
+              const overlapY = Math.min(
+                bubble.y + bubble.size - top,
+                bottom - bubble.y
+              );
 
-            if (overlapX < overlapY) {
-              if (bubble.x + bubble.size / 2 < (left + right) / 2) {
-                bubble.x = left - bubble.size;
+              if (overlapX < overlapY) {
+                if (bubble.x + bubble.size / 2 < (left + right) / 2) {
+                  bubble.x = left - bubble.size;
+                } else {
+                  bubble.x = right;
+                }
+                bubble.vx *= -1;
               } else {
-                bubble.x = right;
+                if (bubble.y + bubble.size / 2 < (top + bottom) / 2) {
+                  bubble.y = top - bubble.size;
+                } else {
+                  bubble.y = bottom;
+                }
+                bubble.vy *= -1;
               }
-              bubble.vx *= -1;
-            } else {
-              if (bubble.y + bubble.size / 2 < (top + bottom) / 2) {
-                bubble.y = top - bubble.size;
-              } else {
-                bubble.y = bottom;
-              }
-              bubble.vy *= -1;
+
+              bubble.vx += (Math.random() - 0.5) * 0.2;
+              bubble.vy += (Math.random() - 0.5) * 0.2;
             }
-
-            bubble.vx += (Math.random() - 0.5) * 0.2;
-            bubble.vy += (Math.random() - 0.5) * 0.2;
           }
         }
 
@@ -858,13 +948,22 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         }
       }
+
+      // Sync sidebar active state
+      const sidebarLinks = document.querySelectorAll(".shop-sidebar-link");
+      sidebarLinks.forEach((link) => {
+        const section = link.getAttribute("data-section");
+        link.classList.toggle("is-active", section === activeId);
+      });
     };
 
     window.addEventListener("scroll", updateActiveNav, { passive: true });
     updateActiveNav();
 
-    // Smooth scroll for nav links
-    navLinks.forEach((link) => {
+    // Smooth scroll for nav links (top bar + sidebar)
+    var allNavLinks = Array.from(navLinks);
+    document.querySelectorAll(".shop-sidebar-link").forEach(function(l) { allNavLinks.push(l); });
+    allNavLinks.forEach((link) => {
       link.addEventListener("click", (e) => {
         const href = link.getAttribute("href");
         if (href && href.startsWith("#")) {
@@ -876,6 +975,701 @@ document.addEventListener("DOMContentLoaded", () => {
             window.scrollTo({ top: targetPosition, behavior: "smooth" });
           }
         }
+      });
+    });
+  }
+
+  // ============================================
+  // SITE SEARCH
+  // ============================================
+  const SiteSearch = {
+    products: [],
+    searchInput: document.getElementById("search-input"),
+    searchResults: document.getElementById("search-results"),
+    searchContainer: document.getElementById("site-search"),
+    mobileToggle: document.getElementById("mobile-search-toggle"),
+
+    init() {
+      if (!this.searchInput) return;
+      this.buildProductIndex();
+      this.bindEvents();
+    },
+
+    buildProductIndex() {
+      // Scrape product cards from the current page (works on shop.html)
+      const cards = document.querySelectorAll(".product-card");
+      cards.forEach((card) => {
+        const name = (card.querySelector("h3") || {}).textContent || "";
+        const desc = (card.querySelector(".product-body p") || {}).textContent || "";
+        const label = (card.querySelector(".label") || {}).textContent || "";
+        const priceEl = card.querySelector(".price");
+        const price = priceEl ? priceEl.textContent.trim() : "";
+        const img = (card.querySelector("img") || {}).getAttribute("src") || "/images/products/vial.png";
+        const section = card.closest("section");
+        const sectionId = section ? section.id : "";
+
+        if (name) {
+          this.products.push({ name, desc, label, price, img, sectionId });
+        }
+      });
+
+      // If we're not on shop page, load a static product catalog for search
+      if (this.products.length === 0) {
+        this.products = this.getStaticCatalog();
+      }
+    },
+
+    getStaticCatalog() {
+      // Minimal catalog for non-shop pages — redirects to shop.html#section
+      // Prices from CSV B2C column. Wholesale-only products excluded.
+      return [
+        // METABOLIC
+        { name: "Semaglutide", desc: "GLP-1 receptor agonist", label: "METABOLIC", price: "From $40.00", img: "/images/products/vial.png", sectionId: "metabolic" },
+        { name: "Tirzepatide", desc: "Dual GIP/GLP-1 receptor agonist", label: "METABOLIC", price: "From $50.00", img: "/images/products/vial.png", sectionId: "metabolic" },
+        { name: "Retatrutide", desc: "Triple GIP/GLP-1/glucagon agonist", label: "METABOLIC", price: "From $250.00", img: "/images/products/vial.png", sectionId: "metabolic" },
+        { name: "Cagrilintide", desc: "Amylin analog", label: "METABOLIC", price: "From $145.00", img: "/images/products/vial.png", sectionId: "metabolic" },
+        { name: "Cagrilintide + Semaglutide", desc: "Dual amylin/GLP-1 combination", label: "METABOLIC", price: "From $150.00", img: "/images/products/vial.png", sectionId: "metabolic" },
+        { name: "Survodutide", desc: "Dual GLP-1/glucagon agonist", label: "METABOLIC", price: "$330.00", img: "/images/products/vial.png", sectionId: "metabolic" },
+        { name: "Mazdutide", desc: "GLP-1/glucagon dual agonist", label: "METABOLIC", price: "$250.00", img: "/images/products/vial.png", sectionId: "metabolic" },
+        { name: "5-Amino-1MQ", desc: "NNMT inhibitor", label: "METABOLIC", price: "$110.00", img: "/images/products/vial.png", sectionId: "metabolic" },
+        { name: "AOD-9604", desc: "Modified HGH fragment", label: "METABOLIC", price: "$145.00", img: "/images/products/vial.png", sectionId: "metabolic" },
+        { name: "Adipotide", desc: "Peptidomimetic compound", label: "METABOLIC", price: "$225.00", img: "/images/products/vial.png", sectionId: "metabolic" },
+        { name: "L-Carnitine", desc: "Amino acid derivative", label: "METABOLIC", price: "$95.00", img: "/images/products/vial.png", sectionId: "metabolic" },
+        { name: "LC120", desc: "Metabolic research blend", label: "METABOLIC", price: "$80.00", img: "/images/products/vial.png", sectionId: "metabolic" },
+        { name: "LC216", desc: "Metabolic research blend", label: "METABOLIC", price: "$80.00", img: "/images/products/vial.png", sectionId: "metabolic" },
+        // GROWTH HORMONE
+        { name: "CJC-1295 (no DAC)", desc: "GHRH analog", label: "GROWTH HORMONE", price: "From $110.00", img: "/images/products/vial.png", sectionId: "growth-hormone" },
+        { name: "CJC-1295 (with DAC)", desc: "Extended half-life GHRH", label: "GROWTH HORMONE", price: "$210.00", img: "/images/products/vial.png", sectionId: "growth-hormone" },
+        { name: "CJC-1295 + Ipamorelin", desc: "GHRH/GHRP combination", label: "GROWTH HORMONE", price: "$180.00", img: "/images/products/vial.png", sectionId: "growth-hormone" },
+        { name: "Ipamorelin", desc: "Growth hormone secretagogue", label: "GROWTH HORMONE", price: "From $65.00", img: "/images/products/vial.png", sectionId: "growth-hormone" },
+        { name: "Sermorelin", desc: "GHRH analog", label: "GROWTH HORMONE", price: "From $100.00", img: "/images/products/vial.png", sectionId: "growth-hormone" },
+        { name: "Tesamorelin", desc: "GHRH analog", label: "GROWTH HORMONE", price: "From $130.00", img: "/images/products/vial.png", sectionId: "growth-hormone" },
+        { name: "Hexarelin", desc: "GHRP secretagogue", label: "GROWTH HORMONE", price: "$140.00", img: "/images/products/vial.png", sectionId: "growth-hormone" },
+        { name: "IGF-1 LR3", desc: "Long-acting IGF-1 analog", label: "GROWTH HORMONE", price: "From $65.00", img: "/images/products/vial.png", sectionId: "growth-hormone" },
+        // RECOVERY
+        { name: "BPC-157", desc: "Body Protection Compound", label: "RECOVERY", price: "From $55.00", img: "/images/products/vial.png", sectionId: "recovery" },
+        { name: "TB-500", desc: "Thymosin Beta-4 fragment", label: "RECOVERY", price: "From $60.00", img: "/images/products/vial.png", sectionId: "recovery" },
+        { name: "BPC-157 + TB-500", desc: "Recovery combination", label: "RECOVERY", price: "From $125.00", img: "/images/products/vial.png", sectionId: "recovery" },
+        // COSMETIC
+        { name: "GHK-Cu", desc: "Copper tripeptide", label: "COSMETIC", price: "$100.00", img: "/images/products/vial.png", sectionId: "cosmetic" },
+        { name: "SNAP-8", desc: "Acetyl octapeptide-3", label: "COSMETIC", price: "$55.00", img: "/images/products/vial.png", sectionId: "cosmetic" },
+        { name: "SNAP-8 + GHK-Cu Serum", desc: "Cosmetic peptide serum", label: "COSMETIC", price: "$65.00", img: "/images/products/vial.png", sectionId: "cosmetic" },
+        // ANTI-INFLAMMATORY
+        { name: "KPV", desc: "Alpha-MSH-derived tripeptide", label: "ANTI-INFLAMMATORY", price: "$65.00", img: "/images/products/vial.png", sectionId: "anti-inflammatory" },
+        // ANTIMICROBIAL
+        { name: "LL-37", desc: "Cathelicidin peptide", label: "ANTIMICROBIAL", price: "$110.00", img: "/images/products/vial.png", sectionId: "antimicrobial" },
+        // ANTIOXIDANT
+        { name: "Glutathione", desc: "Tripeptide antioxidant", label: "ANTIOXIDANT", price: "$110.00", img: "/images/products/vial.png", sectionId: "antioxidant" },
+        // IMMUNE
+        { name: "Thymalin", desc: "Thymic peptide bioregulator", label: "IMMUNE", price: "$85.00", img: "/images/products/vial.png", sectionId: "immune" },
+        { name: "Thymosin Alpha-1", desc: "Thymic peptide", label: "IMMUNE", price: "From $110.00", img: "/images/products/vial.png", sectionId: "immune" },
+        // LONGEVITY
+        { name: "Epithalon", desc: "Tetrapeptide bioregulator", label: "LONGEVITY", price: "$60.00", img: "/images/products/vial.png", sectionId: "longevity" },
+        // MITOCHONDRIAL
+        { name: "MOTS-c", desc: "Mitochondrial-derived peptide", label: "MITOCHONDRIAL", price: "From $100.00", img: "/images/products/vial.png", sectionId: "mitochondrial" },
+        { name: "NAD+", desc: "Nicotinamide adenine dinucleotide", label: "MITOCHONDRIAL", price: "$140.00", img: "/images/products/vial.png", sectionId: "mitochondrial" },
+        { name: "SS-31", desc: "Elamipretide", label: "MITOCHONDRIAL", price: "From $120.00", img: "/images/products/vial.png", sectionId: "mitochondrial" },
+        { name: "SLU-PP-332", desc: "ERR agonist", label: "MITOCHONDRIAL", price: "$165.00", img: "/images/products/vial.png", sectionId: "mitochondrial" },
+        // NOOTROPIC
+        { name: "Selank", desc: "Tuftsin-derived anxiolytic", label: "NOOTROPIC", price: "From $50.00", img: "/images/products/vial.png", sectionId: "nootropic" },
+        { name: "Semax", desc: "ACTH-derived neuropeptide", label: "NOOTROPIC", price: "From $50.00", img: "/images/products/vial.png", sectionId: "nootropic" },
+        { name: "Dihexa", desc: "HGF receptor agonist", label: "NOOTROPIC", price: "From $100.00", img: "/images/products/vial.png", sectionId: "nootropic" },
+        { name: "Pinealon", desc: "Tripeptide bioregulator", label: "NOOTROPIC", price: "From $60.00", img: "/images/products/vial.png", sectionId: "nootropic" },
+        { name: "Cerebrolysin", desc: "Neuropeptide preparation", label: "NOOTROPIC", price: "$70.00", img: "/images/products/vial.png", sectionId: "nootropic" },
+        // NEUROPEPTIDE
+        { name: "VIP", desc: "Vasoactive intestinal peptide", label: "NEUROPEPTIDE", price: "From $100.00", img: "/images/products/vial.png", sectionId: "neuropeptide" },
+        // NEUROPROTECTIVE
+        { name: "ARA-290", desc: "EPO-derived peptide", label: "NEUROPROTECTIVE", price: "$80.00", img: "/images/products/vial.png", sectionId: "neuroprotective" },
+        // HORMONE
+        { name: "Oxytocin", desc: "Neuropeptide hormone", label: "HORMONE", price: "$65.00", img: "/images/products/vial.png", sectionId: "hormone" },
+        // REPRODUCTIVE
+        { name: "HMG", desc: "Human menopausal gonadotropin", label: "REPRODUCTIVE", price: "$90.00", img: "/images/products/vial.png", sectionId: "reproductive" },
+        { name: "Kisspeptin-10", desc: "GnRH stimulator", label: "REPRODUCTIVE", price: "From $80.00", img: "/images/products/vial.png", sectionId: "reproductive" },
+        { name: "hCG", desc: "Human chorionic gonadotropin", label: "REPRODUCTIVE", price: "From $100.00", img: "/images/products/vial.png", sectionId: "reproductive" },
+        // SEXUAL HEALTH
+        { name: "PT-141", desc: "Bremelanotide", label: "SEXUAL HEALTH", price: "$90.00", img: "/images/products/vial.png", sectionId: "sexual-health" },
+        // SLEEP
+        { name: "DSIP", desc: "Delta sleep-inducing peptide", label: "SLEEP", price: "From $55.00", img: "/images/products/vial.png", sectionId: "sleep" },
+        // TANNING
+        { name: "Melanotan-1", desc: "Alpha-MSH analog", label: "TANNING", price: "$75.00", img: "/images/products/vial.png", sectionId: "tanning" },
+        // RESEARCH
+        { name: "Dermorphin", desc: "Opioid peptide", label: "RESEARCH", price: "$70.00", img: "/images/products/vial.png", sectionId: "research" },
+        { name: "PNC-27", desc: "Anti-neoplastic peptide", label: "RESEARCH", price: "From $125.00", img: "/images/products/vial.png", sectionId: "research" },
+        // SUPPLIES
+        { name: "BAC Water", desc: "Bacteriostatic water", label: "SUPPLIES", price: "From $5.00", img: "/images/products/vial.png", sectionId: "supplies" },
+        { name: "Sterile Water", desc: "Sterile water for injection", label: "SUPPLIES", price: "From $5.00", img: "/images/products/vial.png", sectionId: "supplies" },
+        { name: "Acetic Acid", desc: "Reconstitution solution", label: "SUPPLIES", price: "$10.00", img: "/images/products/vial.png", sectionId: "supplies" },
+        // STACKS
+        { name: "Gut Health Stack", desc: "BPC-157 + KPV", label: "STACK", price: "$150.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Bloat Buster Stack", desc: "BPC-157 + Retatrutide", label: "STACK", price: "$305.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Belly Buster Stack", desc: "Retatrutide + Tesamorelin + BPC-157", label: "STACK", price: "$455.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Weight Loss Stack", desc: "Retatrutide + NAD+ + GHK-Cu", label: "STACK", price: "$345.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Baywatch Stack", desc: "Retatrutide + Melanotan-1 + BPC-157", label: "STACK", price: "$400.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Healing Stack", desc: "BPC-157 + TB-500 + KPV", label: "STACK", price: "$240.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Recovery Stack", desc: "BPC-157 + TB-500 + GHK-Cu", label: "STACK", price: "$270.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Anti-Aging Stack", desc: "Epithalon + NAD+ + GHK-Cu", label: "STACK", price: "$285.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Longevity Research Stack", desc: "Epithalon + NAD+ + SS-31", label: "STACK", price: "$250.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Growth Stack", desc: "CJC-1295 + Ipamorelin + NAD+", label: "STACK", price: "$300.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Cognitive Stack", desc: "Semax + Selank + Pinealon", label: "STACK", price: "$200.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Mental Wellness Stack", desc: "Semax + Selank + DSIP", label: "STACK", price: "$250.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Sleep Stack", desc: "DSIP + Pinealon + Epithalon", label: "STACK", price: "$160.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Glow Stack", desc: "GHK-Cu + TB-500 + BPC-157", label: "STACK", price: "$300.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Immune Support Stack", desc: "Thymosin Alpha-1 + Thymalin + KPV", label: "STACK", price: "$360.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Energy Stack", desc: "MOTS-c + SS-31 + NAD+", label: "STACK", price: "$340.00", img: "/images/products/vial.png", sectionId: "stacks" },
+        { name: "Body Recomp Stack", desc: "Retatrutide + CJC w/DAC + Ipamorelin", label: "STACK", price: "$554.00", img: "/images/products/vial.png", sectionId: "stacks" },
+      ];
+    },
+
+    search(query) {
+      if (!query || query.length < 2) return [];
+      const q = query.toLowerCase();
+      return this.products
+        .filter((p) => {
+          return p.name.toLowerCase().includes(q) ||
+                 p.desc.toLowerCase().includes(q) ||
+                 p.label.toLowerCase().includes(q);
+        })
+        .slice(0, 8);
+    },
+
+    renderResults(results, query) {
+      if (!this.searchResults) return;
+
+      if (!query || query.length < 2) {
+        this.searchResults.classList.remove("is-visible");
+        this.searchResults.innerHTML = "";
+        return;
+      }
+
+      if (results.length === 0) {
+        this.searchResults.innerHTML = '<div class="search-no-results">No products found</div>';
+        this.searchResults.classList.add("is-visible");
+        return;
+      }
+
+      const isShopPage = window.location.pathname.includes("shop.html") || window.location.pathname.endsWith("/shop");
+      const html = results.map((p) => {
+        const href = isShopPage
+          ? "#" + p.sectionId
+          : "shop.html#" + p.sectionId;
+        return '<a class="search-result-item" href="' + href + '" data-section="' + p.sectionId + '" data-name="' + p.name.replace(/"/g, '&quot;') + '">' +
+          '<img src="' + p.img + '" alt="' + p.name.replace(/"/g, '&quot;') + '" />' +
+          '<div class="search-result-info">' +
+            '<div class="search-result-name">' + this.highlight(p.name, query) + '</div>' +
+            '<div class="search-result-meta">' + p.label + '</div>' +
+          '</div>' +
+          '<span class="search-result-price">' + p.price + '</span>' +
+        '</a>';
+      }).join("");
+
+      const viewAllHref = isShopPage ? "#" : "shop.html?q=" + encodeURIComponent(query);
+      this.searchResults.innerHTML = html +
+        '<a class="search-view-all" href="' + viewAllHref + '">View all results</a>';
+      this.searchResults.classList.add("is-visible");
+    },
+
+    highlight(text, query) {
+      const idx = text.toLowerCase().indexOf(query.toLowerCase());
+      if (idx === -1) return text;
+      return text.slice(0, idx) + '<strong>' + text.slice(idx, idx + query.length) + '</strong>' + text.slice(idx + query.length);
+    },
+
+    scrollToProduct(sectionId, productName) {
+      const section = document.getElementById(sectionId);
+      if (!section) return;
+
+      // Scroll to section
+      const navHeight = (document.querySelector(".shop-nav") || {}).offsetHeight || 0;
+      const target = section.offsetTop - navHeight - 30;
+      window.scrollTo({ top: target, behavior: "smooth" });
+
+      // Highlight matching product card briefly
+      if (productName) {
+        const cards = section.querySelectorAll(".product-card");
+        cards.forEach((card) => {
+          const h3 = card.querySelector("h3");
+          if (h3 && h3.textContent.trim() === productName) {
+            card.style.transition = "box-shadow 0.3s ease";
+            card.style.boxShadow = "0 0 0 3px var(--rose), " + (getComputedStyle(card).boxShadow || "none");
+            setTimeout(() => {
+              card.style.boxShadow = "";
+            }, 2000);
+          }
+        });
+      }
+    },
+
+    closeMobileSearch() {
+      if (this.searchContainer) {
+        this.searchContainer.classList.remove("is-mobile-open");
+      }
+      if (this.searchResults) {
+        this.searchResults.classList.remove("is-visible");
+      }
+    },
+
+    bindEvents() {
+      let debounceTimer;
+      const self = this;
+
+      this.searchInput.addEventListener("input", function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function() {
+          const query = self.searchInput.value.trim();
+          const results = self.search(query);
+          self.renderResults(results, query);
+        }, 200);
+      });
+
+      this.searchInput.addEventListener("focus", function() {
+        const query = self.searchInput.value.trim();
+        if (query.length >= 2) {
+          const results = self.search(query);
+          self.renderResults(results, query);
+        }
+      });
+
+      // Close results on outside click
+      document.addEventListener("click", function(e) {
+        if (self.searchContainer && !self.searchContainer.contains(e.target)) {
+          if (self.searchResults) self.searchResults.classList.remove("is-visible");
+          // Close mobile search when clicking outside
+          if (window.innerWidth <= 1100) {
+            self.closeMobileSearch();
+          }
+        }
+      });
+
+      // Handle result clicks on shop page — scroll to section
+      if (this.searchResults) {
+        this.searchResults.addEventListener("click", function(e) {
+          const item = e.target.closest(".search-result-item");
+          if (!item) return;
+
+          const isShopPage = window.location.pathname.includes("shop.html") || window.location.pathname.endsWith("/shop");
+          if (isShopPage) {
+            e.preventDefault();
+            const sectionId = item.dataset.section;
+            const productName = item.dataset.name;
+            self.scrollToProduct(sectionId, productName);
+            self.searchResults.classList.remove("is-visible");
+            self.searchInput.value = "";
+            self.closeMobileSearch();
+          }
+        });
+      }
+
+      // Escape to close
+      this.searchInput.addEventListener("keydown", function(e) {
+        if (e.key === "Escape") {
+          self.searchResults.classList.remove("is-visible");
+          self.searchInput.blur();
+          self.closeMobileSearch();
+        }
+        // Enter goes to first result
+        if (e.key === "Enter") {
+          e.preventDefault();
+          var firstResult = self.searchResults.querySelector(".search-result-item");
+          if (firstResult) firstResult.click();
+        }
+      });
+
+      // Mobile search toggle
+      if (this.mobileToggle) {
+        this.mobileToggle.addEventListener("click", function() {
+          if (self.searchContainer) {
+            self.searchContainer.classList.toggle("is-mobile-open");
+            if (self.searchContainer.classList.contains("is-mobile-open")) {
+              setTimeout(function() { self.searchInput.focus(); }, 100);
+            }
+          }
+        });
+      }
+    }
+  };
+
+  SiteSearch.init();
+
+  // Wire shop-nav inline search to SiteSearch (shop page only)
+  (function() {
+    var shopInput = document.getElementById("shop-search-input");
+    if (!shopInput || !SiteSearch.products.length) return;
+
+    var debounce;
+    shopInput.addEventListener("input", function() {
+      clearTimeout(debounce);
+      debounce = setTimeout(function() {
+        var q = shopInput.value.trim();
+        if (q.length < 2) {
+          // Show all products again
+          document.querySelectorAll(".product-card").forEach(function(c) { c.style.display = ""; });
+          document.querySelectorAll("section[id] .section-heading").forEach(function(h) { h.style.display = ""; });
+          return;
+        }
+        var results = SiteSearch.search(q);
+        var matchNames = results.map(function(r) { return r.name.toLowerCase(); });
+        var matchSections = new Set(results.map(function(r) { return r.sectionId; }));
+
+        // Filter product cards to show only matches
+        document.querySelectorAll(".product-card").forEach(function(card) {
+          var h3 = card.querySelector("h3");
+          var name = h3 ? h3.textContent.trim().toLowerCase() : "";
+          card.style.display = matchNames.indexOf(name) >= 0 ? "" : "none";
+        });
+
+        // Scroll to first matching section
+        if (results.length > 0 && results[0].sectionId) {
+          SiteSearch.scrollToProduct(results[0].sectionId, results[0].name);
+        }
+      }, 250);
+    });
+
+    shopInput.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") {
+        shopInput.value = "";
+        shopInput.blur();
+        document.querySelectorAll(".product-card").forEach(function(c) { c.style.display = ""; });
+      }
+      if (e.key === "Enter") {
+        e.preventDefault();
+        var q = shopInput.value.trim();
+        var results = SiteSearch.search(q);
+        if (results.length > 0 && results[0].sectionId) {
+          SiteSearch.scrollToProduct(results[0].sectionId, results[0].name);
+        }
+      }
+    });
+  })();
+
+  // ============================================
+  // MARKETING POPUP (Admin-controlled, API-driven)
+  // ============================================
+  const MarketingPopup = {
+    root: document.getElementById("marketing-popup-root"),
+    config: null,
+    overlay: null,
+    popup: null,
+    storagePrefix: "sbb_popup_",
+    apiBase: window.SBB_API_BASE || (
+      window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+        ? "http://localhost:3001/api/v1"
+        : "https://api.sbbpeptides.com/api/v1"
+    ),
+
+    async init() {
+      if (!this.root) return;
+
+      // Determine current page name
+      var pageName = window.location.pathname.split("/").pop() || "index.html";
+      if (pageName === "" || pageName === "/") pageName = "index.html";
+
+      // Fetch active popup config from admin API
+      try {
+        var res = await fetch(this.apiBase + "/support/popup/active?page=" + encodeURIComponent(pageName));
+        if (!res.ok) return;
+        this.config = await res.json();
+      } catch (e) { return; }
+
+      // No active popup
+      if (!this.config || !this.config.id) return;
+
+      // Frequency check
+      var storageKey = this.storagePrefix + this.config.id;
+      var freq = this.config.showFrequency || "once";
+      if (freq === "once" && localStorage.getItem(storageKey)) return;
+      if (freq === "session" && sessionStorage.getItem(storageKey)) return;
+
+      // Build and show
+      this.render();
+      var delay = this.config.delayMs || 3500;
+      setTimeout(function() { MarketingPopup.show(); }, delay);
+    },
+
+    render() {
+      var c = this.config;
+
+      // Build tier HTML
+      var tiersHtml = "";
+      if (c.tier1Label && c.tier1Value) {
+        tiersHtml += '<div class="promo-tier"><div class="promo-tier-percent">' +
+          this.esc(c.tier1Value) + '</div><div class="promo-tier-label">' +
+          this.esc(c.tier1Label) + '</div></div>';
+      }
+      if (c.tier2Label && c.tier2Value) {
+        tiersHtml += '<div class="promo-tier"><div class="promo-tier-percent">' +
+          this.esc(c.tier2Value) + '</div><div class="promo-tier-label">' +
+          this.esc(c.tier2Label) + '</div></div>';
+      }
+
+      // Build email form HTML (optional)
+      var formHtml = "";
+      if (c.showEmailCapture) {
+        formHtml = '<div class="promo-form-wrap" id="promo-form-wrap">' +
+          '<form class="promo-form" id="promo-form">' +
+          '<input type="email" class="promo-email-input" id="promo-email" placeholder="Enter your email" required />' +
+          '<button type="submit" class="promo-submit-btn" id="promo-submit-btn">' + this.esc(c.ctaText || "Unlock") + '</button>' +
+          '</form>' +
+          '<p class="promo-fine-print">No spam. Unsubscribe anytime. Discount applied at checkout.</p>' +
+          '</div>';
+      } else if (c.ctaLink) {
+        formHtml = '<div style="text-align:center;margin-top:16px;">' +
+          '<a href="' + this.esc(c.ctaLink) + '" class="btn btn-primary">' + this.esc(c.ctaText || "Shop Now") + '</a></div>';
+      }
+
+      // Build success state
+      var successHtml = "";
+      if (c.showEmailCapture) {
+        var successHead = c.successHeadline || "You're In!";
+        var successMsg = c.successMessage || "";
+        var codeHtml = "";
+        if (c.discountCode) {
+          codeHtml = '<div class="promo-code-display">' + this.esc(c.discountCode) + '</div>';
+        }
+        successHtml = '<div class="promo-success" id="promo-success">' +
+          '<h3>' + this.esc(successHead) + '</h3>' + codeHtml +
+          (successMsg ? '<p>' + successMsg + '</p>' : '') +
+          '<a href="shop.html" class="btn btn-primary">Start Shopping</a></div>';
+      }
+
+      // Assemble popup
+      this.root.innerHTML =
+        '<div class="promo-popup-overlay" id="promo-overlay"></div>' +
+        '<div class="promo-popup" id="promo-popup">' +
+        '<div class="promo-popup-card">' +
+        '<button type="button" class="promo-popup-close" id="promo-close" aria-label="Close">&times;</button>' +
+        '<div class="promo-popup-icon">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"/><path d="M2 8h20v4H2z"/><path d="M12 20V8"/><path d="M12 8a4 3 0 0 0-4-3c-2 0-3.5 1.5-3.5 3S6 11 8 11h4"/><path d="M12 8a4 3 0 0 1 4-3c2 0 3.5 1.5 3.5 3s-1.5 3-3.5 3h-4"/></svg>' +
+        '</div>' +
+        '<h2>' + this.esc(c.headline) + '</h2>' +
+        (c.subtitle ? '<p class="promo-subtitle">' + this.esc(c.subtitle) + '</p>' : '') +
+        (c.bodyHtml || '') +
+        (tiersHtml ? '<div class="promo-tiers">' + tiersHtml + '</div>' : '') +
+        formHtml +
+        successHtml +
+        '</div></div>';
+
+      this.overlay = document.getElementById("promo-overlay");
+      this.popup = document.getElementById("promo-popup");
+      this.bindEvents();
+    },
+
+    show() {
+      if (!this.overlay || !this.popup) return;
+      this.overlay.classList.add("is-visible");
+      this.popup.classList.add("is-visible");
+      document.body.style.overflow = "hidden";
+    },
+
+    hide() {
+      if (!this.popup) return;
+      this.popup.classList.remove("is-visible");
+      this.popup.classList.add("is-closing");
+      if (this.overlay) this.overlay.classList.remove("is-visible");
+
+      setTimeout(function() {
+        if (MarketingPopup.popup) MarketingPopup.popup.classList.remove("is-closing");
+        document.body.style.overflow = "";
+      }, 400);
+
+      // Mark as shown
+      var storageKey = this.storagePrefix + this.config.id;
+      localStorage.setItem(storageKey, "true");
+      sessionStorage.setItem(storageKey, "true");
+    },
+
+    async submitEmail(email) {
+      var btn = document.getElementById("promo-submit-btn");
+      if (btn) { btn.disabled = true; btn.textContent = "..."; }
+
+      try {
+        await fetch(this.apiBase + "/support/newsletter/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email, source: "popup_" + this.config.id })
+        });
+      } catch (e) { /* show success regardless */ }
+
+      // Record conversion
+      fetch(this.apiBase + "/support/popup/" + this.config.id + "/convert", {
+        method: "POST"
+      }).catch(function() {});
+
+      this.showSuccess();
+      localStorage.setItem("sbb_promo_email", email);
+      var storageKey = this.storagePrefix + this.config.id;
+      localStorage.setItem(storageKey, "true");
+      sessionStorage.setItem(storageKey, "true");
+    },
+
+    showSuccess() {
+      var wrap = document.getElementById("promo-form-wrap");
+      var success = document.getElementById("promo-success");
+      if (wrap) wrap.style.display = "none";
+      if (success) success.classList.add("is-visible");
+    },
+
+    bindEvents() {
+      var self = this;
+      var closeBtn = document.getElementById("promo-close");
+      var form = document.getElementById("promo-form");
+      var emailInput = document.getElementById("promo-email");
+
+      if (closeBtn) {
+        closeBtn.addEventListener("click", function() { self.hide(); });
+      }
+      if (this.overlay) {
+        this.overlay.addEventListener("click", function() { self.hide(); });
+      }
+      document.addEventListener("keydown", function(e) {
+        if (e.key === "Escape" && self.popup && self.popup.classList.contains("is-visible")) {
+          self.hide();
+        }
+      });
+      if (form) {
+        form.addEventListener("submit", function(e) {
+          e.preventDefault();
+          var email = emailInput ? emailInput.value.trim() : "";
+          if (email) self.submitEmail(email);
+        });
+      }
+    },
+
+    esc(str) {
+      if (!str) return "";
+      var d = document.createElement("div");
+      d.textContent = str;
+      return d.innerHTML;
+    }
+  };
+
+  MarketingPopup.init();
+
+  // ============================================
+  // AFFILIATE & PARTNER FORM SUBMISSIONS
+  // ============================================
+  var API_BASE = window.SBB_API_BASE || "https://api.sbbpeptides.com/api/v1";
+
+  // Helper: show feedback on form
+  function showFormFeedback(form, message, isError) {
+    var existing = form.querySelector(".form-feedback");
+    if (existing) existing.remove();
+    var div = document.createElement("div");
+    div.className = "form-feedback" + (isError ? " form-feedback-error" : " form-feedback-success");
+    div.textContent = message;
+    div.style.cssText = "padding:12px 16px;margin:12px 0;border-radius:8px;font-size:14px;" +
+      (isError ? "background:#fce4ec;color:#c62828;border:1px solid #ef9a9a;" : "background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;");
+    form.prepend(div);
+    div.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  // Affiliate form
+  var affiliateForm = document.getElementById("affiliate-form");
+  if (affiliateForm) {
+    affiliateForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      var btn = affiliateForm.querySelector('button[type="submit"]');
+      var originalText = btn.textContent;
+      btn.textContent = "Submitting...";
+      btn.disabled = true;
+
+      // Parse social links from textarea into object
+      var linksText = (document.getElementById("affiliate-links") || {}).value || "";
+      var socialLinks = {};
+      linksText.split(/[\n,]+/).forEach(function(line) {
+        line = line.trim();
+        if (!line) return;
+        if (line.includes("instagram") || line.startsWith("@")) socialLinks.instagram = line;
+        else if (line.includes("youtube")) socialLinks.youtube = line;
+        else if (line.includes("tiktok")) socialLinks.tiktok = line;
+        else if (line.includes("twitter") || line.includes("x.com")) socialLinks.twitter = line;
+        else socialLinks.other = (socialLinks.other ? socialLinks.other + ", " : "") + line;
+      });
+
+      var formData = new FormData();
+      formData.append("fullName", (document.getElementById("affiliate-name") || {}).value || "");
+      formData.append("email", (document.getElementById("affiliate-email") || {}).value || "");
+      formData.append("phone", (document.getElementById("affiliate-phone") || {}).value || "");
+      formData.append("primaryPlatform", (document.getElementById("affiliate-platform") || {}).value || "");
+      formData.append("socialLinks", JSON.stringify(socialLinks));
+      formData.append("audienceSize", (document.getElementById("affiliate-audience") || {}).value || "");
+      formData.append("contentFocus", (document.getElementById("affiliate-focus") || {}).value || "");
+      formData.append("whyPartner", (document.getElementById("affiliate-notes") || {}).value || "");
+
+      var resumeInput = document.getElementById("affiliate-resume");
+      if (resumeInput && resumeInput.files[0]) {
+        formData.append("resume", resumeInput.files[0]);
+      }
+
+      fetch(API_BASE + "/affiliates/apply", {
+        method: "POST",
+        body: formData
+      })
+      .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
+      .then(function(result) {
+        if (result.ok) {
+          showFormFeedback(affiliateForm, "Application submitted successfully! We will review and get back to you soon.", false);
+          affiliateForm.reset();
+        } else {
+          showFormFeedback(affiliateForm, result.data.message || "Something went wrong. Please try again.", true);
+        }
+      })
+      .catch(function() {
+        showFormFeedback(affiliateForm, "Network error. Please check your connection and try again.", true);
+      })
+      .finally(function() {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      });
+    });
+  }
+
+  // Partner form
+  var partnerForm = document.getElementById("partner-form");
+  if (partnerForm) {
+    partnerForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      var btn = partnerForm.querySelector('button[type="submit"]');
+      var originalText = btn.textContent;
+      btn.textContent = "Submitting...";
+      btn.disabled = true;
+
+      var formData = new FormData();
+      formData.append("organizationName", (document.getElementById("org-name") || {}).value || "");
+      formData.append("contactName", (document.getElementById("contact-name") || {}).value || "");
+      formData.append("email", (document.getElementById("contact-email") || {}).value || "");
+      formData.append("phone", (document.getElementById("contact-phone") || {}).value || "");
+      formData.append("orgType", (document.getElementById("org-type") || {}).value || "");
+      formData.append("website", (document.getElementById("org-website") || {}).value || "");
+      formData.append("location", (document.getElementById("org-location") || {}).value || "");
+      formData.append("partnershipFocus", (document.getElementById("partner-interest") || {}).value || "");
+      formData.append("partnershipOverview", (document.getElementById("partner-notes") || {}).value || "");
+
+      var docsInput = document.getElementById("partner-documents");
+      if (docsInput && docsInput.files.length > 0) {
+        for (var i = 0; i < docsInput.files.length; i++) {
+          formData.append("documents", docsInput.files[i]);
+        }
+      }
+
+      fetch(API_BASE + "/partners/apply", {
+        method: "POST",
+        body: formData
+      })
+      .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
+      .then(function(result) {
+        if (result.ok) {
+          showFormFeedback(partnerForm, "Partnership inquiry submitted! Our team will review and reach out shortly.", false);
+          partnerForm.reset();
+        } else {
+          showFormFeedback(partnerForm, result.data.message || "Something went wrong. Please try again.", true);
+        }
+      })
+      .catch(function() {
+        showFormFeedback(partnerForm, "Network error. Please check your connection and try again.", true);
+      })
+      .finally(function() {
+        btn.textContent = originalText;
+        btn.disabled = false;
       });
     });
   }

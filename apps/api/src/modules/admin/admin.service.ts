@@ -1,14 +1,22 @@
-import { Injectable, NotFoundException, BadRequestException, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Inject, forwardRef, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { OrderStatus, UserStatus, ProductCategory, DiscountType, DiscountStatus, ReturnStatus } from '@prisma/client';
+import { OrderStatus, UserStatus, ProductCategory, DiscountType, DiscountStatus, ReturnStatus, ShipmentStatus } from '@prisma/client';
 import { OrdersService } from '../orders/orders.service';
+import { ShippoService } from '../shipping/shippo.service';
+import { PaymentsService } from '../payments/payments.service';
+import { MailgunService } from '../notifications/mailgun.service';
 
 @Injectable()
 export class AdminService {
+  private readonly logger = new Logger(AdminService.name);
+
   constructor(
     private prisma: PrismaService,
     @Inject(forwardRef(() => OrdersService))
     private ordersService: OrdersService,
+    private shippoService: ShippoService,
+    private paymentsService: PaymentsService,
+    private mailService: MailgunService,
   ) {}
 
   // ==========================================================================
@@ -402,6 +410,10 @@ export class AdminService {
       casNumber?: string;
       isActive?: boolean;
       isFeatured?: boolean;
+      costPerUnit?: number;
+      wholesaleOnly?: boolean;
+      comingSoon?: boolean;
+      subcategory?: string;
     },
     adminId: string,
   ) {
@@ -440,6 +452,10 @@ export class AdminService {
       casNumber?: string;
       isActive?: boolean;
       isFeatured?: boolean;
+      costPerUnit?: number;
+      wholesaleOnly?: boolean;
+      comingSoon?: boolean;
+      subcategory?: string;
     },
     adminId: string,
   ) {
@@ -686,6 +702,8 @@ export class AdminService {
     quantity: number,
     adminId: string,
     notes?: string,
+    lowStockThreshold?: number,
+    leadTimeDays?: number,
   ) {
     const where = variantId ? { variantId } : { productId };
 
@@ -702,6 +720,8 @@ export class AdminService {
       data: {
         quantity,
         lastRestockedAt: quantity > previousQuantity ? new Date() : undefined,
+        ...(lowStockThreshold !== undefined && { lowStockThreshold }),
+        ...(leadTimeDays !== undefined && { leadTimeDays }),
       },
     });
 
@@ -922,7 +942,7 @@ export class AdminService {
     ]);
 
     return {
-      discounts: discounts.map((d) => ({
+      data: discounts.map((d) => ({
         ...d,
         value: Number(d.value),
         minOrderAmount: d.minOrderAmount ? Number(d.minOrderAmount) : null,
@@ -935,12 +955,44 @@ export class AdminService {
   async getDiscountById(id: string) {
     const discount = await this.prisma.discount.findUnique({ where: { id } });
     if (!discount) throw new NotFoundException('Discount not found');
+
+    // Fetch usage analytics: orders that used this discount code
+    const [orderCount, totalRevenue] = await Promise.all([
+      this.prisma.order.count({
+        where: { discountCode: discount.code, status: { notIn: ['CANCELLED', 'REFUNDED'] } },
+      }),
+      this.prisma.order.aggregate({
+        where: { discountCode: discount.code, status: { notIn: ['CANCELLED', 'REFUNDED'] } },
+        _sum: { totalAmount: true },
+      }),
+    ]);
+
     return {
       ...discount,
       value: Number(discount.value),
       minOrderAmount: discount.minOrderAmount ? Number(discount.minOrderAmount) : null,
       maxDiscountAmount: discount.maxDiscountAmount ? Number(discount.maxDiscountAmount) : null,
+      analytics: {
+        ordersUsed: orderCount,
+        totalRevenue: totalRevenue._sum.totalAmount ? Number(totalRevenue._sum.totalAmount) : 0,
+      },
     };
+  }
+
+  /**
+   * Auto-expire discounts that have passed their expiresAt date
+   * Can be called via cron or admin action
+   */
+  async expireDiscounts() {
+    const result = await this.prisma.discount.updateMany({
+      where: {
+        status: 'ACTIVE',
+        expiresAt: { lt: new Date() },
+      },
+      data: { status: 'INACTIVE' },
+    });
+
+    return { expired: result.count };
   }
 
   async createDiscount(
@@ -1120,6 +1172,14 @@ export class AdminService {
       },
     });
 
+    // Notify customer their return was approved (non-blocking)
+    if (returnItem.customerEmail) {
+      const firstName = returnItem.customerName?.split(' ')[0] || 'there';
+      this.mailService
+        .sendReturnApproved(returnItem.customerEmail, firstName, returnItem.orderNumber, refundAmount)
+        .catch((err) => this.logger.error('Failed to send return approved email:', err));
+    }
+
     return updated;
   }
 
@@ -1147,6 +1207,14 @@ export class AdminService {
         newState: { status: 'REJECTED', rejectionReason },
       },
     });
+
+    // Notify customer their return was rejected (non-blocking)
+    if (returnItem.customerEmail) {
+      const firstName = returnItem.customerName?.split(' ')[0] || 'there';
+      this.mailService
+        .sendReturnRejected(returnItem.customerEmail, firstName, returnItem.orderNumber, rejectionReason)
+        .catch((err) => this.logger.error('Failed to send return rejected email:', err));
+    }
 
     return updated;
   }
@@ -1405,5 +1473,649 @@ export class AdminService {
 
   async resendDeliveryNotification(orderId: string, adminId: string) {
     return this.ordersService.resendDeliveryNotification(orderId, adminId);
+  }
+
+  // ==========================================================================
+  // PRICE LISTS (Wholesale)
+  // ==========================================================================
+
+  async getPriceLists() {
+    const priceLists = await this.prisma.priceList.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        organization: { select: { id: true, name: true } },
+        _count: { select: { items: true, users: true } },
+      },
+    });
+
+    return {
+      data: priceLists.map((pl) => ({
+        ...pl,
+        itemCount: pl._count.items,
+        userCount: pl._count.users,
+        _count: undefined,
+      })),
+    };
+  }
+
+  async getPriceListById(id: string) {
+    const priceList = await this.prisma.priceList.findUnique({
+      where: { id },
+      include: {
+        organization: { select: { id: true, name: true } },
+        items: {
+          include: {
+            product: {
+              select: { id: true, name: true, sku: true, basePrice: true, slug: true },
+            },
+          },
+        },
+        users: { select: { id: true, email: true, firstName: true, lastName: true } },
+      },
+    });
+
+    if (!priceList) throw new NotFoundException('Price list not found');
+
+    return {
+      ...priceList,
+      items: priceList.items.map((item) => ({
+        ...item,
+        customPrice: item.customPrice ? Number(item.customPrice) : null,
+        product: {
+          ...item.product,
+          basePrice: Number(item.product.basePrice),
+        },
+      })),
+    };
+  }
+
+  async createPriceList(
+    data: {
+      name: string;
+      description?: string;
+      discountPercent?: number;
+      organizationId?: string;
+    },
+    adminId: string,
+  ) {
+    const priceList = await this.prisma.priceList.create({
+      data: {
+        name: data.name,
+        description: data.description,
+        discountPercent: data.discountPercent,
+        organizationId: data.organizationId,
+      },
+    });
+
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'CREATE',
+        resourceType: 'PriceList',
+        resourceId: priceList.id,
+        newState: priceList as any,
+      },
+    });
+
+    return priceList;
+  }
+
+  async updatePriceList(
+    id: string,
+    data: {
+      name?: string;
+      description?: string;
+      discountPercent?: number;
+      isActive?: boolean;
+    },
+    adminId: string,
+  ) {
+    const previous = await this.prisma.priceList.findUnique({ where: { id } });
+    if (!previous) throw new NotFoundException('Price list not found');
+
+    const priceList = await this.prisma.priceList.update({ where: { id }, data });
+
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'UPDATE',
+        resourceType: 'PriceList',
+        resourceId: id,
+        previousState: previous as any,
+        newState: priceList as any,
+      },
+    });
+
+    return priceList;
+  }
+
+  async upsertPriceListItem(
+    priceListId: string,
+    data: {
+      productId: string;
+      customPrice?: number;
+      discountPercent?: number;
+    },
+    adminId: string,
+  ) {
+    const priceList = await this.prisma.priceList.findUnique({ where: { id: priceListId } });
+    if (!priceList) throw new NotFoundException('Price list not found');
+
+    const item = await this.prisma.priceListItem.upsert({
+      where: {
+        priceListId_productId: { priceListId, productId: data.productId },
+      },
+      create: {
+        priceListId,
+        productId: data.productId,
+        customPrice: data.customPrice,
+        discountPercent: data.discountPercent,
+      },
+      update: {
+        customPrice: data.customPrice,
+        discountPercent: data.discountPercent,
+      },
+    });
+
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'UPDATE',
+        resourceType: 'PriceListItem',
+        resourceId: item.id,
+        newState: item as any,
+      },
+    });
+
+    return item;
+  }
+
+  async deletePriceListItem(priceListId: string, itemId: string, adminId: string) {
+    const item = await this.prisma.priceListItem.findFirst({
+      where: { id: itemId, priceListId },
+    });
+    if (!item) throw new NotFoundException('Price list item not found');
+
+    await this.prisma.priceListItem.delete({ where: { id: itemId } });
+
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'DELETE',
+        resourceType: 'PriceListItem',
+        resourceId: itemId,
+        previousState: item as any,
+      },
+    });
+
+    return { success: true };
+  }
+
+  // ==========================================================================
+  // MARKETING POPUPS
+  // ==========================================================================
+
+  async getPopups() {
+    const popups = await this.prisma.marketingPopup.findMany({
+      orderBy: [{ isActive: 'desc' }, { priority: 'desc' }, { createdAt: 'desc' }],
+    });
+    return { popups };
+  }
+
+  async getPopupById(id: string) {
+    const popup = await this.prisma.marketingPopup.findUnique({ where: { id } });
+    if (!popup) throw new NotFoundException('Popup not found');
+    return popup;
+  }
+
+  async createPopup(data: {
+    name: string;
+    headline: string;
+    subtitle?: string;
+    bodyHtml?: string;
+    ctaText?: string;
+    ctaLink?: string;
+    discountCode?: string;
+    discountCode2?: string;
+    tier1Label?: string;
+    tier1Value?: string;
+    tier2Label?: string;
+    tier2Value?: string;
+    showEmailCapture?: boolean;
+    successHeadline?: string;
+    successMessage?: string;
+    delayMs?: number;
+    showOnPages?: string[];
+    showFrequency?: string;
+    startsAt?: string;
+    expiresAt?: string;
+    priority?: number;
+    isActive?: boolean;
+  }, adminId: string) {
+    const popup = await this.prisma.marketingPopup.create({
+      data: {
+        name: data.name,
+        headline: data.headline,
+        subtitle: data.subtitle,
+        bodyHtml: data.bodyHtml,
+        ctaText: data.ctaText || 'Unlock',
+        ctaLink: data.ctaLink,
+        discountCode: data.discountCode,
+        discountCode2: data.discountCode2,
+        tier1Label: data.tier1Label,
+        tier1Value: data.tier1Value,
+        tier2Label: data.tier2Label,
+        tier2Value: data.tier2Value,
+        showEmailCapture: data.showEmailCapture ?? true,
+        successHeadline: data.successHeadline,
+        successMessage: data.successMessage,
+        delayMs: data.delayMs ?? 3500,
+        showOnPages: data.showOnPages || [],
+        showFrequency: data.showFrequency || 'once',
+        startsAt: data.startsAt ? new Date(data.startsAt) : null,
+        expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
+        priority: data.priority ?? 0,
+        isActive: data.isActive ?? false,
+        createdById: adminId,
+      },
+    });
+
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'CREATE',
+        resourceType: 'MarketingPopup',
+        resourceId: popup.id,
+        newState: popup as any,
+      },
+    });
+
+    return popup;
+  }
+
+  async updatePopup(id: string, data: Record<string, any>, adminId: string) {
+    const existing = await this.prisma.marketingPopup.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException('Popup not found');
+
+    // Clean the data — only allow known fields
+    const allowed = [
+      'name', 'headline', 'subtitle', 'bodyHtml', 'ctaText', 'ctaLink',
+      'discountCode', 'discountCode2', 'tier1Label', 'tier1Value',
+      'tier2Label', 'tier2Value', 'showEmailCapture', 'successHeadline',
+      'successMessage', 'delayMs', 'showOnPages', 'showFrequency',
+      'startsAt', 'expiresAt', 'priority', 'isActive',
+    ];
+    const updateData: Record<string, any> = {};
+    for (const key of allowed) {
+      if (data[key] !== undefined) {
+        if ((key === 'startsAt' || key === 'expiresAt') && data[key]) {
+          updateData[key] = new Date(data[key]);
+        } else {
+          updateData[key] = data[key];
+        }
+      }
+    }
+
+    const popup = await this.prisma.marketingPopup.update({
+      where: { id },
+      data: updateData,
+    });
+
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'UPDATE',
+        resourceType: 'MarketingPopup',
+        resourceId: id,
+        previousState: existing as any,
+        newState: popup as any,
+      },
+    });
+
+    return popup;
+  }
+
+  async deletePopup(id: string, adminId: string) {
+    const existing = await this.prisma.marketingPopup.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException('Popup not found');
+
+    await this.prisma.marketingPopup.delete({ where: { id } });
+
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'DELETE',
+        resourceType: 'MarketingPopup',
+        resourceId: id,
+        previousState: existing as any,
+      },
+    });
+
+    return { success: true };
+  }
+
+  async togglePopup(id: string, adminId: string) {
+    const existing = await this.prisma.marketingPopup.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException('Popup not found');
+
+    const popup = await this.prisma.marketingPopup.update({
+      where: { id },
+      data: { isActive: !existing.isActive },
+    });
+
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'UPDATE',
+        resourceType: 'MarketingPopup',
+        resourceId: id,
+        previousState: { isActive: existing.isActive } as any,
+        newState: { isActive: popup.isActive } as any,
+      },
+    });
+
+    return popup;
+  }
+
+  async getActivePopup(page?: string) {
+    const now = new Date();
+    const popups = await this.prisma.marketingPopup.findMany({
+      where: {
+        isActive: true,
+        OR: [
+          { startsAt: null },
+          { startsAt: { lte: now } },
+        ],
+      },
+      orderBy: { priority: 'desc' },
+    });
+
+    // Filter: not expired, matches page
+    for (const popup of popups) {
+      if (popup.expiresAt && popup.expiresAt < now) continue;
+      if (popup.showOnPages.length > 0 && page && !popup.showOnPages.includes(page)) continue;
+
+      // Increment impressions (non-blocking)
+      this.prisma.marketingPopup.update({
+        where: { id: popup.id },
+        data: { impressions: { increment: 1 } },
+      }).catch(() => {});
+
+      return popup;
+    }
+
+    return null;
+  }
+
+  async recordPopupConversion(id: string) {
+    await this.prisma.marketingPopup.update({
+      where: { id },
+      data: { conversions: { increment: 1 } },
+    }).catch(() => {});
+  }
+
+  // ==========================================================================
+  // ORDER FULFILLMENT (Shippo + Manual Payment Approval)
+  // ==========================================================================
+
+  /**
+   * Admin approves a pending Zelle/CashApp payment
+   */
+  async approvePayment(orderId: string, adminId: string, notes?: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: { payments: { orderBy: { createdAt: 'desc' }, take: 1 } },
+    });
+
+    if (!order) throw new NotFoundException('Order not found');
+
+    const payment = order.payments[0];
+    if (!payment) throw new BadRequestException('No payment record found for this order');
+
+    if (payment.status === 'COMPLETED') {
+      throw new BadRequestException('Payment is already verified');
+    }
+
+    await this.paymentsService.verifyPayment(payment.id, adminId, notes);
+
+    const updated = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: { payments: true, user: { select: { email: true, firstName: true } } },
+    });
+
+    // Send payment confirmation email to customer (non-blocking)
+    if (updated?.user?.email) {
+      this.mailService
+        .sendPaymentConfirmed(
+          updated.user.email,
+          updated.user.firstName || 'there',
+          updated.orderNumber,
+          Number(updated.totalAmount),
+        )
+        .catch((err) => this.logger.error('Failed to send payment confirmation email:', err));
+    }
+
+    return {
+      success: true,
+      message: 'Payment approved',
+      order: updated ? {
+        id: updated.id,
+        orderNumber: updated.orderNumber,
+        status: updated.status,
+        paidAt: updated.paidAt,
+      } : { id: orderId },
+    };
+  }
+
+  /**
+   * Get live shipping rates from Shippo for an order
+   */
+  async getShippingRates(orderId: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        shippingAddress: true,
+        items: true,
+      },
+    });
+
+    if (!order) throw new NotFoundException('Order not found');
+    if (!order.shippingAddress) throw new BadRequestException('Order has no shipping address');
+
+    // Calculate total weight from items (default 0.5 lb per item if no weight)
+    const totalWeightLbs = order.items.reduce((sum, item) => {
+      return sum + (item.quantity * 0.5); // 0.5 lb per vial (peptide default)
+    }, 0);
+
+    const addr = order.shippingAddress;
+    const result = await this.shippoService.createShipmentWithRates(
+      {
+        name: `${addr.firstName || ''} ${addr.lastName || ''}`.trim(),
+        street1: addr.street1,
+        street2: addr.street2 || undefined,
+        city: addr.city,
+        state: addr.state,
+        zip: addr.postalCode,
+        country: addr.country || 'US',
+        phone: addr.phone || undefined,
+      },
+      Math.max(totalWeightLbs, 0.5), // Minimum 0.5 lb
+    );
+
+    // Cache the shipment ID on the order for later label creation
+    if (result.shipmentId) {
+      await this.prisma.shipment.upsert({
+        where: { orderId },
+        create: {
+          orderId,
+          shippoShipmentId: result.shipmentId,
+          shippingCost: 0,
+        },
+        update: {
+          shippoShipmentId: result.shipmentId,
+        },
+      });
+    }
+
+    return {
+      shipmentId: result.shipmentId,
+      rates: result.rates.map((rate: any) => ({
+        rateId: rate.object_id,
+        provider: rate.provider,
+        servicelevel: rate.servicelevel?.name || rate.servicelevel_name,
+        amount: rate.amount,
+        currency: rate.currency,
+        estimatedDays: rate.estimated_days || rate.days,
+        durationTerms: rate.duration_terms,
+      })),
+    };
+  }
+
+  /**
+   * Create shipping label from a selected Shippo rate
+   */
+  async createShippingLabel(orderId: string, rateId: string, adminId: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        user: { select: { email: true, firstName: true } },
+        shippingAddress: true,
+        shipment: true,
+      },
+    });
+
+    if (!order) throw new NotFoundException('Order not found');
+
+    // Create label via Shippo
+    const transaction = await this.shippoService.createLabel(rateId);
+
+    if (transaction.status !== 'SUCCESS') {
+      throw new BadRequestException(
+        `Shippo label creation failed: ${JSON.stringify(transaction.messages || transaction.status)}`,
+      );
+    }
+
+    // Update or create shipment record
+    const rateAmount = transaction.rate?.amount ? parseFloat(transaction.rate.amount) : 0;
+    const shipment = await this.prisma.shipment.upsert({
+      where: { orderId },
+      create: {
+        orderId,
+        status: ShipmentStatus.LABEL_CREATED,
+        carrier: transaction.rate?.provider || 'USPS',
+        serviceLevel: transaction.rate?.servicelevel?.name || '',
+        trackingNumber: transaction.tracking_number,
+        trackingUrl: transaction.tracking_url_provider,
+        labelUrl: transaction.label_url,
+        shippoTransactionId: transaction.object_id,
+        shippoRateId: rateId,
+        shippingCost: rateAmount,
+        shippedAt: new Date(),
+      },
+      update: {
+        status: ShipmentStatus.LABEL_CREATED,
+        carrier: transaction.rate?.provider || 'USPS',
+        serviceLevel: transaction.rate?.servicelevel?.name || '',
+        trackingNumber: transaction.tracking_number,
+        trackingUrl: transaction.tracking_url_provider,
+        labelUrl: transaction.label_url,
+        shippoTransactionId: transaction.object_id,
+        shippoRateId: rateId,
+        shippingCost: rateAmount,
+        shippedAt: new Date(),
+      },
+    });
+
+    // Update order status → SHIPPED
+    await this.prisma.order.update({
+      where: { id: orderId },
+      data: {
+        status: OrderStatus.SHIPPED,
+        shippedAt: new Date(),
+      },
+    });
+
+    // Audit log
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'SHIP',
+        resourceType: 'Order',
+        resourceId: orderId,
+        newState: {
+          carrier: shipment.carrier,
+          trackingNumber: shipment.trackingNumber,
+          labelUrl: shipment.labelUrl,
+        },
+      },
+    });
+
+    // Send branded shipping notification to customer (non-blocking)
+    this.mailService
+      .sendOrderShipped(
+        order.user.email,
+        order.user.firstName || 'there',
+        order.orderNumber,
+        shipment.trackingNumber || '',
+        shipment.trackingUrl || '',
+        shipment.carrier || 'USPS',
+      )
+      .catch((err) => this.logger.error('Failed to send shipping notification:', err));
+
+    return {
+      success: true,
+      message: 'Shipping label created',
+      shipment: {
+        id: shipment.id,
+        carrier: shipment.carrier,
+        serviceLevel: shipment.serviceLevel,
+        trackingNumber: shipment.trackingNumber,
+        trackingUrl: shipment.trackingUrl,
+        labelUrl: shipment.labelUrl,
+      },
+    };
+  }
+
+  /**
+   * One-click fulfillment: approve payment + get rates + create cheapest label
+   */
+  async fulfillOrder(orderId: string, adminId: string, notes?: string) {
+    // Step 1: Approve payment
+    const paymentResult = await this.approvePayment(orderId, adminId, notes);
+
+    // Step 2: Get shipping rates
+    const ratesResult = await this.getShippingRates(orderId);
+
+    if (!ratesResult.rates || ratesResult.rates.length === 0) {
+      return {
+        ...paymentResult,
+        shipping: { error: 'No shipping rates available from Shippo' },
+      };
+    }
+
+    // Step 3: Pick cheapest rate (prefer USPS, then cheapest overall)
+    const uspsRates = ratesResult.rates.filter(
+      (r: any) => r.provider?.toUpperCase().includes('USPS'),
+    );
+    const selectedRate = uspsRates.length > 0
+      ? uspsRates.reduce((cheapest: any, r: any) =>
+          parseFloat(r.amount) < parseFloat(cheapest.amount) ? r : cheapest,
+        )
+      : ratesResult.rates.reduce((cheapest: any, r: any) =>
+          parseFloat(r.amount) < parseFloat(cheapest.amount) ? r : cheapest,
+        );
+
+    // Step 4: Create label
+    const labelResult = await this.createShippingLabel(orderId, selectedRate.rateId, adminId);
+
+    return {
+      payment: paymentResult,
+      shipping: labelResult,
+      selectedRate: {
+        provider: selectedRate.provider,
+        service: selectedRate.servicelevel,
+        cost: selectedRate.amount,
+      },
+    };
   }
 }

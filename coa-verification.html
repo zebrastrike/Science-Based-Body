@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>COA Verification | Science Based Body</title>
+    <meta name="description" content="How to read and verify your Certificate of Analysis (COA) from Science Based Body. Understand purity results, batch numbers, and lab identifiers." />
     <link
       href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400&family=Sora:wght@300;400;500&display=swap"
       rel="stylesheet"
@@ -30,14 +31,34 @@
       <span class="bubble bubble-8"></span>
       <span class="bubble bubble-9"></span>
       <span class="bubble bubble-10"></span>
+      <span class="bubble bubble-11"></span>
+      <span class="bubble bubble-12"></span>
+      <span class="bubble bubble-13"></span>
+      <span class="bubble bubble-14"></span>
+      <span class="bubble bubble-15"></span>
+      <span class="bubble bubble-16"></span>
+      <span class="bubble bubble-17"></span>
+      <span class="bubble bubble-18"></span>
+      <span class="bubble bubble-19"></span>
+      <span class="bubble bubble-20"></span>
     </div>
     <header class="site-header">
       <div class="container header-grid">
         <a class="logo" href="index.html">
           <img src="/logo.png" alt="Science Based Body" />
         </a>
+        <div class="site-search" id="site-search">
+          <input type="text" class="site-search-input" id="search-input" placeholder="Search peptides..." autocomplete="off" aria-label="Search products" />
+          <button type="button" class="site-search-btn" aria-label="Search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          </button>
+          <div class="search-results" id="search-results"></div>
+        </div>
         <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
           <span class="menu-icon"></span>
+        </button>
+        <button type="button" class="mobile-search-toggle" id="mobile-search-toggle" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         </button>
         <nav class="site-nav">
           <a href="index.html" class="nav-link">Home</a>
@@ -54,30 +75,76 @@
         <div class="container">
           <div class="section-heading reveal">
             <span class="label">COA VERIFICATION</span>
-            <h1>COA Verification</h1>
+            <h1>How to Read Your COA</h1>
             <p>
-              Confirm a certificate of analysis for your batch.
+              Every order includes a Certificate of Analysis. Here is what each section means and how to verify your batch documentation.
             </p>
           </div>
+
           <div class="split-grid">
             <div class="card reveal">
-              <span class="label">Verification steps</span>
-              <p>Match batch information across documents.</p>
+              <span class="label">Batch identification</span>
+              <p>
+                The batch number is the primary identifier linking your product to its analytical records. This unique code connects to manufacturing date, test results, and chain of custody.
+              </p>
               <ul>
-                <li>Match batch ID to COA</li>
-                <li>Review test date and methods</li>
-                <li>Check analyst and lab identifiers</li>
+                <li><strong>Batch Number</strong> — Unique ID printed on vial label and COA</li>
+                <li><strong>Manufacturing Date</strong> — When the batch was synthesized</li>
+                <li><strong>Expiration Date</strong> — Recommended use-by date for research purposes</li>
+                <li><strong>Product Name / Compound</strong> — The specific research material</li>
               </ul>
             </div>
             <div class="card reveal">
-              <span class="label">Need help</span>
-              <p>Support can confirm documentation.</p>
+              <span class="label">Purity results</span>
+              <p>
+                Purity is reported as a percentage determined by HPLC analysis. This measures the proportion of the target compound relative to any impurities in the sample.
+              </p>
               <ul>
-                <li>Send batch ID to support</li>
-                <li>We can resend documentation</li>
-                <li>COAs provided for research use only</li>
+                <li><strong>HPLC Purity %</strong> — Target compound concentration (typically 98%+)</li>
+                <li><strong>Method</strong> — The specific HPLC protocol used (e.g., RP-HPLC)</li>
+                <li><strong>Molecular Weight (MS)</strong> — Confirmed via mass spectrometry</li>
+                <li><strong>Appearance</strong> — Physical description (lyophilized powder, solution, etc.)</li>
               </ul>
             </div>
+          </div>
+
+          <div class="split-grid" style="margin-top: var(--space-sm);">
+            <div class="card reveal">
+              <span class="label">Lab information</span>
+              <p>
+                Each COA identifies the testing laboratory and analyst. This allows independent verification of results.
+              </p>
+              <ul>
+                <li><strong>Laboratory Name</strong> — The third-party lab that performed testing</li>
+                <li><strong>Test Date</strong> — When the analysis was conducted</li>
+                <li><strong>Analyst / Reviewer</strong> — Lab personnel responsible for the results</li>
+                <li><strong>Microbial Results</strong> — Endotoxin and bioburden screening outcome</li>
+              </ul>
+            </div>
+            <div class="card reveal">
+              <span class="label">Verification steps</span>
+              <p>
+                To verify your COA, match the batch number on your vial label to the batch number on the COA document. All fields should be consistent.
+              </p>
+              <ul>
+                <li>Match batch ID on vial label to COA document</li>
+                <li>Confirm compound name and molecular weight match</li>
+                <li>Review test date — should precede your order date</li>
+                <li>Check that lab name and analyst fields are populated</li>
+                <li>Contact <a href="support.html" class="text-link">support</a> if anything does not match</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="quality-badge-strip reveal" style="margin-top: var(--space-md);">
+            <a href="testing-standards.html" class="quality-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L3 7v6c0 5.25 3.75 10.13 9 11.25C17.25 23.13 21 18.25 21 13V7l-9-5z"/><path d="M9 12l2 2 4-4"/></svg>
+              <span>Quality Assurance</span>
+            </a>
+            <a href="support.html" class="quality-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Contact Support</span>
+            </a>
           </div>
         </div>
       </section>
@@ -92,7 +159,7 @@
             </a>
             <span class="label">SCIENCE BASED BODY</span>
           </div>
-          <p>Research peptide supply with transparent batch standards.</p>
+          <p>American-made research peptides with dual-method purity verification.</p>
         </div>
         <div class="footer-links">
           <a href="about.html" class="text-link">About</a>
@@ -105,7 +172,7 @@
           <a href="privacy.html" class="text-link">Privacy</a>
           <a href="cookies.html" class="text-link">Cookies</a>
           <a href="accessibility.html" class="text-link">Accessibility</a>
-          <a href="testing-standards.html" class="text-link">Testing Standards</a>
+          <a href="testing-standards.html" class="text-link">Quality Assurance</a>
           <a href="storage-guidelines.html" class="text-link">Storage Guidelines</a>
           <a href="coa-verification.html" class="text-link">COA Verification</a>
           <a href="research-use.html" class="text-link">Research Use Only</a>

@@ -28,6 +28,9 @@ import { ContentModule } from './modules/content/content.module';
 import { SupportModule } from './modules/support/support.module';
 import { SeoModule } from './modules/seo/seo.module';
 import { HealthModule } from './health/health.module';
+import { TaxModule } from './modules/tax/tax.module';
+import { AffiliatesModule } from './modules/affiliates/affiliates.module';
+import { PartnersModule } from './modules/partners/partners.module';
 
 @Module({
   imports: [
@@ -74,6 +77,9 @@ import { HealthModule } from './health/health.module';
     SupportModule,
     SeoModule,
     HealthModule,
+    TaxModule,
+    AffiliatesModule,
+    PartnersModule,
   ],
   providers: [
     // Global rate limiting guard

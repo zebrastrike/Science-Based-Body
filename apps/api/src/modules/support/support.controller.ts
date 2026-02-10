@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Param,
   Query,
   Req,
   HttpCode,
@@ -29,6 +30,7 @@ class ContactFormDto {
 
 class NewsletterDto {
   email: string;
+  source?: string;
 }
 
 @ApiTags('support')
@@ -75,6 +77,32 @@ export class SupportController {
   @ApiResponse({ status: 200, description: 'Unsubscribed successfully' })
   unsubscribeNewsletter(@Body() dto: NewsletterDto) {
     return this.supportService.unsubscribeNewsletter(dto.email);
+  }
+
+  // ===========================================================================
+  // FAQ
+  // ===========================================================================
+
+  // ===========================================================================
+  // MARKETING POPUP
+  // ===========================================================================
+
+  @Get('popup/active')
+  @Public()
+  @ApiOperation({ summary: 'Get active marketing popup for a page' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page identifier (e.g. index.html, shop.html)' })
+  @ApiResponse({ status: 200, description: 'Active popup config or null' })
+  getActivePopup(@Query('page') page?: string) {
+    return this.supportService.getActivePopup(page);
+  }
+
+  @Post('popup/:id/convert')
+  @Public()
+  @HttpCode(200)
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @ApiOperation({ summary: 'Record popup conversion' })
+  recordPopupConversion(@Param('id') id: string) {
+    return this.supportService.recordPopupConversion(id);
   }
 
   // ===========================================================================

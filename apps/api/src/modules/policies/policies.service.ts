@@ -97,7 +97,7 @@ export class PoliciesService {
 
 By purchasing from us, you acknowledge and agree that:
 - You are purchasing products exclusively for legitimate research purposes
-- You are at least 21 years of age
+- You are at least 18 years of age
 - You will not use these products for human or animal consumption
 - You will not use these products for diagnostic or therapeutic purposes
 - You accept full responsibility for ensuring compliance with all applicable laws and regulations`,
@@ -203,7 +203,7 @@ To exercise these rights, contact us at privacy@sciencebasedbody.com.`,
         },
         {
           title: 'Children\'s Privacy',
-          content: `Our services are not intended for individuals under 21 years of age. We do not knowingly collect personal information from anyone under 21.`,
+          content: `Our services are not intended for individuals under 18 years of age. We do not knowingly collect personal information from anyone under 18.`,
         },
         {
           title: 'Contact Us',

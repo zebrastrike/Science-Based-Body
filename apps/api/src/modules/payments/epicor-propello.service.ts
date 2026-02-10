@@ -259,15 +259,24 @@ export class EpicorPropelloService {
     return {
       zelle: {
         enabled: true,
+        name: this.config.get('PAYMENT_ZELLE_NAME') || 'HEALTH SBB',
+        phone: this.config.get('PAYMENT_ZELLE_PHONE') || '702-686-5343',
         email: this.config.get('PAYMENT_ZELLE_EMAIL'),
         instructions:
-          'Send payment via Zelle to the email address provided. Include your order number in the memo.',
+          'Send payment via Zelle to the recipient provided. Include your invoice number in the memo.',
+      },
+      venmo: {
+        enabled: true,
+        username: this.config.get('PAYMENT_VENMO_USERNAME') || '@healthsbb',
+        phone: this.config.get('PAYMENT_VENMO_PHONE') || '702-686-5343',
+        instructions:
+          'Send payment via Venmo to the username provided. Include your invoice number in the note.',
       },
       cashapp: {
         enabled: true,
         tag: this.config.get('PAYMENT_CASHAPP_TAG'),
         instructions:
-          'Send payment via CashApp to the tag provided. Include your order number in the note.',
+          'Send payment via CashApp to the tag provided. Include your invoice number in the note.',
       },
     };
   }

@@ -102,10 +102,78 @@ async function main() {
   });
   console.log('✅ Test customer created (test@example.com / test123!)');
 
+  // Create welcome promo discount codes
+  console.log('🎟️  Creating welcome promo discounts...');
+
+  await prisma.discount.upsert({
+    where: { code: 'WELCOME10' },
+    update: {},
+    create: {
+      code: 'WELCOME10',
+      description: 'First-time visitor welcome discount — 10% off orders under $500',
+      type: 'PERCENTAGE',
+      value: new Decimal(10),
+      maxDiscountAmount: new Decimal(50), // cap at $50
+      perUserLimit: 1,
+      status: 'ACTIVE',
+      productIds: [],
+      categoryIds: [],
+      userIds: [],
+    },
+  });
+
+  await prisma.discount.upsert({
+    where: { code: 'WELCOME15' },
+    update: {},
+    create: {
+      code: 'WELCOME15',
+      description: 'First-time visitor welcome discount — 15% off orders $500+',
+      type: 'PERCENTAGE',
+      value: new Decimal(15),
+      minOrderAmount: new Decimal(500),
+      perUserLimit: 1,
+      status: 'ACTIVE',
+      productIds: [],
+      categoryIds: [],
+      userIds: [],
+    },
+  });
+  console.log('✅ Welcome promo discounts created (WELCOME10, WELCOME15)');
+
+  // Create default marketing popup
+  console.log('📢 Creating default marketing popup...');
+  await prisma.marketingPopup.upsert({
+    where: { id: 'default-welcome-popup' },
+    update: {},
+    create: {
+      id: 'default-welcome-popup',
+      name: 'Welcome Discount Popup',
+      isActive: true,
+      headline: 'Welcome to SBB',
+      subtitle: 'Join our research community and unlock your first-order discount.',
+      tier1Value: '10%',
+      tier1Label: 'Orders under $500',
+      tier2Value: '15%',
+      tier2Label: 'Orders $500+',
+      showEmailCapture: true,
+      ctaText: 'Unlock',
+      discountCode: 'WELCOME10',
+      discountCode2: 'WELCOME15',
+      successHeadline: "You're In!",
+      successMessage: 'Use <strong>WELCOME10</strong> for 10% off, or <strong>WELCOME15</strong> for 15% off orders $500+.',
+      delayMs: 3500,
+      showOnPages: ['index.html', 'shop.html'],
+      showFrequency: 'once',
+      priority: 10,
+    },
+  });
+  console.log('✅ Default marketing popup created');
+
   console.log('\n🎉 Database seeding complete!');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log(`📦 ${products.length} products`);
-  console.log(`👤 2 users (admin + test)`)
+  console.log(`👤 2 users (admin + test)`);
+  console.log(`🎟️  2 promo discounts`);
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 }
 

@@ -30,14 +30,34 @@
       <span class="bubble bubble-8"></span>
       <span class="bubble bubble-9"></span>
       <span class="bubble bubble-10"></span>
+      <span class="bubble bubble-11"></span>
+      <span class="bubble bubble-12"></span>
+      <span class="bubble bubble-13"></span>
+      <span class="bubble bubble-14"></span>
+      <span class="bubble bubble-15"></span>
+      <span class="bubble bubble-16"></span>
+      <span class="bubble bubble-17"></span>
+      <span class="bubble bubble-18"></span>
+      <span class="bubble bubble-19"></span>
+      <span class="bubble bubble-20"></span>
     </div>
     <header class="site-header">
       <div class="container header-grid">
         <a class="logo" href="index.html">
           <img src="/logo.png" alt="Science Based Body" />
         </a>
+        <div class="site-search" id="site-search">
+          <input type="text" class="site-search-input" id="search-input" placeholder="Search peptides..." autocomplete="off" aria-label="Search products" />
+          <button type="button" class="site-search-btn" aria-label="Search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          </button>
+          <div class="search-results" id="search-results"></div>
+        </div>
         <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
           <span class="menu-icon"></span>
+        </button>
+        <button type="button" class="mobile-search-toggle" id="mobile-search-toggle" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         </button>
         <nav class="site-nav">
           <a href="index.html" class="nav-link">Home</a>
@@ -69,14 +89,41 @@
           <div class="hero-copy reveal">
             <span class="label">SHOP</span>
             <h1>Research Peptides</h1>
-            <p>COA included with every order. All products sold in 10-vial packs.</p>
+            <p>COA included with every order. Single vial increments available.</p>
           </div>
         </div>
       </section>
 
+      <!-- QUALITY TRUST BADGES -->
+      <div class="container">
+        <div class="quality-badge-strip reveal">
+          <a href="testing-standards.html" class="quality-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L3 7v6c0 5.25 3.75 10.13 9 11.25C17.25 23.13 21 18.25 21 13V7l-9-5z"/><path d="M9 12l2 2 4-4"/></svg>
+            <span>American Made</span>
+          </a>
+          <a href="testing-standards.html" class="quality-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 3h6v4H9z"/><path d="M12 7v7"/><circle cx="12" cy="17" r="3"/><path d="M6 21h12"/></svg>
+            <span>HPLC + MS Verified</span>
+          </a>
+          <a href="testing-standards.html" class="quality-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/><path d="M4.5 4.5l2 2"/><path d="M19.5 4.5l-2 2"/></svg>
+            <span>Independent Microbial Lab</span>
+          </a>
+          <a href="testing-standards.html" class="quality-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
+            <span>COA Every Batch</span>
+          </a>
+        </div>
+      </div>
+
       <!-- CATEGORY NAVIGATION -->
       <nav class="shop-nav" id="shop-nav">
         <div class="container">
+          <div class="shop-nav-inner">
+            <div class="shop-search-inline" id="shop-search-inline">
+              <input type="text" class="shop-search-input" id="shop-search-input" placeholder="Search products..." autocomplete="off" aria-label="Search products" />
+              <svg class="shop-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            </div>
           <div class="shop-nav-scroll">
             <a href="#metabolic" class="shop-nav-link">Metabolic</a>
             <a href="#recovery" class="shop-nav-link">Recovery</a>
@@ -97,10 +144,37 @@
             <a href="#supplies" class="shop-nav-link">Supplies</a>
             <a href="#stacks" class="shop-nav-link">Stacks</a>
           </div>
+          </div>
         </div>
       </nav>
 
+      <!-- SIDEBAR NAVIGATION -->
+      <aside class="shop-sidebar" id="shop-sidebar">
+        <nav class="shop-sidebar-nav">
+          <a href="#metabolic" class="shop-sidebar-link" data-section="metabolic">Metabolic</a>
+          <a href="#recovery" class="shop-sidebar-link" data-section="recovery">Recovery</a>
+          <a href="#growth-hormone" class="shop-sidebar-link" data-section="growth-hormone">Growth Hormone</a>
+          <a href="#nootropic" class="shop-sidebar-link" data-section="nootropic">Nootropic</a>
+          <a href="#longevity" class="shop-sidebar-link" data-section="longevity">Longevity</a>
+          <a href="#mitochondrial" class="shop-sidebar-link" data-section="mitochondrial">Mitochondrial</a>
+          <a href="#immune" class="shop-sidebar-link" data-section="immune">Immune</a>
+          <a href="#anti-inflammatory" class="shop-sidebar-link" data-section="anti-inflammatory">Anti-inflam.</a>
+          <a href="#cosmetic" class="shop-sidebar-link" data-section="cosmetic">Cosmetic</a>
+          <a href="#antimicrobial" class="shop-sidebar-link" data-section="antimicrobial">Antimicrobial</a>
+          <a href="#neuropeptide" class="shop-sidebar-link" data-section="neuropeptide">Neuropeptide</a>
+          <a href="#reproductive" class="shop-sidebar-link" data-section="reproductive">Reproductive</a>
+          <a href="#hormone" class="shop-sidebar-link" data-section="hormone">Hormone</a>
+          <a href="#sleep" class="shop-sidebar-link" data-section="sleep">Sleep</a>
+          <a href="#tanning" class="shop-sidebar-link" data-section="tanning">Tanning</a>
+          <a href="#research" class="shop-sidebar-link" data-section="research">Research</a>
+          <a href="#supplies" class="shop-sidebar-link" data-section="supplies">Supplies</a>
+          <a href="#stacks" class="shop-sidebar-link" data-section="stacks">Stacks</a>
+        </nav>
+      </aside>
+
+      <!-- ============================================================ -->
       <!-- METABOLIC -->
+      <!-- ============================================================ -->
       <section class="section" id="metabolic">
         <div class="container">
           <div class="section-heading reveal">
@@ -108,140 +182,242 @@
             <h2>GLP-1 Analogs &amp; Metabolic Peptides</h2>
           </div>
           <div class="shop-grid">
+
+            <!-- Semaglutide -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Semaglutide" />
               <div class="product-body">
                 <span class="label">METABOLIC</span>
                 <h3>Semaglutide</h3>
-                <p>GLP-1 receptor agonist. 2mg, 5mg, 10mg, 15mg, 20mg, 30mg</p>
-                <span class="price">From $72.00</span>
-                <button type="button" class="btn-add-cart" data-add-to-cart="semaglutide-5mg" data-product-name="Semaglutide" data-product-variant="5mg" data-product-price="99.00">
+                <p>GLP-1 receptor agonist for metabolic research.</p>
+                <span class="price">From $40.00</span>
+                <select class="variant-select" data-product-slug="semaglutide">
+                  <option value="semaglutide-2mg" data-price="40.00">2mg - $40.00</option>
+                  <option value="semaglutide-5mg" data-price="50.00">5mg - $50.00</option>
+                  <option value="semaglutide-10mg" data-price="70.00">10mg - $70.00</option>
+                  <option value="semaglutide-15mg" data-price="90.00">15mg - $90.00</option>
+                  <option value="semaglutide-20mg" data-price="110.00">20mg - $110.00</option>
+                  <option value="semaglutide-30mg" data-price="140.00">30mg - $140.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="semaglutide-2mg" data-product-name="Semaglutide" data-product-variant="2mg" data-product-price="40.00">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
                   Add to Cart
                 </button>
               </div>
             </article>
+
+            <!-- Tirzepatide -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Tirzepatide" />
               <div class="product-body">
                 <span class="label">METABOLIC</span>
                 <h3>Tirzepatide</h3>
-                <p>Dual GLP-1/GIP agonist. 5mg, 10mg, 15mg, 20mg, 30mg, 40mg, 50mg, 60mg</p>
-                <span class="price">From $90.00</span>
-                <button type="button" class="btn-add-cart" data-add-to-cart="tirzepatide-10mg" data-product-name="Tirzepatide" data-product-variant="10mg" data-product-price="126.00">
+                <p>Dual GLP-1/GIP receptor agonist for metabolic research.</p>
+                <span class="price">From $50.00</span>
+                <select class="variant-select" data-product-slug="tirzepatide">
+                  <option value="tirzepatide-5mg" data-price="50.00">5mg - $50.00</option>
+                  <option value="tirzepatide-10mg" data-price="70.00">10mg - $70.00</option>
+                  <option value="tirzepatide-15mg" data-price="100.00">15mg - $100.00</option>
+                  <option value="tirzepatide-20mg" data-price="110.00">20mg - $110.00</option>
+                  <option value="tirzepatide-30mg" data-price="150.00">30mg - $150.00</option>
+                  <option value="tirzepatide-40mg" data-price="175.00">40mg - $175.00</option>
+                  <option value="tirzepatide-50mg" data-price="210.00">50mg - $210.00</option>
+                  <option value="tirzepatide-60mg" data-price="260.00">60mg - $260.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="tirzepatide-5mg" data-product-name="Tirzepatide" data-product-variant="5mg" data-product-price="50.00">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
                   Add to Cart
                 </button>
               </div>
             </article>
+
+            <!-- Retatrutide (NO 5mg - wholesale only) -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Retatrutide" />
               <div class="product-body">
                 <span class="label">METABOLIC</span>
                 <h3>Retatrutide</h3>
-                <p>Triple agonist (GLP-1/GIP/Glucagon). 5mg, 10mg, 15mg, 20mg, 30mg, 40mg</p>
-                <span class="price">From $135.00</span>
-                <button type="button" class="btn-add-cart" data-add-to-cart="retatrutide-10mg" data-product-name="Retatrutide" data-product-variant="10mg" data-product-price="216.00">
+                <p>Triple agonist (GLP-1/GIP/Glucagon) for metabolic research.</p>
+                <span class="price">From $250.00</span>
+                <select class="variant-select" data-product-slug="retatrutide">
+                  <option value="retatrutide-10mg" data-price="250.00">10mg - $250.00</option>
+                  <option value="retatrutide-15mg" data-price="275.00">15mg - $275.00</option>
+                  <option value="retatrutide-20mg" data-price="325.00">20mg - $325.00</option>
+                  <option value="retatrutide-30mg" data-price="350.00">30mg - $350.00</option>
+                  <option value="retatrutide-40mg" data-price="400.00">40mg - $400.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="retatrutide-10mg" data-product-name="Retatrutide" data-product-variant="10mg" data-product-price="250.00">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
                   Add to Cart
                 </button>
               </div>
             </article>
+
+            <!-- Cagrilintide -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Cagrilintide" />
               <div class="product-body">
                 <span class="label">METABOLIC</span>
                 <h3>Cagrilintide</h3>
-                <p>Amylin analog. 5mg, 10mg</p>
-                <span class="price">From $261.00</span>
+                <p>Amylin analog for metabolic research.</p>
+                <span class="price">From $145.00</span>
+                <select class="variant-select" data-product-slug="cagrilintide">
+                  <option value="cagrilintide-5mg" data-price="145.00">5mg - $145.00</option>
+                  <option value="cagrilintide-10mg" data-price="220.00">10mg - $220.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="cagrilintide-5mg" data-product-name="Cagrilintide" data-product-variant="5mg" data-product-price="145.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Cagrilintide+Semaglutide -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Cagrilintide+Semaglutide" />
               <div class="product-body">
                 <span class="label">METABOLIC</span>
                 <h3>Cagrilintide+Semaglutide</h3>
-                <p>Combination blend. 5mg, 10mg</p>
-                <span class="price">From $270.00</span>
+                <p>Combination blend for metabolic research.</p>
+                <span class="price">From $150.00</span>
+                <select class="variant-select" data-product-slug="cagrilintide-semaglutide">
+                  <option value="cagrilintide-semaglutide-5mg" data-price="150.00">5mg - $150.00</option>
+                  <option value="cagrilintide-semaglutide-10mg" data-price="260.00">10mg - $260.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="cagrilintide-semaglutide-5mg" data-product-name="Cagrilintide+Semaglutide" data-product-variant="5mg" data-product-price="150.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="Mazdutide" />
-              <div class="product-body">
-                <span class="label">METABOLIC</span>
-                <h3>Mazdutide</h3>
-                <p>Dual GLP-1/GIP agonist. 10mg</p>
-                <span class="price">$450.00</span>
-              </div>
-            </article>
+
+            <!-- Survodutide (single variant) -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Survodutide" />
               <div class="product-body">
                 <span class="label">METABOLIC</span>
                 <h3>Survodutide</h3>
-                <p>Dual GLP-1/Glucagon agonist. 10mg</p>
-                <span class="price">$594.00</span>
+                <p>Dual GLP-1/glucagon receptor agonist for metabolic research.</p>
+                <span class="price">$330.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="survodutide-10mg" data-product-name="Survodutide" data-product-variant="10mg" data-product-price="330.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Mazdutide (single variant) -->
+            <article class="card product-card reveal">
+              <img class="product-image" src="/images/products/vial.png" alt="Mazdutide" />
+              <div class="product-body">
+                <span class="label">METABOLIC</span>
+                <h3>Mazdutide</h3>
+                <p>Dual GLP-1/glucagon receptor agonist for metabolic research.</p>
+                <span class="price">$250.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="mazdutide-10mg" data-product-name="Mazdutide" data-product-variant="10mg" data-product-price="250.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+
+            <!-- 5-Amino-1MQ (single variant) -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="5-Amino-1MQ" />
               <div class="product-body">
                 <span class="label">METABOLIC</span>
                 <h3>5-Amino-1MQ</h3>
-                <p>NNMT inhibitor. 5mg</p>
-                <span class="price">$157.50</span>
+                <p>NNMT inhibitor for metabolic research.</p>
+                <span class="price">$110.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="5-amino-1mq-5mg" data-product-name="5-Amino-1MQ" data-product-variant="5mg" data-product-price="110.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- AOD-9604 (single variant) -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="AOD-9604" />
               <div class="product-body">
                 <span class="label">METABOLIC</span>
                 <h3>AOD-9604</h3>
-                <p>Modified HGH fragment. 5mg</p>
-                <span class="price">$261.00</span>
+                <p>Modified HGH fragment for metabolic research.</p>
+                <span class="price">$145.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="aod-9604-5mg" data-product-name="AOD-9604" data-product-variant="5mg" data-product-price="145.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Adipotide (single variant) -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Adipotide" />
               <div class="product-body">
                 <span class="label">METABOLIC</span>
                 <h3>Adipotide</h3>
-                <p>Proapoptotic peptide. 5mg</p>
-                <span class="price">$405.00</span>
+                <p>Proapoptotic peptide for metabolic research.</p>
+                <span class="price">$225.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="adipotide-5mg" data-product-name="Adipotide" data-product-variant="5mg" data-product-price="225.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- L-Carnitine (single variant) -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="L-Carnitine" />
               <div class="product-body">
                 <span class="label">METABOLIC</span>
                 <h3>L-Carnitine</h3>
-                <p>Injectable solution. 10ml</p>
-                <span class="price">$171.00</span>
+                <p>Injectable solution for metabolic research.</p>
+                <span class="price">$95.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="l-carnitine-10ml" data-product-name="L-Carnitine" data-product-variant="10ml" data-product-price="95.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- LC120 (single variant) -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="LC120" />
               <div class="product-body">
                 <span class="label">METABOLIC</span>
                 <h3>LC120</h3>
-                <p>Lipotropic compound.</p>
-                <span class="price">$144.00</span>
+                <p>Lipotropic compound for metabolic research.</p>
+                <span class="price">$80.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="lc120-standard" data-product-name="LC120" data-product-variant="Standard" data-product-price="80.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- LC216 (single variant) -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="LC216" />
               <div class="product-body">
                 <span class="label">METABOLIC</span>
                 <h3>LC216</h3>
-                <p>Lipotropic compound.</p>
-                <span class="price">$144.00</span>
+                <p>Lipotropic compound for metabolic research.</p>
+                <span class="price">$80.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="lc216-standard" data-product-name="LC216" data-product-variant="Standard" data-product-price="80.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
           </div>
         </div>
       </section>
 
+      <!-- ============================================================ -->
       <!-- RECOVERY -->
+      <!-- ============================================================ -->
       <section class="section" id="recovery">
         <div class="container">
           <div class="section-heading reveal">
@@ -249,46 +425,71 @@
             <h2>Tissue Repair Peptides</h2>
           </div>
           <div class="shop-grid">
+
+            <!-- BPC-157 -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="BPC-157" />
               <div class="product-body">
                 <span class="label">RECOVERY</span>
                 <h3>BPC-157</h3>
-                <p>Gastric pentadecapeptide. 5mg, 10mg</p>
-                <span class="price">From $99.00</span>
-                <button type="button" class="btn-add-cart" data-add-to-cart="bpc157-10mg" data-product-name="BPC-157" data-product-variant="10mg" data-product-price="148.50">
+                <p>Gastric pentadecapeptide for tissue repair research.</p>
+                <span class="price">From $55.00</span>
+                <select class="variant-select" data-product-slug="bpc-157">
+                  <option value="bpc-157-5mg" data-price="55.00">5mg - $55.00</option>
+                  <option value="bpc-157-10mg" data-price="100.00">10mg - $100.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="bpc-157-5mg" data-product-name="BPC-157" data-product-variant="5mg" data-product-price="55.00">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
                   Add to Cart
                 </button>
               </div>
             </article>
+
+            <!-- TB-500 -->
             <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="TB500" />
+              <img class="product-image" src="/images/products/vial.png" alt="TB-500" />
               <div class="product-body">
                 <span class="label">RECOVERY</span>
-                <h3>TB500</h3>
-                <p>Thymosin beta-4 fragment. 5mg, 10mg</p>
-                <span class="price">From $180.00</span>
-                <button type="button" class="btn-add-cart" data-add-to-cart="tb500-10mg" data-product-name="TB500" data-product-variant="10mg" data-product-price="328.50">
+                <h3>TB-500</h3>
+                <p>Thymosin beta-4 fragment for tissue repair research.</p>
+                <span class="price">From $60.00</span>
+                <select class="variant-select" data-product-slug="tb-500">
+                  <option value="tb-500-5mg" data-price="60.00">5mg - $60.00</option>
+                  <option value="tb-500-10mg" data-price="100.00">10mg - $100.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="tb-500-5mg" data-product-name="TB-500" data-product-variant="5mg" data-product-price="60.00">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
                   Add to Cart
                 </button>
               </div>
             </article>
+
+            <!-- BPC-157+TB-500 -->
             <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="BPC + TB500" />
+              <img class="product-image" src="/images/products/vial.png" alt="BPC-157+TB-500" />
               <div class="product-body">
                 <span class="label">RECOVERY</span>
-                <h3>BPC + TB500</h3>
-                <p>Combination blend. 10mg, 20mg</p>
-                <span class="price">From $225.00</span>
+                <h3>BPC-157+TB-500</h3>
+                <p>Combination blend for tissue repair research.</p>
+                <span class="price">From $125.00</span>
+                <select class="variant-select" data-product-slug="bpc-157-tb-500">
+                  <option value="bpc-157-tb-500-10mg" data-price="125.00">10mg - $125.00</option>
+                  <option value="bpc-157-tb-500-20mg" data-price="200.00">20mg - $200.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="bpc-157-tb-500-10mg" data-product-name="BPC-157+TB-500" data-product-variant="10mg" data-product-price="125.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
           </div>
         </div>
       </section>
 
+      <!-- ============================================================ -->
       <!-- GROWTH HORMONE -->
+      <!-- ============================================================ -->
       <section class="section" id="growth-hormone">
         <div class="container">
           <div class="section-heading reveal">
@@ -296,119 +497,154 @@
             <h2>GHRH Analogs &amp; Secretagogues</h2>
           </div>
           <div class="shop-grid">
+
+            <!-- CJC-1295 (no DAC) -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="CJC-1295 (no DAC)" />
               <div class="product-body">
                 <span class="label">GROWTH HORMONE</span>
                 <h3>CJC-1295 (no DAC)</h3>
-                <p>GHRH analog. 5mg, 10mg</p>
-                <span class="price">From $198.00</span>
+                <p>GHRH analog for growth hormone research.</p>
+                <span class="price">From $110.00</span>
+                <select class="variant-select" data-product-slug="cjc-1295-no-dac">
+                  <option value="cjc-1295-no-dac-5mg" data-price="110.00">5mg - $110.00</option>
+                  <option value="cjc-1295-no-dac-10mg" data-price="210.00">10mg - $210.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="cjc-1295-no-dac-5mg" data-product-name="CJC-1295 (no DAC)" data-product-variant="5mg" data-product-price="110.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- CJC-1295 (with DAC) -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="CJC-1295 (with DAC)" />
               <div class="product-body">
                 <span class="label">GROWTH HORMONE</span>
                 <h3>CJC-1295 (with DAC)</h3>
-                <p>Extended half-life GHRH. 5mg</p>
-                <span class="price">$382.50</span>
+                <p>Extended half-life GHRH analog for growth hormone research.</p>
+                <span class="price">$210.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="cjc-1295-with-dac-5mg" data-product-name="CJC-1295 (with DAC)" data-product-variant="5mg" data-product-price="210.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- CJC-1295+Ipamorelin -->
             <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="CJC-1295 + Ipamorelin" />
+              <img class="product-image" src="/images/products/vial.png" alt="CJC-1295+Ipamorelin" />
               <div class="product-body">
                 <span class="label">GROWTH HORMONE</span>
-                <h3>CJC-1295 + Ipamorelin</h3>
-                <p>Combination blend. 10mg (5mg+5mg)</p>
-                <span class="price">$238.50</span>
+                <h3>CJC-1295+Ipamorelin</h3>
+                <p>Combination blend for growth hormone research.</p>
+                <span class="price">$180.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="cjc-1295-ipamorelin-10mg" data-product-name="CJC-1295+Ipamorelin" data-product-variant="10mg" data-product-price="180.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Ipamorelin -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Ipamorelin" />
               <div class="product-body">
                 <span class="label">GROWTH HORMONE</span>
                 <h3>Ipamorelin</h3>
-                <p>GHRP secretagogue. 5mg, 10mg</p>
-                <span class="price">From $99.00</span>
+                <p>GHRP secretagogue for growth hormone research.</p>
+                <span class="price">From $65.00</span>
+                <select class="variant-select" data-product-slug="ipamorelin">
+                  <option value="ipamorelin-5mg" data-price="65.00">5mg - $65.00</option>
+                  <option value="ipamorelin-10mg" data-price="110.00">10mg - $110.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="ipamorelin-5mg" data-product-name="Ipamorelin" data-product-variant="5mg" data-product-price="65.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Sermorelin -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Sermorelin" />
               <div class="product-body">
                 <span class="label">GROWTH HORMONE</span>
                 <h3>Sermorelin</h3>
-                <p>GHRH analog (1-29). 5mg, 10mg</p>
-                <span class="price">From $157.50</span>
+                <p>GHRH analog (1-29) for growth hormone research.</p>
+                <span class="price">From $100.00</span>
+                <select class="variant-select" data-product-slug="sermorelin">
+                  <option value="sermorelin-5mg" data-price="100.00">5mg - $100.00</option>
+                  <option value="sermorelin-10mg" data-price="140.00">10mg - $140.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="sermorelin-5mg" data-product-name="Sermorelin" data-product-variant="5mg" data-product-price="100.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Tesamorelin -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Tesamorelin" />
               <div class="product-body">
                 <span class="label">GROWTH HORMONE</span>
                 <h3>Tesamorelin</h3>
-                <p>GHRH analog. 5mg, 10mg</p>
-                <span class="price">From $238.50</span>
+                <p>GHRH analog for growth hormone research.</p>
+                <span class="price">From $130.00</span>
+                <select class="variant-select" data-product-slug="tesamorelin">
+                  <option value="tesamorelin-5mg" data-price="130.00">5mg - $130.00</option>
+                  <option value="tesamorelin-10mg" data-price="200.00">10mg - $200.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="tesamorelin-5mg" data-product-name="Tesamorelin" data-product-variant="5mg" data-product-price="130.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="GHRP-2" />
-              <div class="product-body">
-                <span class="label">GROWTH HORMONE</span>
-                <h3>GHRP-2</h3>
-                <p>Growth hormone releasing peptide. 5mg, 10mg</p>
-                <span class="price">From $112.50</span>
-              </div>
-            </article>
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="GHRP-6" />
-              <div class="product-body">
-                <span class="label">GROWTH HORMONE</span>
-                <h3>GHRP-6</h3>
-                <p>Growth hormone releasing peptide. 5mg, 10mg</p>
-                <span class="price">From $90.00</span>
-              </div>
-            </article>
+
+            <!-- Hexarelin -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Hexarelin" />
               <div class="product-body">
                 <span class="label">GROWTH HORMONE</span>
                 <h3>Hexarelin</h3>
-                <p>GHRP secretagogue. 5mg</p>
-                <span class="price">$202.50</span>
+                <p>GHRP secretagogue for growth hormone research.</p>
+                <span class="price">$140.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="hexarelin-5mg" data-product-name="Hexarelin" data-product-variant="5mg" data-product-price="140.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="HGH" />
-              <div class="product-body">
-                <span class="label">GROWTH HORMONE</span>
-                <h3>HGH</h3>
-                <p>Somatropin. 10iu, 15iu</p>
-                <span class="price">From $130.50</span>
-              </div>
-            </article>
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="HGH Frag 176-191" />
-              <div class="product-body">
-                <span class="label">GROWTH HORMONE</span>
-                <h3>HGH Frag 176-191</h3>
-                <p>C-terminal fragment. 5mg</p>
-                <span class="price">$247.50</span>
-              </div>
-            </article>
+
+            <!-- IGF-1 LR3 -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="IGF-1 LR3" />
               <div class="product-body">
                 <span class="label">GROWTH HORMONE</span>
                 <h3>IGF-1 LR3</h3>
-                <p>Long-acting IGF-1. 0.1mg, 1mg</p>
-                <span class="price">From $85.50</span>
+                <p>Long-acting IGF-1 for growth factor research.</p>
+                <span class="price">From $65.00</span>
+                <select class="variant-select" data-product-slug="igf-1-lr3">
+                  <option value="igf-1-lr3-0.1mg" data-price="65.00">0.1mg - $65.00</option>
+                  <option value="igf-1-lr3-1mg" data-price="400.00">1mg - $400.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="igf-1-lr3-0.1mg" data-product-name="IGF-1 LR3" data-product-variant="0.1mg" data-product-price="65.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
           </div>
         </div>
       </section>
 
+      <!-- ============================================================ -->
       <!-- NOOTROPIC -->
+      <!-- ============================================================ -->
       <section class="section" id="nootropic">
         <div class="container">
           <div class="section-heading reveal">
@@ -416,56 +652,106 @@
             <h2>Cognitive Peptides</h2>
           </div>
           <div class="shop-grid">
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="Semax" />
-              <div class="product-body">
-                <span class="label">NOOTROPIC</span>
-                <h3>Semax</h3>
-                <p>ACTH-derived neuropeptide. 5mg, 10mg</p>
-                <span class="price">From $85.50</span>
-              </div>
-            </article>
+
+            <!-- Selank -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Selank" />
               <div class="product-body">
                 <span class="label">NOOTROPIC</span>
                 <h3>Selank</h3>
-                <p>Tuftsin-derived peptide. 5mg, 10mg</p>
-                <span class="price">From $85.50</span>
+                <p>Tuftsin-derived peptide for cognitive research.</p>
+                <span class="price">From $50.00</span>
+                <select class="variant-select" data-product-slug="selank">
+                  <option value="selank-5mg" data-price="50.00">5mg - $50.00</option>
+                  <option value="selank-10mg" data-price="75.00">10mg - $75.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="selank-5mg" data-product-name="Selank" data-product-variant="5mg" data-product-price="50.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Semax -->
             <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="Pinealon" />
+              <img class="product-image" src="/images/products/vial.png" alt="Semax" />
               <div class="product-body">
                 <span class="label">NOOTROPIC</span>
-                <h3>Pinealon</h3>
-                <p>Bioregulator tripeptide. 5mg, 10mg, 20mg</p>
-                <span class="price">From $112.50</span>
+                <h3>Semax</h3>
+                <p>ACTH-derived neuropeptide for cognitive research.</p>
+                <span class="price">From $50.00</span>
+                <select class="variant-select" data-product-slug="semax">
+                  <option value="semax-5mg" data-price="50.00">5mg - $50.00</option>
+                  <option value="semax-10mg" data-price="70.00">10mg - $70.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="semax-5mg" data-product-name="Semax" data-product-variant="5mg" data-product-price="50.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Dihexa -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Dihexa" />
               <div class="product-body">
                 <span class="label">NOOTROPIC</span>
                 <h3>Dihexa</h3>
-                <p>HGF receptor agonist. 5mg, 10mg</p>
-                <span class="price">From $180.00</span>
+                <p>HGF receptor agonist for cognitive research.</p>
+                <span class="price">From $100.00</span>
+                <select class="variant-select" data-product-slug="dihexa">
+                  <option value="dihexa-5mg" data-price="100.00">5mg - $100.00</option>
+                  <option value="dihexa-10mg" data-price="160.00">10mg - $160.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="dihexa-5mg" data-product-name="Dihexa" data-product-variant="5mg" data-product-price="100.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Pinealon -->
+            <article class="card product-card reveal">
+              <img class="product-image" src="/images/products/vial.png" alt="Pinealon" />
+              <div class="product-body">
+                <span class="label">NOOTROPIC</span>
+                <h3>Pinealon</h3>
+                <p>Bioregulator tripeptide for cognitive research.</p>
+                <span class="price">From $60.00</span>
+                <select class="variant-select" data-product-slug="pinealon">
+                  <option value="pinealon-5mg" data-price="60.00">5mg - $60.00</option>
+                  <option value="pinealon-10mg" data-price="90.00">10mg - $90.00</option>
+                  <option value="pinealon-20mg" data-price="120.00">20mg - $120.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="pinealon-5mg" data-product-name="Pinealon" data-product-variant="5mg" data-product-price="60.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+
+            <!-- Cerebrolysin -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Cerebrolysin" />
               <div class="product-body">
                 <span class="label">NOOTROPIC</span>
                 <h3>Cerebrolysin</h3>
-                <p>Neuropeptide preparation. 60mg (6 vials)</p>
-                <span class="price">$96.30</span>
+                <p>Neuropeptide preparation for cognitive research.</p>
+                <span class="price">$70.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="cerebrolysin-60mg" data-product-name="Cerebrolysin" data-product-variant="60mg" data-product-price="70.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
           </div>
         </div>
       </section>
 
+      <!-- ============================================================ -->
       <!-- LONGEVITY -->
+      <!-- ============================================================ -->
       <section class="section" id="longevity">
         <div class="container">
           <div class="section-heading reveal">
@@ -473,20 +759,29 @@
             <h2>Anti-Aging Peptides</h2>
           </div>
           <div class="shop-grid">
+
+            <!-- Epithalon (NO 50mg - wholesale only) -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Epithalon" />
               <div class="product-body">
                 <span class="label">LONGEVITY</span>
                 <h3>Epithalon</h3>
-                <p>Tetrapeptide bioregulator. 10mg, 50mg</p>
-                <span class="price">From $108.00</span>
+                <p>Tetrapeptide bioregulator for longevity research.</p>
+                <span class="price">$60.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="epithalon-10mg" data-product-name="Epithalon" data-product-variant="10mg" data-product-price="60.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
           </div>
         </div>
       </section>
 
+      <!-- ============================================================ -->
       <!-- MITOCHONDRIAL -->
+      <!-- ============================================================ -->
       <section class="section" id="mitochondrial">
         <div class="container">
           <div class="section-heading reveal">
@@ -494,47 +789,82 @@
             <h2>Cellular Energy Peptides</h2>
           </div>
           <div class="shop-grid">
+
+            <!-- MOTS-c -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="MOTS-c" />
               <div class="product-body">
                 <span class="label">MITOCHONDRIAL</span>
                 <h3>MOTS-c</h3>
-                <p>Mitochondrial-derived peptide. 10mg, 40mg</p>
-                <span class="price">From $153.00</span>
+                <p>Mitochondrial-derived peptide for cellular energy research.</p>
+                <span class="price">From $100.00</span>
+                <select class="variant-select" data-product-slug="mots-c">
+                  <option value="mots-c-10mg" data-price="100.00">10mg - $100.00</option>
+                  <option value="mots-c-40mg" data-price="250.00">40mg - $250.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="mots-c-10mg" data-product-name="MOTS-c" data-product-variant="10mg" data-product-price="100.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- NAD+ (NO 100mg - wholesale only) -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="NAD+" />
               <div class="product-body">
                 <span class="label">MITOCHONDRIAL</span>
                 <h3>NAD+</h3>
-                <p>Nicotinamide adenine dinucleotide. 100mg, 500mg</p>
-                <span class="price">From $79.20</span>
+                <p>Nicotinamide adenine dinucleotide for cellular energy research.</p>
+                <span class="price">$140.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="nad-500mg" data-product-name="NAD+" data-product-variant="500mg" data-product-price="140.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="SS-31" />
-              <div class="product-body">
-                <span class="label">MITOCHONDRIAL</span>
-                <h3>SS-31</h3>
-                <p>Elamipretide. 10mg, 50mg</p>
-                <span class="price">From $216.00</span>
-              </div>
-            </article>
+
+            <!-- SLU-PP-332 -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="SLU-PP-332" />
               <div class="product-body">
                 <span class="label">MITOCHONDRIAL</span>
                 <h3>SLU-PP-332</h3>
-                <p>ERR agonist. 5mg</p>
-                <span class="price">$297.00</span>
+                <p>ERR agonist for cellular energy research.</p>
+                <span class="price">$165.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="slu-pp-332-5mg" data-product-name="SLU-PP-332" data-product-variant="5mg" data-product-price="165.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- SS-31 -->
+            <article class="card product-card reveal">
+              <img class="product-image" src="/images/products/vial.png" alt="SS-31" />
+              <div class="product-body">
+                <span class="label">MITOCHONDRIAL</span>
+                <h3>SS-31</h3>
+                <p>Elamipretide for mitochondrial research.</p>
+                <span class="price">From $120.00</span>
+                <select class="variant-select" data-product-slug="ss-31">
+                  <option value="ss-31-10mg" data-price="120.00">10mg - $120.00</option>
+                  <option value="ss-31-50mg" data-price="500.00">50mg - $500.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="ss-31-10mg" data-product-name="SS-31" data-product-variant="10mg" data-product-price="120.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+
           </div>
         </div>
       </section>
 
+      <!-- ============================================================ -->
       <!-- IMMUNE -->
+      <!-- ============================================================ -->
       <section class="section" id="immune">
         <div class="container">
           <div class="section-heading reveal">
@@ -542,29 +872,48 @@
             <h2>Thymic Peptides</h2>
           </div>
           <div class="shop-grid">
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="Thymosin Alpha-1" />
-              <div class="product-body">
-                <span class="label">IMMUNE</span>
-                <h3>Thymosin Alpha-1</h3>
-                <p>Thymic peptide. 5mg, 10mg</p>
-                <span class="price">From $198.00</span>
-              </div>
-            </article>
+
+            <!-- Thymalin -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Thymalin" />
               <div class="product-body">
                 <span class="label">IMMUNE</span>
                 <h3>Thymalin</h3>
-                <p>Thymic extract. 10mg</p>
-                <span class="price">$135.00</span>
+                <p>Thymic extract for immune research.</p>
+                <span class="price">$85.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="thymalin-10mg" data-product-name="Thymalin" data-product-variant="10mg" data-product-price="85.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Thymosin Alpha-1 -->
+            <article class="card product-card reveal">
+              <img class="product-image" src="/images/products/vial.png" alt="Thymosin Alpha-1" />
+              <div class="product-body">
+                <span class="label">IMMUNE</span>
+                <h3>Thymosin Alpha-1</h3>
+                <p>Thymic peptide for immune research.</p>
+                <span class="price">From $110.00</span>
+                <select class="variant-select" data-product-slug="thymosin-alpha-1">
+                  <option value="thymosin-alpha-1-5mg" data-price="110.00">5mg - $110.00</option>
+                  <option value="thymosin-alpha-1-10mg" data-price="210.00">10mg - $210.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="thymosin-alpha-1-5mg" data-product-name="Thymosin Alpha-1" data-product-variant="5mg" data-product-price="110.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+
           </div>
         </div>
       </section>
 
+      <!-- ============================================================ -->
       <!-- ANTI-INFLAMMATORY -->
+      <!-- ============================================================ -->
       <section class="section" id="anti-inflammatory">
         <div class="container">
           <div class="section-heading reveal">
@@ -572,20 +921,29 @@
             <h2>Anti-inflammatory Peptides</h2>
           </div>
           <div class="shop-grid">
+
+            <!-- KPV (NO 5mg - wholesale only) -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="KPV" />
               <div class="product-body">
                 <span class="label">ANTI-INFLAMMATORY</span>
                 <h3>KPV</h3>
-                <p>Alpha-MSH fragment. 5mg, 10mg</p>
-                <span class="price">From $108.00</span>
+                <p>Alpha-MSH fragment for anti-inflammatory research.</p>
+                <span class="price">$65.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="kpv-10mg" data-product-name="KPV" data-product-variant="10mg" data-product-price="65.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
           </div>
         </div>
       </section>
 
-      <!-- COSMETIC / COPPER PEPTIDE -->
+      <!-- ============================================================ -->
+      <!-- COSMETIC -->
+      <!-- ============================================================ -->
       <section class="section" id="cosmetic">
         <div class="container">
           <div class="section-heading reveal">
@@ -593,77 +951,87 @@
             <h2>Skin &amp; Hair Peptides</h2>
           </div>
           <div class="shop-grid">
+
+            <!-- GHK-Cu (NO 50mg - wholesale only) -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="GHK-Cu" />
               <div class="product-body">
-                <span class="label">COPPER PEPTIDE</span>
+                <span class="label">COSMETIC</span>
                 <h3>GHK-Cu</h3>
-                <p>Copper tripeptide. 50mg, 100mg</p>
-                <span class="price">From $67.50</span>
+                <p>Copper tripeptide for cosmetic research.</p>
+                <span class="price">$100.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="ghk-cu-100mg" data-product-name="GHK-Cu" data-product-variant="100mg" data-product-price="100.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- SNAP-8 -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="SNAP-8" />
               <div class="product-body">
                 <span class="label">COSMETIC</span>
                 <h3>SNAP-8</h3>
-                <p>Acetyl octapeptide-3. 10mg</p>
-                <span class="price">$99.00</span>
+                <p>Acetyl octapeptide-3 for cosmetic research.</p>
+                <span class="price">$55.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="snap-8-10mg" data-product-name="SNAP-8" data-product-variant="10mg" data-product-price="55.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
-            <article class="card product-card reveal">
+
+            <!-- SNAP-8 + GHK-Cu Serum — COMING SOON -->
+            <article class="card product-card reveal coming-soon">
+              <span class="badge badge-coming-soon">Coming Soon</span>
               <img class="product-image" src="/images/products/vial.png" alt="SNAP-8 + GHK-Cu Serum" />
               <div class="product-body">
                 <span class="label">COSMETIC</span>
                 <h3>SNAP-8 + GHK-Cu Serum</h3>
-                <p>Topical serum. 30ml</p>
-                <span class="price">From $11.70</span>
+                <p>Cosmetic peptide serum for research applications.</p>
+                <span class="price">$65.00</span>
+                <button type="button" class="btn-add-cart" disabled>Coming Soon</button>
               </div>
             </article>
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="GLOW Blend" />
-              <div class="product-body">
-                <span class="label">COSMETIC</span>
-                <h3>GLOW (BPC+GHK-Cu+TB500)</h3>
-                <p>Triple peptide blend.</p>
-                <span class="price">$427.50</span>
-              </div>
-            </article>
+
           </div>
         </div>
       </section>
 
-      <!-- ANTIMICROBIAL / ANTIOXIDANT -->
+      <!-- ============================================================ -->
+      <!-- ANTIMICROBIAL -->
+      <!-- ============================================================ -->
       <section class="section" id="antimicrobial">
         <div class="container">
           <div class="section-heading reveal">
-            <span class="label">ANTIMICROBIAL / ANTIOXIDANT</span>
-            <h2>Immune Support</h2>
+            <span class="label">ANTIMICROBIAL</span>
+            <h2>Antimicrobial Peptides</h2>
           </div>
           <div class="shop-grid">
+
+            <!-- LL-37 -->
             <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="LL37" />
+              <img class="product-image" src="/images/products/vial.png" alt="LL-37" />
               <div class="product-body">
                 <span class="label">ANTIMICROBIAL</span>
-                <h3>LL37</h3>
-                <p>Cathelicidin peptide. 5mg</p>
-                <span class="price">$198.00</span>
+                <h3>LL-37</h3>
+                <p>Cathelicidin peptide for antimicrobial research.</p>
+                <span class="price">$110.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="ll-37-5mg" data-product-name="LL-37" data-product-variant="5mg" data-product-price="110.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="Glutathione" />
-              <div class="product-body">
-                <span class="label">ANTIOXIDANT</span>
-                <h3>Glutathione</h3>
-                <p>Master antioxidant. 1500mg</p>
-                <span class="price">$171.00</span>
-              </div>
-            </article>
+
           </div>
         </div>
       </section>
 
-      <!-- NEUROPEPTIDE / NEUROPROTECTIVE -->
+      <!-- ============================================================ -->
+      <!-- NEUROPEPTIDE -->
+      <!-- ============================================================ -->
       <section class="section" id="neuropeptide">
         <div class="container">
           <div class="section-heading reveal">
@@ -671,29 +1039,48 @@
             <h2>Neuropeptides</h2>
           </div>
           <div class="shop-grid">
+
+            <!-- VIP -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="VIP" />
               <div class="product-body">
                 <span class="label">NEUROPEPTIDE</span>
                 <h3>VIP</h3>
-                <p>Vasoactive intestinal peptide. 5mg, 10mg</p>
-                <span class="price">From $184.50</span>
+                <p>Vasoactive intestinal peptide for neuropeptide research.</p>
+                <span class="price">From $100.00</span>
+                <select class="variant-select" data-product-slug="vip">
+                  <option value="vip-5mg" data-price="100.00">5mg - $100.00</option>
+                  <option value="vip-10mg" data-price="180.00">10mg - $180.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="vip-5mg" data-product-name="VIP" data-product-variant="5mg" data-product-price="100.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- ARA-290 (Neuroprotective) -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="ARA-290" />
               <div class="product-body">
                 <span class="label">NEUROPROTECTIVE</span>
                 <h3>ARA-290</h3>
-                <p>EPO-derived peptide. 10mg</p>
-                <span class="price">$148.50</span>
+                <p>EPO-derived peptide for neuroprotective research.</p>
+                <span class="price">$80.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="ara-290-10mg" data-product-name="ARA-290" data-product-variant="10mg" data-product-price="80.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
           </div>
         </div>
       </section>
 
+      <!-- ============================================================ -->
       <!-- REPRODUCTIVE -->
+      <!-- ============================================================ -->
       <section class="section" id="reproductive">
         <div class="container">
           <div class="section-heading reveal">
@@ -701,38 +1088,67 @@
             <h2>Reproductive Peptides</h2>
           </div>
           <div class="shop-grid">
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="hCG" />
-              <div class="product-body">
-                <span class="label">REPRODUCTIVE</span>
-                <h3>hCG</h3>
-                <p>Human chorionic gonadotropin. 5000IU, 10000IU</p>
-                <span class="price">From $184.50</span>
-              </div>
-            </article>
+
+            <!-- HMG -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="HMG" />
               <div class="product-body">
                 <span class="label">REPRODUCTIVE</span>
                 <h3>HMG</h3>
-                <p>Human menopausal gonadotropin. 75iu</p>
-                <span class="price">$157.50</span>
+                <p>Human menopausal gonadotropin for reproductive research.</p>
+                <span class="price">$90.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="hmg-75iu" data-product-name="HMG" data-product-variant="75iu" data-product-price="90.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Kisspeptin-10 -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Kisspeptin-10" />
               <div class="product-body">
                 <span class="label">REPRODUCTIVE</span>
                 <h3>Kisspeptin-10</h3>
-                <p>GnRH stimulator. 5mg, 10mg</p>
-                <span class="price">From $148.50</span>
+                <p>GnRH stimulator for reproductive research.</p>
+                <span class="price">From $80.00</span>
+                <select class="variant-select" data-product-slug="kisspeptin-10">
+                  <option value="kisspeptin-10-5mg" data-price="80.00">5mg - $80.00</option>
+                  <option value="kisspeptin-10-10mg" data-price="140.00">10mg - $140.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="kisspeptin-10-5mg" data-product-name="Kisspeptin-10" data-product-variant="5mg" data-product-price="80.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- hCG -->
+            <article class="card product-card reveal">
+              <img class="product-image" src="/images/products/vial.png" alt="hCG" />
+              <div class="product-body">
+                <span class="label">REPRODUCTIVE</span>
+                <h3>hCG</h3>
+                <p>Human chorionic gonadotropin for reproductive research.</p>
+                <span class="price">From $100.00</span>
+                <select class="variant-select" data-product-slug="hcg">
+                  <option value="hcg-5000iu" data-price="100.00">5000IU - $100.00</option>
+                  <option value="hcg-10000iu" data-price="180.00">10000IU - $180.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="hcg-5000iu" data-product-name="hCG" data-product-variant="5000IU" data-product-price="100.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+
           </div>
         </div>
       </section>
 
+      <!-- ============================================================ -->
       <!-- HORMONE / SEXUAL HEALTH -->
+      <!-- ============================================================ -->
       <section class="section" id="hormone">
         <div class="container">
           <div class="section-heading reveal">
@@ -740,29 +1156,44 @@
             <h2>Hormones &amp; Sexual Health</h2>
           </div>
           <div class="shop-grid">
+
+            <!-- Oxytocin -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Oxytocin" />
               <div class="product-body">
                 <span class="label">HORMONE</span>
                 <h3>Oxytocin</h3>
-                <p>Peptide hormone. 2mg</p>
-                <span class="price">$90.00</span>
+                <p>Peptide hormone for hormone research.</p>
+                <span class="price">$65.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="oxytocin-2mg" data-product-name="Oxytocin" data-product-variant="2mg" data-product-price="65.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- PT-141 -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="PT-141" />
               <div class="product-body">
                 <span class="label">SEXUAL HEALTH</span>
                 <h3>PT-141</h3>
-                <p>Bremelanotide. 10mg</p>
-                <span class="price">$157.50</span>
+                <p>Bremelanotide for sexual health research.</p>
+                <span class="price">$90.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="pt-141-10mg" data-product-name="PT-141" data-product-variant="10mg" data-product-price="90.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
           </div>
         </div>
       </section>
 
+      <!-- ============================================================ -->
       <!-- SLEEP -->
+      <!-- ============================================================ -->
       <section class="section" id="sleep">
         <div class="container">
           <div class="section-heading reveal">
@@ -770,20 +1201,33 @@
             <h2>Sleep Peptides</h2>
           </div>
           <div class="shop-grid">
+
+            <!-- DSIP -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="DSIP" />
               <div class="product-body">
                 <span class="label">SLEEP</span>
                 <h3>DSIP</h3>
-                <p>Delta sleep-inducing peptide. 5mg, 15mg</p>
-                <span class="price">From $99.00</span>
+                <p>Delta sleep-inducing peptide for sleep research.</p>
+                <span class="price">From $55.00</span>
+                <select class="variant-select" data-product-slug="dsip">
+                  <option value="dsip-5mg" data-price="55.00">5mg - $55.00</option>
+                  <option value="dsip-15mg" data-price="120.00">15mg - $120.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="dsip-5mg" data-product-name="DSIP" data-product-variant="5mg" data-product-price="55.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
           </div>
         </div>
       </section>
 
+      <!-- ============================================================ -->
       <!-- TANNING -->
+      <!-- ============================================================ -->
       <section class="section" id="tanning">
         <div class="container">
           <div class="section-heading reveal">
@@ -791,29 +1235,29 @@
             <h2>Melanocortin Peptides</h2>
           </div>
           <div class="shop-grid">
+
+            <!-- Melanotan-1 -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Melanotan-1" />
               <div class="product-body">
                 <span class="label">TANNING</span>
                 <h3>Melanotan-1</h3>
-                <p>Alpha-MSH analog. 10mg</p>
-                <span class="price">$112.50</span>
+                <p>Alpha-MSH analog for melanocortin research.</p>
+                <span class="price">$75.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="melanotan-1-10mg" data-product-name="Melanotan-1" data-product-variant="10mg" data-product-price="75.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="Melanotan-2" />
-              <div class="product-body">
-                <span class="label">TANNING</span>
-                <h3>Melanotan-2</h3>
-                <p>Cyclic alpha-MSH. 10mg</p>
-                <span class="price">$103.50</span>
-              </div>
-            </article>
+
           </div>
         </div>
       </section>
 
-      <!-- RESEARCH / OTHER -->
+      <!-- ============================================================ -->
+      <!-- RESEARCH -->
+      <!-- ============================================================ -->
       <section class="section" id="research">
         <div class="container">
           <div class="section-heading reveal">
@@ -821,38 +1265,48 @@
             <h2>Research Compounds</h2>
           </div>
           <div class="shop-grid">
+
+            <!-- Dermorphin -->
+            <article class="card product-card reveal">
+              <img class="product-image" src="/images/products/vial.png" alt="Dermorphin" />
+              <div class="product-body">
+                <span class="label">RESEARCH</span>
+                <h3>Dermorphin</h3>
+                <p>Opioid peptide for research applications.</p>
+                <span class="price">$70.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="dermorphin-5mg" data-product-name="Dermorphin" data-product-variant="5mg" data-product-price="70.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+
+            <!-- PNC-27 -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="PNC-27" />
               <div class="product-body">
                 <span class="label">RESEARCH</span>
                 <h3>PNC-27</h3>
-                <p>p53-derived peptide. 5mg, 10mg</p>
-                <span class="price">From $225.00</span>
+                <p>p53-derived peptide for research applications.</p>
+                <span class="price">From $125.00</span>
+                <select class="variant-select" data-product-slug="pnc-27">
+                  <option value="pnc-27-5mg" data-price="125.00">5mg - $125.00</option>
+                  <option value="pnc-27-10mg" data-price="210.00">10mg - $210.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="pnc-27-5mg" data-product-name="PNC-27" data-product-variant="5mg" data-product-price="125.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="KLOW80 Blend" />
-              <div class="product-body">
-                <span class="label">RESEARCH</span>
-                <h3>KLOW80 Blend</h3>
-                <p>Research blend. 80mg</p>
-                <span class="price">$540.00</span>
-              </div>
-            </article>
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="Dermorphin" />
-              <div class="product-body">
-                <span class="label">OPIOID</span>
-                <h3>Dermorphin</h3>
-                <p>Opioid peptide. 5mg</p>
-                <span class="price">$126.00</span>
-              </div>
-            </article>
+
           </div>
         </div>
       </section>
 
+      <!-- ============================================================ -->
       <!-- SUPPLIES -->
+      <!-- ============================================================ -->
       <section class="section" id="supplies">
         <div class="container">
           <div class="section-heading reveal">
@@ -860,38 +1314,71 @@
             <h2>Reconstitution Supplies</h2>
           </div>
           <div class="shop-grid">
+
+            <!-- BAC Water -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="BAC Water" />
               <div class="product-body">
                 <span class="label">SUPPLIES</span>
                 <h3>BAC Water</h3>
-                <p>Bacteriostatic water. 3ml, 10ml</p>
-                <span class="price">From $11.70</span>
+                <p>Bacteriostatic water for reconstitution.</p>
+                <span class="price">From $5.00</span>
+                <select class="variant-select" data-product-slug="bac-water">
+                  <option value="bac-water-3ml" data-price="5.00">3ml - $5.00</option>
+                  <option value="bac-water-10ml" data-price="10.00">10ml - $10.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="bac-water-3ml" data-product-name="BAC Water" data-product-variant="3ml" data-product-price="5.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Sterile Water -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Sterile Water" />
               <div class="product-body">
                 <span class="label">SUPPLIES</span>
                 <h3>Sterile Water</h3>
-                <p>Sterile water for injection. 3ml, 10ml</p>
-                <span class="price">From $11.70</span>
+                <p>Sterile water for injection reconstitution.</p>
+                <span class="price">From $5.00</span>
+                <select class="variant-select" data-product-slug="sterile-water">
+                  <option value="sterile-water-3ml" data-price="5.00">3ml - $5.00</option>
+                  <option value="sterile-water-10ml" data-price="10.00">10ml - $10.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="sterile-water-3ml" data-product-name="Sterile Water" data-product-variant="3ml" data-product-price="5.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Acetic Acid -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Acetic Acid" />
               <div class="product-body">
                 <span class="label">SUPPLIES</span>
                 <h3>Acetic Acid</h3>
-                <p>Reconstitution solution. 3ml, 10ml</p>
-                <span class="price">From $13.50</span>
+                <p>Reconstitution solution.</p>
+                <span class="price">$10.00</span>
+                <select class="variant-select" data-product-slug="acetic-acid">
+                  <option value="acetic-acid-3ml" data-price="10.00">3ml - $10.00</option>
+                  <option value="acetic-acid-10ml" data-price="10.00">10ml - $10.00</option>
+                </select>
+                <button type="button" class="btn-add-cart" data-add-to-cart="acetic-acid-3ml" data-product-name="Acetic Acid" data-product-variant="3ml" data-product-price="10.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
           </div>
         </div>
       </section>
 
+      <!-- ============================================================ -->
       <!-- STACKS -->
+      <!-- ============================================================ -->
       <section class="section" id="stacks">
         <div class="container">
           <div class="section-heading reveal">
@@ -899,167 +1386,262 @@
             <h2>Curated Peptide Stacks - 10% Off</h2>
           </div>
           <div class="shop-grid">
+
+            <!-- Gut Health Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Gut Health Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Gut Health Stack</h3>
-                <p>BPC-157 + KPV</p>
-                <span class="price">$255.15</span>
-                <button type="button" class="btn-add-cart" data-add-to-cart="gut-health-stack" data-product-name="Gut Health Stack" data-product-variant="BPC-157 + KPV" data-product-price="255.15">
+                <p>BPC-157 10mg + KPV 10mg</p>
+                <span class="price">$150.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="gut-health-stack-def" data-product-name="Gut Health Stack" data-product-variant="BPC-157 10mg + KPV 10mg" data-product-price="150.00">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
                   Add to Cart
                 </button>
               </div>
             </article>
+
+            <!-- Bloat Buster Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Bloat Buster Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Bloat Buster Stack</h3>
-                <p>BPC-157 + Retatrutide</p>
-                <span class="price">$328.05</span>
-                <button type="button" class="btn-add-cart" data-add-to-cart="bloat-buster-stack" data-product-name="Bloat Buster Stack" data-product-variant="BPC-157 + Retatrutide" data-product-price="328.05">
+                <p>BPC-157 10mg + Retatrutide 10mg</p>
+                <span class="price">$305.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="bloat-buster-stack-def" data-product-name="Bloat Buster Stack" data-product-variant="BPC-157 10mg + Retatrutide 10mg" data-product-price="305.00">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
                   Add to Cart
                 </button>
               </div>
             </article>
+
+            <!-- Belly Buster Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Belly Buster Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Belly Buster Stack</h3>
                 <p>Retatrutide + Tesamorelin + BPC-157</p>
-                <span class="price">$733.05</span>
+                <span class="price">$455.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="belly-buster-stack-def" data-product-name="Belly Buster Stack" data-product-variant="Retatrutide + Tesamorelin + BPC-157" data-product-price="455.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Weight Loss Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Weight Loss Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Weight Loss Stack</h3>
                 <p>Retatrutide + NAD+ + GHK-Cu</p>
-                <span class="price">$342.63</span>
+                <span class="price">$345.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="weight-loss-stack-def" data-product-name="Weight Loss Stack" data-product-variant="Retatrutide + NAD+ + GHK-Cu" data-product-price="345.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Baywatch Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Baywatch Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Baywatch Stack</h3>
                 <p>Retatrutide + Melanotan-1 + BPC-157</p>
-                <span class="price">$429.30</span>
+                <span class="price">$400.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="baywatch-stack-def" data-product-name="Baywatch Stack" data-product-variant="Retatrutide + Melanotan-1 + BPC-157" data-product-price="400.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Healing Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Healing Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Healing Stack</h3>
-                <p>BPC-157 + TB500 + KPV</p>
-                <span class="price">$550.80</span>
+                <p>BPC-157 + TB-500 + KPV</p>
+                <span class="price">$240.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="healing-stack-def" data-product-name="Healing Stack" data-product-variant="BPC-157 + TB-500 + KPV" data-product-price="240.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Recovery Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Recovery Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Recovery Stack</h3>
-                <p>BPC-157 + TB500 + GHK-Cu</p>
-                <span class="price">$506.25</span>
+                <p>BPC-157 + TB-500 + GHK-Cu</p>
+                <span class="price">$270.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="recovery-stack-def" data-product-name="Recovery Stack" data-product-variant="BPC-157 + TB-500 + GHK-Cu" data-product-price="270.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Anti-Aging Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Anti-Aging Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Anti-Aging Stack</h3>
                 <p>Epithalon + NAD+ + GHK-Cu</p>
-                <span class="price">$245.43</span>
+                <span class="price">$285.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="anti-aging-stack-def" data-product-name="Anti-Aging Stack" data-product-variant="Epithalon + NAD+ + GHK-Cu" data-product-price="285.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Longevity Research Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Longevity Research Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Longevity Research Stack</h3>
                 <p>Epithalon + NAD+ + SS-31</p>
-                <span class="price">$362.88</span>
+                <span class="price">$250.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="longevity-research-stack-def" data-product-name="Longevity Research Stack" data-product-variant="Epithalon + NAD+ + SS-31" data-product-price="250.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Growth Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Growth Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Growth Stack</h3>
                 <p>CJC-1295 + Ipamorelin + NAD+</p>
-                <span class="price">$569.43</span>
+                <span class="price">$300.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="growth-stack-def" data-product-name="Growth Stack" data-product-variant="CJC-1295 + Ipamorelin + NAD+" data-product-price="300.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Cognitive Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Cognitive Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Cognitive Stack</h3>
                 <p>Semax + Selank + Pinealon</p>
-                <span class="price">$376.65</span>
+                <span class="price">$200.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="cognitive-stack-def" data-product-name="Cognitive Stack" data-product-variant="Semax + Selank + Pinealon" data-product-price="200.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Mental Wellness Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Mental Wellness Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Mental Wellness Stack</h3>
                 <p>Semax + Selank + DSIP</p>
-                <span class="price">$324.00</span>
+                <span class="price">$250.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="mental-wellness-stack-def" data-product-name="Mental Wellness Stack" data-product-variant="Semax + Selank + DSIP" data-product-price="250.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Sleep Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Sleep Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Sleep Stack</h3>
                 <p>DSIP + Pinealon + Epithalon</p>
-                <span class="price">$328.05</span>
+                <span class="price">$160.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="sleep-stack-def" data-product-name="Sleep Stack" data-product-variant="DSIP + Pinealon + Epithalon" data-product-price="160.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
-            <article class="card product-card reveal">
-              <img class="product-image" src="/images/products/vial.png" alt="Skin + Hair Radiance Stack" />
-              <div class="product-body">
-                <span class="label">STACK</span>
-                <h3>Skin + Hair Radiance Stack</h3>
-                <p>GHK-Cu + SNAP-8 Serum + KPV</p>
-                <span class="price">$303.75</span>
-              </div>
-            </article>
+
+            <!-- Glow Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Glow Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Glow Stack</h3>
-                <p>GHK-Cu + TB500 + BPC-157</p>
-                <span class="price">$506.25</span>
+                <p>GHK-Cu + TB-500 + BPC-157</p>
+                <span class="price">$300.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="glow-stack-def" data-product-name="Glow Stack" data-product-variant="GHK-Cu + TB-500 + BPC-157" data-product-price="300.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Immune Support Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Immune Support Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Immune Support Stack</h3>
                 <p>Thymosin Alpha-1 + Thymalin + KPV</p>
-                <span class="price">$583.20</span>
+                <span class="price">$360.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="immune-support-stack-def" data-product-name="Immune Support Stack" data-product-variant="Thymosin Alpha-1 + Thymalin + KPV" data-product-price="360.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Energy Stack -->
             <article class="card product-card reveal">
               <img class="product-image" src="/images/products/vial.png" alt="Energy Stack" />
               <div class="product-body">
-                <span class="label">STACK</span>
+                <span class="label">RESEARCH COMBINATION</span>
                 <h3>Energy Stack</h3>
                 <p>MOTS-c + SS-31 + NAD+</p>
-                <span class="price">$403.38</span>
+                <span class="price">$340.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="energy-stack-def" data-product-name="Energy Stack" data-product-variant="MOTS-c + SS-31 + NAD+" data-product-price="340.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
               </div>
             </article>
+
+            <!-- Body Recomp Stack -->
+            <article class="card product-card reveal">
+              <img class="product-image" src="/images/products/vial.png" alt="Body Recomp Stack" />
+              <div class="product-body">
+                <span class="label">RESEARCH COMBINATION</span>
+                <h3>Body Recomp Stack</h3>
+                <p>Advanced body recomposition research combination</p>
+                <span class="price">$554.00</span>
+                <button type="button" class="btn-add-cart" data-add-to-cart="body-recomp-stack-def" data-product-name="Body Recomp Stack" data-product-variant="Body Recomp Stack" data-product-price="554.00">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+
           </div>
         </div>
       </section>
@@ -1095,7 +1677,7 @@
           <a href="privacy.html" class="text-link">Privacy</a>
           <a href="cookies.html" class="text-link">Cookies</a>
           <a href="accessibility.html" class="text-link">Accessibility</a>
-          <a href="testing-standards.html" class="text-link">Testing Standards</a>
+          <a href="testing-standards.html" class="text-link">Quality Assurance</a>
           <a href="storage-guidelines.html" class="text-link">Storage Guidelines</a>
           <a href="coa-verification.html" class="text-link">COA Verification</a>
           <a href="research-use.html" class="text-link">Research Use Only</a>
@@ -1125,6 +1707,10 @@
         <a href="checkout.html" class="btn btn-primary cart-checkout-btn is-hidden" id="cart-checkout-btn">Proceed to Checkout</a>
       </div>
     </aside>
+
+    <!-- PROMO POPUP (First-time visitor) -->
+    <!-- Dynamic marketing popup — loaded from admin API -->
+    <div id="marketing-popup-root"></div>
 
     <script src="scripts.js"></script>
   </body>

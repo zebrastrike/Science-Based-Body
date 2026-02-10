@@ -230,50 +230,79 @@ cat > "$APP_DIR/.env.production.template" << 'EOF'
 # =============================================================================
 # PRODUCTION ENVIRONMENT - Science Based Body
 # =============================================================================
-# Copy to .env and fill in values from .env.secrets
+# Copy to .env and fill in values from .env.secrets + your API keys
 
 NODE_ENV=production
 PORT=3001
+FRONTEND_URL=https://sbbpeptides.com
 
-# Database
-DATABASE_URL=postgresql://sbb_user:${DB_PASSWORD}@postgres:5432/science_based_body
+# Database (values auto-generated in .env.secrets)
 DB_USER=sbb_user
 DB_PASSWORD=<from .env.secrets>
 DB_NAME=science_based_body
 
-# Redis
+# Redis (value auto-generated in .env.secrets)
 REDIS_PASSWORD=<from .env.secrets>
 
-# Security
+# Security (values auto-generated in .env.secrets)
 JWT_SECRET=<from .env.secrets>
+JWT_EXPIRATION=24h
+JWT_REFRESH_EXPIRATION=7d
 ENCRYPTION_KEY=<from .env.secrets>
 
 # CORS - Your frontend domains
-CORS_ORIGINS=https://sciencebasedbody.com,https://www.sciencebasedbody.com
+CORS_ORIGINS=https://sbbpeptides.com,https://www.sbbpeptides.com,https://sciencebasedbody.com
 
-# Shippo Shipping
-SHIPPO_API_KEY=
-SHIPPO_RETURN_NAME=Science Based Body
-SHIPPO_RETURN_STREET=
-SHIPPO_RETURN_CITY=
-SHIPPO_RETURN_STATE=
-SHIPPO_RETURN_ZIP=
-SHIPPO_RETURN_COUNTRY=US
+# SMTP Email (Google Workspace)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=<your-google-workspace-email>
+SMTP_PASS=<your-google-app-password>
+SMTP_FROM_EMAIL=noreply@sciencebasedbody.com
+SMTP_FROM_NAME=Science Based Body
+ADMIN_EMAIL=sales@sbbpeptides.com
 
-# Payments (enable when ready)
+# Mailgun (legacy - leave empty, SMTP is primary)
+MAILGUN_API_KEY=
+MAILGUN_DOMAIN=
+
+# Payment Methods
+PAYMENT_ZELLE_NAME=HEALTH SBB
+PAYMENT_ZELLE_PHONE=702-686-5343
+PAYMENT_ZELLE_EMAIL=payments@sciencebasedbody.com
+PAYMENT_VENMO_USERNAME=@healthsbb
+PAYMENT_VENMO_PHONE=702-686-5343
+PAYMENT_VENMO_EMAIL=sales@sbbpeptides.com
+PAYMENT_CASHAPP_TAG=$ScienceBasedBody
+
+# Epicor Propello (enable when ready)
 EPICOR_PROPELLO_ENABLED=false
 
-# Email (leave empty to disable)
-MAILGUN_API_KEY=
+# Shippo Shipping
+SHIPPO_API_KEY=<your-live-shippo-key>
+SHIPPO_RETURN_NAME=SBB Health
+SHIPPO_RETURN_STREET=<your-warehouse-street>
+SHIPPO_RETURN_CITY=Gilbert
+SHIPPO_RETURN_STATE=AZ
+SHIPPO_RETURN_ZIP=<your-zip>
+SHIPPO_RETURN_COUNTRY=US
 
-# Cloudflare R2
+# TaxJar (Sales Tax)
+TAXJAR_API_KEY=<your-live-taxjar-key>
+TAXJAR_FROM_STREET=<your-warehouse-street>
+TAXJAR_FROM_CITY=Gilbert
+TAXJAR_FROM_STATE=AZ
+TAXJAR_FROM_ZIP=<your-zip>
+TAXJAR_FROM_COUNTRY=US
+
+# Cloudflare R2 (when ready)
 R2_ACCOUNT_ID=
 R2_ACCESS_KEY_ID=
 R2_SECRET_ACCESS_KEY=
 R2_BUCKET_NAME=sbb-files
 
 # Compliance
-MINIMUM_AGE=21
+MINIMUM_AGE=18
 
 # Rate limiting
 THROTTLE_TTL=60

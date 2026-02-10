@@ -14,11 +14,13 @@ export type SortOption =
 
 export interface CatalogFilters {
   category?: ProductCategory;
+  subcategory?: string;
   minPrice?: number;
   maxPrice?: number;
   inStock?: boolean;
   featured?: boolean;
   search?: string;
+  includeWholesaleOnly?: boolean;
 }
 
 export interface CatalogOptions extends CatalogFilters {
@@ -38,11 +40,13 @@ export class CatalogService {
   async findAll(options: CatalogOptions) {
     const {
       category,
+      subcategory,
       minPrice,
       maxPrice,
       inStock,
       featured,
       search,
+      includeWholesaleOnly = false,
       page = 1,
       limit = 20,
       sort = 'default',
@@ -53,8 +57,17 @@ export class CatalogService {
     // Build where clause
     const where: Prisma.ProductWhereInput = { isActive: true };
 
+    // Exclude wholesale-only products from public queries
+    if (!includeWholesaleOnly) {
+      where.wholesaleOnly = false;
+    }
+
     if (category) {
       where.category = category;
+    }
+
+    if (subcategory) {
+      where.subcategory = subcategory;
     }
 
     if (featured !== undefined) {
@@ -114,12 +127,22 @@ export class CatalogService {
       sku: product.sku,
       shortDescription: product.shortDescription,
       category: product.category,
+      subcategory: product.subcategory,
       basePrice: Number(product.basePrice),
       compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null,
-      // Price range for variant products
-      priceRange: this.getPriceRange(product),
+      comingSoon: product.comingSoon,
+      // Price range for variant products (exclude wholesale-only variants from public range)
+      priceRange: this.getPriceRange(product, !includeWholesaleOnly),
       hasVariants: product.variants.length > 0,
       variantCount: product.variants.length,
+      variants: product.variants.map((v) => ({
+        id: v.id,
+        sku: v.sku,
+        name: v.name,
+        strength: v.strength,
+        price: Number(v.price),
+        wholesaleOnly: v.wholesaleOnly,
+      })),
       primaryImage: product.images[0]?.url || null,
       images: product.images,
       inStock: product.inventory
@@ -160,7 +183,7 @@ export class CatalogService {
     // In production, this would aggregate from OrderItem counts
     // For now, use featured products as proxy
     const products = await this.prisma.product.findMany({
-      where: { isActive: true, isFeatured: true },
+      where: { isActive: true, isFeatured: true, wholesaleOnly: false },
       take: limit,
       include: {
         variants: { where: { isActive: true } },
@@ -202,16 +225,22 @@ export class CatalogService {
       throw new NotFoundException('Product not found');
     }
 
+    // Strip internal fields (costPerUnit) — never expose to public API
+    const { costPerUnit: _cpu, ...safeProduct } = product as any;
+
     return {
-      ...product,
+      ...safeProduct,
       basePrice: Number(product.basePrice),
       compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null,
       priceRange: this.getPriceRange(product),
-      variants: product.variants.map((v) => ({
-        ...v,
-        price: Number(v.price),
-        compareAtPrice: v.compareAtPrice ? Number(v.compareAtPrice) : null,
-      })),
+      variants: product.variants.map((v) => {
+        const { costPerUnit: _vCpu, ...safeVariant } = v as any;
+        return {
+          ...safeVariant,
+          price: Number(v.price),
+          compareAtPrice: v.compareAtPrice ? Number(v.compareAtPrice) : null,
+        };
+      }),
       currentBatch: product.batches[0] || null,
       inStock: product.inventory
         ? product.inventory.quantity > product.inventory.reservedQuantity
@@ -246,7 +275,7 @@ export class CatalogService {
   async getCategories() {
     const categoryCounts = await this.prisma.product.groupBy({
       by: ['category'],
-      where: { isActive: true },
+      where: { isActive: true, wholesaleOnly: false },
       _count: { category: true },
     });
 
@@ -268,7 +297,7 @@ export class CatalogService {
    */
   async getFeatured(limit = 4) {
     const products = await this.prisma.product.findMany({
-      where: { isActive: true, isFeatured: true },
+      where: { isActive: true, isFeatured: true, wholesaleOnly: false },
       take: limit,
       include: {
         images: { where: { isPrimary: true } },
@@ -300,6 +329,7 @@ export class CatalogService {
     const products = await this.prisma.product.findMany({
       where: {
         isActive: true,
+        wholesaleOnly: false,
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
           { shortDescription: { contains: query, mode: 'insensitive' } },
@@ -323,13 +353,21 @@ export class CatalogService {
   }
 
   /**
-   * Get related products for a product
+   * Get related products for a product (accepts slug or ID)
    */
-  async getRelatedProducts(productId: string, limit = 4) {
-    const product = await this.prisma.product.findUnique({
-      where: { id: productId },
-      select: { category: true },
+  async getRelatedProducts(slugOrId: string, limit = 4) {
+    // Try slug first (controller passes slug from URL), fall back to ID
+    let product = await this.prisma.product.findUnique({
+      where: { slug: slugOrId },
+      select: { id: true, category: true },
     });
+
+    if (!product) {
+      product = await this.prisma.product.findUnique({
+        where: { id: slugOrId },
+        select: { id: true, category: true },
+      });
+    }
 
     if (!product) {
       return [];
@@ -338,8 +376,9 @@ export class CatalogService {
     const related = await this.prisma.product.findMany({
       where: {
         isActive: true,
+        wholesaleOnly: false,
         category: product.category,
-        id: { not: productId },
+        id: { not: product.id },
       },
       take: limit,
       include: {
@@ -376,12 +415,18 @@ export class CatalogService {
 
   // ========== Helper Methods ==========
 
-  private getPriceRange(product: any): { min: number; max: number } | null {
+  private getPriceRange(product: any, excludeWholesale = false): { min: number; max: number } | null {
     if (!product.variants || product.variants.length === 0) {
       return null;
     }
 
-    const prices = product.variants.map((v: any) => Number(v.price));
+    let variants = product.variants;
+    if (excludeWholesale) {
+      variants = variants.filter((v: any) => !v.wholesaleOnly);
+      if (variants.length === 0) return null;
+    }
+
+    const prices = variants.map((v: any) => Number(v.price));
     return {
       min: Math.min(...prices),
       max: Math.max(...prices),
