@@ -14,7 +14,7 @@ COPY apps/web/ ./
 
 # Copy legacy HTML files and assets from repo root
 COPY index.html shop.html product.html branded-for-science.html brand-partnerships.html affiliate-program.html ./
-COPY checkout.html about.html support.html faq.html tracking.html ./
+COPY checkout.html about.html support.html faq.html tracking.html login.html ./
 COPY testing-standards.html storage-guidelines.html coa-verification.html ./
 COPY terms.html privacy.html shipping.html returns.html ./
 COPY research-use.html compliance.html cookies.html accessibility.html ./
