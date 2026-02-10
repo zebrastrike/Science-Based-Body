@@ -272,12 +272,6 @@ export class EpicorPropelloService {
         instructions:
           'Send payment via Venmo to the username provided. Include your invoice number in the note.',
       },
-      cashapp: {
-        enabled: true,
-        tag: this.config.get('PAYMENT_CASHAPP_TAG'),
-        instructions:
-          'Send payment via CashApp to the tag provided. Include your invoice number in the note.',
-      },
     };
   }
 }

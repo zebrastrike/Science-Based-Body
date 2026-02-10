@@ -413,8 +413,9 @@ button.btn {
   align-items: center;
   padding: 10px 0;
   gap: 0;
-  width: min(1400px, 97%);
+  width: min(1400px, 98%);
   margin: 0 auto;
+  margin-left: 12px;
 }
 
 .logo {
@@ -428,7 +429,7 @@ button.btn {
 }
 
 .logo img {
-  height: 46px;
+  height: 92px;
   width: auto;
   display: block;
 }
@@ -2561,7 +2562,7 @@ body.is-ready .reveal {
   }
 
   .logo img {
-    height: 42px;
+    height: 80px;
   }
 }
 
@@ -3318,7 +3319,7 @@ body.is-ready .reveal {
   }
 
   .logo img {
-    height: 36px;
+    height: 64px;
   }
 
   .section-heading h1 {

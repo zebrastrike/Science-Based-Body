@@ -51,7 +51,6 @@ enum PaymentMethod {
   EPICOR_PROPELLO
   WIRE_TRANSFER
   ZELLE
-  CASHAPP
   VENMO
   CRYPTO
 }
@@ -594,7 +593,7 @@ model Payment {
   propelloPaymentIntentId String?
 
   // Manual payments
-  referenceNumber String?       // Zelle/CashApp/Wire reference
+  referenceNumber String?       // Zelle/Venmo/Wire reference
   proofFileId     String?
   proofFile       File?         @relation(fields: [proofFileId], references: [id])
 
@@ -629,7 +628,7 @@ model PaymentLink {
   currency        String    @default("USD")
 
   status          String    @default("PENDING") // PENDING, PAID, EXPIRED, CANCELLED
-  paymentMethods  Json      @default("[]") // ["Zelle", "Wire", "CashApp", "Crypto"]
+  paymentMethods  Json      @default("[]") // ["Zelle", "Venmo", "Wire", "Crypto"]
   paymentMethod   String?   // Method used when paid
 
   notes           String?

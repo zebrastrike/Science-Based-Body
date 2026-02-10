@@ -299,18 +299,6 @@ export class EmailTemplatesService {
           </tr>
         </table>
 
-        <!-- CashApp -->
-        <table role="presentation" style="width:100%;">
-          <tr>
-            <td style="width:36px;vertical-align:top;padding-top:2px;">
-              <div style="width:32px;height:32px;border-radius:8px;background:${this.rose};text-align:center;line-height:32px;font-weight:700;font-size:14px;color:#ffffff;">$</div>
-            </td>
-            <td style="padding-left:12px;">
-              <strong style="color:${this.ink};font-size:15px;">CashApp</strong><br>
-              <span style="color:${this.ink};font-size:14px;">Tag: <strong>$ScienceBasedBody</strong></span>
-            </td>
-          </tr>
-        </table>
       </div>
 
       <!-- Important note -->
@@ -379,7 +367,7 @@ export class EmailTemplatesService {
       </p>
     `, `Order #${order.orderNumber} received - Please complete payment`);
 
-    const text = `Thank You for Your Order - #${order.orderNumber}\n\nTotal Due: $${order.total.toFixed(2)}\n\nPlease send payment via one of the following:\n\nZelle: HEALTH SBB - 702-686-5343\nVenmo: @healthsbb - 702-686-5343\nCashApp: $ScienceBasedBody\n\nIMPORTANT: Include invoice #${order.orderNumber} in the payment note.\n\nOnce payment is received, your order will be processed and shipped.\n\nView order: https://sciencebasedbody.com/account/orders/${order.orderNumber}`;
+    const text = `Thank You for Your Order - #${order.orderNumber}\n\nTotal Due: $${order.total.toFixed(2)}\n\nPlease send payment via one of the following:\n\nZelle: HEALTH SBB - 702-686-5343\nVenmo: @healthsbb - 702-686-5343\n\nIMPORTANT: Include invoice #${order.orderNumber} in the payment note.\n\nOnce payment is received, your order will be processed and shipped.\n\nView order: https://sciencebasedbody.com/account/orders/${order.orderNumber}`;
     return { subject, html, text };
   }
 

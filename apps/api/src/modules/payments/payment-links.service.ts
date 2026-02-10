@@ -67,7 +67,7 @@ export class PaymentLinksService {
       customerName,
       amount,
       expiresInHours = 48,
-      paymentMethods = ['Zelle', 'Wire', 'CashApp', 'Crypto'],
+      paymentMethods = ['Zelle', 'Venmo', 'Wire', 'Crypto'],
       notes,
       sendEmail = true,
     } = data;

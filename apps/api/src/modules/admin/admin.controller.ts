@@ -151,7 +151,7 @@ export class AdminController {
   // ==========================================================================
 
   @Post('orders/:id/approve-payment')
-  @ApiOperation({ summary: 'Approve Zelle/CashApp payment for an order' })
+  @ApiOperation({ summary: 'Approve Zelle/Venmo payment for an order' })
   @ApiParam({ name: 'id', description: 'Order ID' })
   @ApiResponse({ status: 200, description: 'Payment approved' })
   @ApiResponse({ status: 400, description: 'Payment already verified or no payment found' })

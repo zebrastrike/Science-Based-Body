@@ -1859,7 +1859,7 @@ export class AdminService {
   // ==========================================================================
 
   /**
-   * Admin approves a pending Zelle/CashApp payment
+   * Admin approves a pending Zelle/Venmo payment
    */
   async approvePayment(orderId: string, adminId: string, notes?: string) {
     const order = await this.prisma.order.findUnique({

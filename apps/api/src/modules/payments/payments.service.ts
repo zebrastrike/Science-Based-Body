@@ -97,12 +97,6 @@ export class PaymentsService {
           phone: fallback.venmo.phone,
           instructions: `Send $[amount] via Venmo to ${fallback.venmo.username} (${fallback.venmo.phone}). Include invoice number ${orderNumber} in the note.`,
         };
-      case 'CASHAPP':
-        return {
-          method: 'CashApp',
-          tag: fallback.cashapp.tag,
-          instructions: `Send $[amount] via CashApp to ${fallback.cashapp.tag}. Include invoice number ${orderNumber} in the note.`,
-        };
       case 'WIRE_TRANSFER':
         return {
           method: 'Wire Transfer',
@@ -374,15 +368,6 @@ export class PaymentsService {
       methods.push({
         id: 'VENMO',
         name: 'Venmo',
-        type: 'manual',
-        enabled: true,
-      });
-    }
-
-    if (fallback.cashapp.enabled) {
-      methods.push({
-        id: 'CASHAPP',
-        name: 'CashApp',
         type: 'manual',
         enabled: true,
       });

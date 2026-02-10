@@ -76,7 +76,7 @@
               <div class="checkout-step-number">2</div>
               <div class="checkout-step-content">
                 <strong>Send Payment</strong>
-                <p>You'll receive an email with payment instructions. Send via Zelle, Venmo, or CashApp.</p>
+                <p>You'll receive an email with payment instructions. Send via Zelle or Venmo.</p>
               </div>
             </div>
             <div class="checkout-step-divider"></div>
@@ -232,13 +232,6 @@
                       <span class="payment-label">
                         <strong>Venmo</strong>
                         <span>@healthsbb &middot; 702-686-5343</span>
-                      </span>
-                    </label>
-                    <label class="payment-option">
-                      <input type="radio" name="paymentMethod" value="cashapp" />
-                      <span class="payment-label">
-                        <strong>CashApp</strong>
-                        <span>$ScienceBasedBody</span>
                       </span>
                     </label>
                   </div>
@@ -677,8 +670,7 @@
         /* ── Payment method mapping ────────────────────── */
         var PAYMENT_MAP = {
           zelle:   'ZELLE',
-          venmo:   'VENMO',
-          cashapp: 'CASHAPP'
+          venmo:   'VENMO'
         };
 
         /* ── Form submit → API ─────────────────────────── */

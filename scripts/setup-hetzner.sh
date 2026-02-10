@@ -273,7 +273,6 @@ PAYMENT_ZELLE_EMAIL=payments@sciencebasedbody.com
 PAYMENT_VENMO_USERNAME=@healthsbb
 PAYMENT_VENMO_PHONE=702-686-5343
 PAYMENT_VENMO_EMAIL=sales@sbbpeptides.com
-PAYMENT_CASHAPP_TAG=$ScienceBasedBody
 
 # Epicor Propello (enable when ready)
 EPICOR_PROPELLO_ENABLED=false
