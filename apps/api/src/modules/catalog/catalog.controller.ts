@@ -46,7 +46,7 @@ export class CatalogController {
       category,
       page: page ? Number(page) : undefined,
       limit: limit ? Number(limit) : undefined,
-      featured: featured === true || featured === 'true' as any,
+      featured: featured !== undefined ? (featured === true || featured === 'true' as any) : undefined,
       sort,
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
