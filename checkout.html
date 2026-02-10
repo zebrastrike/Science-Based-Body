@@ -245,9 +245,19 @@
                   </div>
                 </div>
 
+                <!-- Discount Code (Optional) -->
+                <div class="card checkout-step">
+                  <h2>5. Discount Code</h2>
+                  <div style="display:flex;gap:8px;align-items:flex-end;">
+                    <input type="text" id="discount-code" name="discountCode" placeholder="Enter code (e.g. WELCOME10)" style="flex:1;text-transform:uppercase;" autocomplete="off" />
+                    <button type="button" id="apply-discount" class="btn btn-primary" style="white-space:nowrap;padding:10px 20px;">Apply</button>
+                  </div>
+                  <p id="discount-feedback" style="font-size:0.85rem;margin-top:6px;"></p>
+                </div>
+
                 <!-- Compliance Acknowledgments (REQUIRED) -->
                 <div class="card checkout-step compliance-section">
-                  <h2>5. Research Use Acknowledgment</h2>
+                  <h2>6. Research Use Acknowledgment</h2>
                   <p class="compliance-intro">
                     <strong>Important:</strong> All products are sold for research and educational purposes only.
                     You must acknowledge and agree to the following statements to complete your order.
@@ -418,6 +428,15 @@
         let resolvedItems = [];
         let subtotal = 0;
         let taxAmount = 0;
+        let appliedDiscount = null;
+
+        /* ── Auth header helper ── */
+        function authHeaders() {
+          var h = { 'Content-Type': 'application/json' };
+          var token = localStorage.getItem('accessToken');
+          if (token) h['Authorization'] = 'Bearer ' + token;
+          return h;
+        }
 
         /* ── Pre-fill from logged-in user or show auth banner ── */
         try {
@@ -648,7 +667,7 @@
           try {
             const res = await fetch(API_BASE + '/checkout/resolve-cart', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: authHeaders(),
               body: JSON.stringify({
                 items: cart.map(item => ({
                   cartId: item.id,
@@ -721,6 +740,34 @@
           venmo:   'VENMO'
         };
 
+        /* ── Discount Code ─────────────────────────── */
+        var discountBtn = document.getElementById('apply-discount');
+        var discountInput = document.getElementById('discount-code');
+        var discountFeedback = document.getElementById('discount-feedback');
+        if (discountBtn) {
+          discountBtn.addEventListener('click', async () => {
+            var code = (discountInput.value || '').trim().toUpperCase();
+            if (!code) { discountFeedback.textContent = 'Please enter a code.'; discountFeedback.style.color = '#92400e'; return; }
+            discountFeedback.textContent = 'Checking…';
+            discountFeedback.style.color = '#71717a';
+            try {
+              var r = await fetch(API_BASE + '/cart/validate-discount?code=' + encodeURIComponent(code) + '&subtotal=' + subtotal, { headers: authHeaders() });
+              var d = await r.json();
+              if (!r.ok) throw new Error(d.message || 'Invalid code');
+              appliedDiscount = code;
+              var desc = d.type === 'PERCENTAGE' ? (d.value + '% off') : ('$' + d.value.toFixed(2) + ' off');
+              discountFeedback.innerHTML = '<strong>' + code + '</strong> applied — ' + desc;
+              discountFeedback.style.color = '#166534';
+              discountInput.disabled = true;
+              discountBtn.disabled = true;
+            } catch (err) {
+              appliedDiscount = null;
+              discountFeedback.textContent = err.message;
+              discountFeedback.style.color = '#dc2626';
+            }
+          });
+        }
+
         /* ── Form submit → API ─────────────────────────── */
         checkoutForm.addEventListener('submit', async (e) => {
           e.preventDefault();
@@ -784,6 +831,7 @@
               termsAccepted:         !!fd.get('termsAccepted')
             },
             guestEmail: fd.get('email'),
+            discountCode: appliedDiscount || undefined,
             taxAmount: taxAmount,
             affiliateReferralCode: (document.cookie.match(/sbb_ref=([^;]+)/) || [])[1] || undefined
           };
@@ -791,7 +839,7 @@
           try {
             const res = await fetch(API_BASE + '/checkout/create-order', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: authHeaders(),
               body: JSON.stringify(payload)
             });
 

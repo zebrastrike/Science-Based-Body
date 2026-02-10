@@ -44,6 +44,18 @@ export class CartController {
     return this.cartService.applyDiscountCode(cart, dto.code);
   }
 
+  @Get('validate-discount')
+  @Public()
+  @ApiOperation({ summary: 'Validate a discount code without applying it' })
+  @ApiResponse({ status: 200, description: 'Discount code is valid' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired discount code' })
+  async validateDiscount(
+    @Query('code') code: string,
+    @Query('subtotal') subtotal: string,
+  ) {
+    return this.cartService.validateDiscountCode(code, Number(subtotal) || 0);
+  }
+
   @Get('shipping-rates')
   @Public()
   @ApiOperation({ summary: 'Get shipping rates for cart' })

@@ -156,6 +156,33 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl:ro
       - certbot_webroot:/var/www/certbot:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      # Legacy static site files (HTML, CSS, JS, images)
+      - ./index.html:/etc/nginx/site/index.html:ro
+      - ./shop.html:/etc/nginx/site/shop.html:ro
+      - ./checkout.html:/etc/nginx/site/checkout.html:ro
+      - ./about.html:/etc/nginx/site/about.html:ro
+      - ./faq.html:/etc/nginx/site/faq.html:ro
+      - ./support.html:/etc/nginx/site/support.html:ro
+      - ./terms.html:/etc/nginx/site/terms.html:ro
+      - ./privacy.html:/etc/nginx/site/privacy.html:ro
+      - ./shipping.html:/etc/nginx/site/shipping.html:ro
+      - ./returns.html:/etc/nginx/site/returns.html:ro
+      - ./compliance.html:/etc/nginx/site/compliance.html:ro
+      - ./cookies.html:/etc/nginx/site/cookies.html:ro
+      - ./research-use.html:/etc/nginx/site/research-use.html:ro
+      - ./testing-standards.html:/etc/nginx/site/testing-standards.html:ro
+      - ./storage-guidelines.html:/etc/nginx/site/storage-guidelines.html:ro
+      - ./coa-verification.html:/etc/nginx/site/coa-verification.html:ro
+      - ./accessibility.html:/etc/nginx/site/accessibility.html:ro
+      - ./tracking.html:/etc/nginx/site/tracking.html:ro
+      - ./product.html:/etc/nginx/site/product.html:ro
+      - ./brand-partnerships.html:/etc/nginx/site/brand-partnerships.html:ro
+      - ./branded-for-science.html:/etc/nginx/site/branded-for-science.html:ro
+      - ./affiliate-program.html:/etc/nginx/site/affiliate-program.html:ro
+      - ./login.html:/etc/nginx/site/login.html:ro
+      - ./styles.css:/etc/nginx/site/styles.css:ro
+      - ./scripts.js:/etc/nginx/site/scripts.js:ro
+      - ./images:/etc/nginx/site/images:ro
     depends_on:
       - api
       - web
