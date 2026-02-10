@@ -145,9 +145,9 @@ export class CartService {
         variantQuantities.set(key, (variantQuantities.get(key) || 0) + item.quantity);
       }
 
-      // Check inventory
+      // Check inventory — allow special order items (leadTimeDays set) even when stock is 0
       const inventory = product.inventory;
-      if (inventory && inventory.quantity < item.quantity) {
+      if (inventory && inventory.quantity < item.quantity && !inventory.leadTimeDays) {
         throw new BadRequestException(`Insufficient stock for ${product.name}`);
       }
 

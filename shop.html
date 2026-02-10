@@ -151,6 +151,7 @@
       <!-- SIDEBAR NAVIGATION -->
       <aside class="shop-sidebar" id="shop-sidebar">
         <nav class="shop-sidebar-nav">
+          <a href="#in-stock-spotlight" class="shop-sidebar-link" data-section="in-stock-spotlight" style="color:var(--sage);font-weight:600;">&#9733; In Stock</a>
           <a href="#metabolic" class="shop-sidebar-link" data-section="metabolic">Metabolic</a>
           <a href="#recovery" class="shop-sidebar-link" data-section="recovery">Recovery</a>
           <a href="#growth-hormone" class="shop-sidebar-link" data-section="growth-hormone">Growth Hormone</a>
@@ -171,6 +172,23 @@
           <a href="#stacks" class="shop-sidebar-link" data-section="stacks">Stacks</a>
         </nav>
       </aside>
+
+      <!-- ============================================================ -->
+      <!-- IN-STOCK CAROUSEL — Ready to Ship Today -->
+      <!-- ============================================================ -->
+      <section class="section" id="in-stock-spotlight">
+        <div class="container">
+          <div class="section-heading reveal">
+            <span class="label">READY TO SHIP</span>
+            <h2>In Stock &mdash; Ships Today</h2>
+          </div>
+          <div class="carousel-wrap">
+            <button class="carousel-arrow carousel-prev" aria-label="Previous">&lsaquo;</button>
+            <div class="carousel-track" id="instock-carousel"></div>
+            <button class="carousel-arrow carousel-next" aria-label="Next">&rsaquo;</button>
+          </div>
+        </div>
+      </section>
 
       <!-- ============================================================ -->
       <!-- METABOLIC -->
@@ -1714,23 +1732,45 @@
 
     <script src="scripts.js"></script>
     <script>
-      // Dynamic stock badge injection — fetches live inventory from API
+      // Dynamic stock badges + in-stock carousel — single API fetch
       (function() {
         var API = window.SBB_CONFIG ? window.SBB_CONFIG.API_URL : 'https://api.sbbpeptides.com/api/v1';
         fetch(API + '/catalog/products?limit=100')
           .then(function(r) { return r.json(); })
           .then(function(data) {
             var products = data.products || [];
-            var stockMap = {};
+            var slugMap = {};
+            var nameMap = {};
+            var inStockProducts = [];
             products.forEach(function(p) {
-              stockMap[p.slug] = { inStock: p.inStock, qty: p.stockQuantity || 0, lead: p.leadTimeDays };
+              var info = { inStock: p.inStock, qty: p.stockQuantity || 0, lead: p.leadTimeDays,
+                           name: p.name, slug: p.slug, category: p.category || '',
+                           price: p.basePrice, priceRange: p.priceRange, primaryImage: p.primaryImage };
+              slugMap[p.slug] = info;
+              nameMap[p.name.toLowerCase().trim()] = info;
+              if (info.qty > 0) inStockProducts.push(info);
             });
-            document.querySelectorAll('.variant-select[data-product-slug]').forEach(function(sel) {
-              var slug = sel.getAttribute('data-product-slug');
-              var info = stockMap[slug];
-              var card = sel.closest('.product-card');
-              if (!card) return;
-              // Remove any existing badge
+
+            /* ---- Stock badges on every product card ---- */
+            document.querySelectorAll('.card.product-card').forEach(function(card) {
+              var info = null;
+              var sel = card.querySelector('.variant-select[data-product-slug]');
+              if (sel) info = slugMap[sel.getAttribute('data-product-slug')];
+              if (!info) {
+                var btn = card.querySelector('[data-add-to-cart]');
+                if (btn) {
+                  var cartId = btn.getAttribute('data-add-to-cart');
+                  if (slugMap[cartId]) { info = slugMap[cartId]; }
+                  if (!info) {
+                    var stripped = cartId.replace(/-\d+m[gl]$/i, '');
+                    if (slugMap[stripped]) info = slugMap[stripped];
+                  }
+                }
+              }
+              if (!info) {
+                var h3 = card.querySelector('h3');
+                if (h3) info = nameMap[h3.textContent.toLowerCase().trim()];
+              }
               var old = card.querySelector('.stock-badge');
               if (old) old.remove();
               var badge = document.createElement('span');
@@ -1742,11 +1782,66 @@
                 var days = (info && info.lead) ? info.lead : 7;
                 badge.textContent = 'Special Order \u2014 Ships in ' + days + ' business days';
               }
-              // Insert badge after the price
               var priceEl = card.querySelector('.price');
               if (priceEl && priceEl.parentNode) {
                 priceEl.parentNode.insertBefore(badge, priceEl.nextSibling);
               }
+            });
+
+            /* ---- In-Stock Carousel ---- */
+            var track = document.getElementById('instock-carousel');
+            if (!track || inStockProducts.length === 0) return;
+
+            inStockProducts.forEach(function(p) {
+              var priceText = p.priceRange
+                ? ('From $' + (p.priceRange.min != null ? p.priceRange.min.toFixed(2) : p.price.toFixed(2)))
+                : ('$' + (p.price || 0).toFixed(2));
+              var cat = (p.category || '').replace(/_/g, ' ');
+              var card = document.createElement('article');
+              card.className = 'card product-card reveal';
+              card.innerHTML =
+                '<img class="product-image" src="' + (p.primaryImage || '/images/products/vial.png') + '" alt="' + p.name + '" />' +
+                '<div class="product-body">' +
+                  '<span class="carousel-card-cat">' + cat + '</span>' +
+                  '<h3>' + p.name + '</h3>' +
+                  '<span class="price">' + priceText + '</span>' +
+                  '<span class="stock-badge stock-in">In Stock</span>' +
+                  '<a href="#' + (p.category || '').toLowerCase().replace(/_/g, '-') + '" class="btn btn-primary" style="font-size:.82rem;padding:8px 16px;margin-top:8px;">View Options</a>' +
+                '</div>';
+              track.appendChild(card);
+            });
+
+            // Carousel navigation
+            var idx = 0;
+            var perPage = window.innerWidth <= 480 ? 1 : (window.innerWidth <= 768 ? 2 : 3);
+            var maxIdx = Math.max(0, inStockProducts.length - perPage);
+            function slideTo(i) {
+              idx = Math.max(0, Math.min(i, maxIdx));
+              var pct = idx * (100 / perPage);
+              track.style.transform = 'translateX(-' + pct + '%)';
+            }
+            var wrap = track.parentElement;
+            var prevBtn = wrap.querySelector('.carousel-prev');
+            var nextBtn = wrap.querySelector('.carousel-next');
+            if (prevBtn) prevBtn.addEventListener('click', function() { slideTo(idx - 1); });
+            if (nextBtn) nextBtn.addEventListener('click', function() { slideTo(idx + 1); });
+
+            // Auto-advance every 5s
+            var autoTimer = setInterval(function() {
+              if (idx >= maxIdx) { slideTo(0); } else { slideTo(idx + 1); }
+            }, 5000);
+            wrap.addEventListener('mouseenter', function() { clearInterval(autoTimer); });
+            wrap.addEventListener('mouseleave', function() {
+              autoTimer = setInterval(function() {
+                if (idx >= maxIdx) { slideTo(0); } else { slideTo(idx + 1); }
+              }, 5000);
+            });
+
+            // Update perPage on resize
+            window.addEventListener('resize', function() {
+              perPage = window.innerWidth <= 480 ? 1 : (window.innerWidth <= 768 ? 2 : 3);
+              maxIdx = Math.max(0, inStockProducts.length - perPage);
+              slideTo(Math.min(idx, maxIdx));
             });
           })
           .catch(function(err) { console.warn('Stock badge fetch failed:', err); });

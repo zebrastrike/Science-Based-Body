@@ -804,10 +804,12 @@
 
             // Clear cart
             localStorage.setItem('sbb_cart', '[]');
-            if (window.SBBCart) {
-              window.SBBCart.items = [];
-              window.SBBCart.updateBadge();
-            }
+            try {
+              if (window.SBBCart && typeof window.SBBCart.updateBadge === 'function') {
+                window.SBBCart.items = [];
+                window.SBBCart.updateBadge();
+              }
+            } catch (e) { console.warn('Cart badge update skipped:', e); }
 
             // Populate confirmation modal
             var orderNumber = (data.order && data.order.orderNumber) || 'N/A';
