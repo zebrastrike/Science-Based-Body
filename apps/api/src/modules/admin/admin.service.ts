@@ -64,11 +64,10 @@ export class AdminService {
       this.prisma.user.count({
         where: { status: UserStatus.ACTIVE },
       }),
-      this.prisma.inventory.count({
-        where: {
-          quantity: { lte: this.prisma.inventory.fields.lowStockThreshold },
-        },
-      }),
+      this.prisma.$queryRaw<[{ count: bigint }]>`
+        SELECT COUNT(*) as count FROM "Inventory"
+        WHERE quantity <= low_stock_threshold
+      `.then((r) => Number(r[0]?.count || 0)),
     ]);
 
     return {

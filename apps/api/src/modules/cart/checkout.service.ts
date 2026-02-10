@@ -421,6 +421,8 @@ export class CheckoutService {
       productName: string;
       variantName?: string;
       unitPrice: number;
+      inStock: boolean;
+      leadTimeDays: number | null;
     }> = [];
     const unresolved: Array<{
       cartId: string;
@@ -485,6 +487,14 @@ export class CheckoutService {
         variant = product.variants[0];
       }
 
+      // Check inventory for special-order status
+      const inventory = await this.prisma.inventory.findFirst({
+        where: variant ? { variantId: variant.id } : { productId: product.id },
+        select: { quantity: true, leadTimeDays: true },
+      });
+      const inStock = inventory ? inventory.quantity > 0 : false;
+      const leadTimeDays = inventory?.leadTimeDays || null;
+
       resolved.push({
         productId: product.id,
         variantId: variant?.id,
@@ -492,6 +502,8 @@ export class CheckoutService {
         productName: product.name,
         variantName: variant?.name,
         unitPrice: variant ? Number(variant.price) : Number(product.basePrice),
+        inStock,
+        leadTimeDays,
       });
     }
 

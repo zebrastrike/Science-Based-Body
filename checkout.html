@@ -329,6 +329,27 @@
         </div>
       </section>
 
+      <!-- Special Order Warning Modal -->
+      <div class="modal" id="special-order-modal" aria-hidden="true">
+        <div class="modal-overlay"></div>
+        <div class="modal-card">
+          <div class="modal-body" style="text-align:center;">
+            <div style="margin-bottom:12px;">
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#e3a7a1" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </div>
+            <h2 style="margin-bottom:8px;">Special Order Notice</h2>
+            <p style="margin-bottom:12px;">Your cart contains <strong>special-order item(s)</strong> that are not currently in stock:</p>
+            <ul id="special-order-list" style="text-align:left;margin:0 auto 16px;max-width:360px;list-style:none;padding:0;"></ul>
+            <p style="margin-bottom:20px;color:var(--rose,#e3a7a1);font-weight:600;">These items require an additional <strong>7–14 business days</strong> lead time before shipment.</p>
+            <button type="button" class="btn btn-primary" id="special-order-ok" style="margin-right:10px;">OK, Continue to Checkout</button>
+            <a href="shop.html" class="btn" style="background:transparent;border:1px solid var(--glass-border,rgba(255,255,255,0.2));color:var(--ink,#1f2a36);">Back to Shop</a>
+          </div>
+        </div>
+      </div>
+
       <!-- Order Confirmation Modal -->
       <div class="modal" id="order-confirmation-modal" aria-hidden="true">
         <div class="modal-overlay" data-modal-close></div>
@@ -732,6 +753,26 @@
         loadCheckoutItems().then(function () {
           // Trigger initial tax calculation once items are resolved
           calculateTax();
+
+          // Check for special-order items and show warning
+          var specialItems = resolvedItems.filter(function (item) { return !item.inStock && item.leadTimeDays; });
+          if (specialItems.length > 0) {
+            var soModal = document.getElementById('special-order-modal');
+            var soList = document.getElementById('special-order-list');
+            soList.innerHTML = specialItems.map(function (item) {
+              return '<li style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.08);">' +
+                '<strong>' + item.productName + '</strong>' +
+                (item.variantName ? ' — ' + item.variantName : '') +
+                ' <span style="color:var(--sage,#b9cbb6);font-size:0.85em;">(~' + item.leadTimeDays + ' day lead time)</span></li>';
+            }).join('');
+            soModal.classList.add('is-open');
+            soModal.setAttribute('aria-hidden', 'false');
+
+            document.getElementById('special-order-ok').addEventListener('click', function () {
+              soModal.classList.remove('is-open');
+              soModal.setAttribute('aria-hidden', 'true');
+            });
+          }
         });
 
         /* ── Payment method mapping ────────────────────── */
@@ -867,7 +908,12 @@
             var instrEl   = document.getElementById('payment-instructions');
             var instrText = document.getElementById('payment-instructions-text');
             if (data.payment && data.payment.instructions) {
-              instrText.textContent = data.payment.instructions;
+              var pi = data.payment.instructions;
+              if (typeof pi === 'object') {
+                instrText.textContent = pi.instructions || (pi.method + ': ' + JSON.stringify(pi));
+              } else {
+                instrText.textContent = pi;
+              }
               instrEl.style.display = 'block';
             }
 

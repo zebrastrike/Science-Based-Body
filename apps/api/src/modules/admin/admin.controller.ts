@@ -47,6 +47,13 @@ export class AdminController {
     return this.adminService.getDashboardStats();
   }
 
+  @Get('dashboard/stats')
+  @ApiOperation({ summary: 'Get dashboard statistics (alias)' })
+  @ApiResponse({ status: 200, description: 'Dashboard stats' })
+  getDashboardStatsAlias() {
+    return this.adminService.getDashboardStats();
+  }
+
   @Get('dashboard/recent-orders')
   @ApiOperation({ summary: 'Get recent orders for dashboard' })
   @ApiQuery({ name: 'limit', required: false, type: Number })

@@ -38,9 +38,9 @@ export class SmtpService {
     const port = this.config.get('SMTP_PORT', 587);
     const user = this.config.get('SMTP_USER', '');
     const pass = this.config.get('SMTP_PASS', '');
-    this.fromEmail = this.config.get('SMTP_FROM_EMAIL', 'noreply@sciencebasedbody.com');
+    this.fromEmail = this.config.get('SMTP_FROM_EMAIL', 'noreply@sbbpeptides.com');
     this.fromName = this.config.get('SMTP_FROM_NAME', 'Science Based Body');
-    this.adminEmail = this.config.get('ADMIN_EMAIL', 'admin@sciencebasedbody.com');
+    this.adminEmail = this.config.get('ADMIN_EMAIL', 'sales@sbbpeptides.com');
     this.testEmailRedirect = this.config.get('TEST_EMAIL_REDIRECT', '');
     this.isEnabled = !!user && !!pass;
 

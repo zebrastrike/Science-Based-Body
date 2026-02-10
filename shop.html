@@ -1745,7 +1745,8 @@
             products.forEach(function(p) {
               var info = { inStock: p.inStock, qty: p.stockQuantity || 0, lead: p.leadTimeDays,
                            name: p.name, slug: p.slug, category: p.category || '',
-                           price: p.basePrice, priceRange: p.priceRange, primaryImage: p.primaryImage };
+                           price: p.basePrice, priceRange: p.priceRange, primaryImage: p.primaryImage,
+                           variants: p.variants || [] };
               slugMap[p.slug] = info;
               nameMap[p.name.toLowerCase().trim()] = info;
               if (info.qty > 0) inStockProducts.push(info);
@@ -1779,8 +1780,7 @@
                 badge.textContent = 'In Stock';
               } else {
                 badge.className = 'stock-badge stock-special';
-                var days = (info && info.lead) ? info.lead : 7;
-                badge.textContent = 'Special Order \u2014 Ships in ' + days + ' business days';
+                badge.textContent = 'Available for Special Order';
               }
               var priceEl = card.querySelector('.price');
               if (priceEl && priceEl.parentNode) {
@@ -1793,9 +1793,11 @@
             if (!track || inStockProducts.length === 0) return;
 
             inStockProducts.forEach(function(p) {
-              var priceText = p.priceRange
-                ? ('From $' + (p.priceRange.min != null ? p.priceRange.min.toFixed(2) : p.price.toFixed(2)))
-                : ('$' + (p.price || 0).toFixed(2));
+              // Use first variant price if available, else basePrice
+              var firstVariant = (p.variants && p.variants.length > 0) ? p.variants[0] : null;
+              var displayPrice = firstVariant ? firstVariant.price : (p.price || 0);
+              var variantName = firstVariant ? firstVariant.name : '';
+              var cartSlug = p.slug + (variantName ? '-' + variantName.toLowerCase().replace(/[^a-z0-9]+/g, '') : '');
               var cat = (p.category || '').replace(/_/g, ' ');
               var card = document.createElement('article');
               card.className = 'card product-card reveal';
@@ -1804,9 +1806,12 @@
                 '<div class="product-body">' +
                   '<span class="carousel-card-cat">' + cat + '</span>' +
                   '<h3>' + p.name + '</h3>' +
-                  '<span class="price">' + priceText + '</span>' +
+                  '<span class="price">$' + displayPrice.toFixed(2) + '</span>' +
                   '<span class="stock-badge stock-in">In Stock</span>' +
-                  '<a href="#' + (p.category || '').toLowerCase().replace(/_/g, '-') + '" class="btn btn-primary" style="font-size:.82rem;padding:8px 16px;margin-top:8px;">View Options</a>' +
+                  '<button type="button" class="btn-add-cart carousel-atc" data-add-to-cart="' + cartSlug + '" data-product-name="' + p.name + '" data-product-variant="' + variantName + '" data-product-price="' + displayPrice.toFixed(2) + '">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>' +
+                    'Add to Cart' +
+                  '</button>' +
                 '</div>';
               track.appendChild(card);
             });
