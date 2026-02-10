@@ -66,7 +66,7 @@ export class AdminService {
       }),
       this.prisma.$queryRaw<[{ count: bigint }]>`
         SELECT COUNT(*) as count FROM "Inventory"
-        WHERE quantity <= low_stock_threshold
+        WHERE quantity <= "lowStockThreshold"
       `.then((r) => Number(r[0]?.count || 0)),
     ]);
 

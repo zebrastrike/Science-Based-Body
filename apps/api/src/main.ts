@@ -15,9 +15,9 @@ async function bootstrap() {
         frameAncestors: ["'none'"],
       },
     },
-    crossOriginEmbedderPolicy: true,
+    crossOriginEmbedderPolicy: false,
     crossOriginOpenerPolicy: { policy: 'same-origin' },
-    crossOriginResourcePolicy: { policy: 'same-origin' },
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
   }));
 
   // CORS configuration

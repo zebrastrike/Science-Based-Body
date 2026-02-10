@@ -116,13 +116,15 @@ export class SmtpService {
   }
 
   async sendEmailVerification(to: string, firstName: string, verificationToken: string) {
-    const verificationUrl = `https://sciencebasedbody.com/verify-email?token=${verificationToken}`;
+    const baseUrl = this.config.get('FRONTEND_URL', 'https://sbbpeptides.com');
+    const verificationUrl = `${baseUrl}/verify-email?token=${verificationToken}`;
     const { subject, html, text } = this.templates.emailVerification(firstName, verificationUrl);
     return this.sendEmail({ to, subject, html, text, tags: ['verification', 'account'] });
   }
 
   async sendPasswordReset(to: string, firstName: string, resetToken: string) {
-    const resetUrl = `https://sciencebasedbody.com/reset-password?token=${resetToken}`;
+    const baseUrl = this.config.get('FRONTEND_URL', 'https://sbbpeptides.com');
+    const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`;
     const { subject, html, text } = this.templates.passwordReset(firstName, resetUrl);
     return this.sendEmail({ to, subject, html, text, tags: ['password-reset', 'account'] });
   }

@@ -11,6 +11,7 @@ import { PaymentsService } from '../payments/payments.service';
 import { MailgunService } from '../notifications/mailgun.service';
 import { TaxService } from '../tax/tax.service';
 import { v4 as uuidv4 } from 'uuid';
+import * as crypto from 'crypto';
 import { PaymentMethod } from '@prisma/client';
 import { CreateOrderDto, ResolveCartItemDto } from './dto/create-order.dto';
 
@@ -293,11 +294,11 @@ export class CheckoutService {
       .notifyAdminNewOrder(orderDetails, email)
       .catch((err) => console.error('Failed to send admin notification:', err));
 
-    // 9b. Send welcome email for new auto-created accounts (non-blocking)
+    // 9b. Send set-password email for new auto-created accounts (non-blocking)
     if (isNewAccount) {
-      this.mailgunService
-        .sendWelcomeEmail(email, firstName)
-        .catch((err) => console.error('Failed to send welcome email:', err));
+      this.sendSetPasswordEmail(email, firstName).catch((err) =>
+        console.error('Failed to send set-password email:', err),
+      );
     }
 
     // 10. Track affiliate referral (non-blocking)
@@ -508,6 +509,35 @@ export class CheckoutService {
     }
 
     return { resolvedItems: resolved, unresolvedItems: unresolved };
+  }
+
+  /**
+   * Generate a password-reset token and email the new customer a set-password link
+   */
+  private async sendSetPasswordEmail(email: string, firstName: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+    if (!user) return;
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days for new accounts
+
+    await this.prisma.setting.upsert({
+      where: { key: `password_reset_${user.id}` },
+      create: {
+        key: `password_reset_${user.id}`,
+        value: JSON.stringify({ hash: resetTokenHash, expiresAt: expiresAt.toISOString() }),
+        type: 'json',
+        description: 'Password setup token (new account from checkout)',
+      },
+      update: {
+        value: JSON.stringify({ hash: resetTokenHash, expiresAt: expiresAt.toISOString() }),
+      },
+    });
+
+    await this.mailgunService.sendPasswordReset(email, firstName || 'Customer', resetToken);
   }
 
   /**
