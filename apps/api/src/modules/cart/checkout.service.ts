@@ -99,11 +99,11 @@ export class CheckoutService {
     const orderNumber = this.generateOrderNumber();
 
     // 6. Create order in transaction
+    let isNewAccount = false;
+
     const order = await this.prisma.$transaction(async (tx) => {
       // Create or get user
       let orderUserId = userId;
-
-      let isNewAccount = false;
 
       if (!orderUserId && dto.guestEmail) {
         // Check if guest email exists
