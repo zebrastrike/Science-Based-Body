@@ -2,6 +2,39 @@ document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("is-ready");
 
   // ============================================
+  // ACCOUNT / LOGIN NAV LINK (injected on all pages)
+  // ============================================
+  (function () {
+    var cartBtn = document.querySelector("[data-cart-toggle]");
+    if (!cartBtn) return;
+
+    var link = document.createElement("a");
+    link.href = "login.html";
+    link.className = "nav-account";
+    link.id = "nav-account";
+    link.setAttribute("aria-label", "Account");
+    link.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+        '<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>' +
+        '<circle cx="12" cy="7" r="4"/>' +
+      '</svg>';
+
+    cartBtn.parentNode.insertBefore(link, cartBtn);
+
+    // If logged in, show user initial instead of generic icon
+    try {
+      var user = JSON.parse(localStorage.getItem("sbb_user"));
+      if (user && localStorage.getItem("accessToken")) {
+        var initial = (user.firstName || "?")[0].toUpperCase();
+        link.innerHTML =
+          '<span style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#e3a7a1,#c7d7e6);' +
+          'color:#fff;font-size:0.7rem;font-weight:600;display:inline-flex;align-items:center;justify-content:center;">' +
+          initial + '</span>';
+      }
+    } catch (e) {}
+  })();
+
+  // ============================================
   // AFFILIATE TRACKING (capture ?ref= param)
   // ============================================
   (function() {

@@ -103,6 +103,8 @@ export class CheckoutService {
       // Create or get user
       let orderUserId = userId;
 
+      let isNewAccount = false;
+
       if (!orderUserId && dto.guestEmail) {
         // Check if guest email exists
         let guestUser = await tx.user.findUnique({
@@ -110,12 +112,27 @@ export class CheckoutService {
         });
 
         if (!guestUser) {
-          // Create guest user account
+          // Auto-create customer account from checkout info
           guestUser = await tx.user.create({
             data: {
               email: dto.guestEmail.toLowerCase(),
-              passwordHash: '', // Guest - no password
-              status: 'PENDING_VERIFICATION',
+              passwordHash: '', // Will be set via password-reset flow
+              firstName: dto.shippingAddress.firstName || undefined,
+              lastName: dto.shippingAddress.lastName || undefined,
+              phone: dto.shippingAddress.phone || undefined,
+              role: 'CLIENT',
+              status: 'ACTIVE',
+            },
+          });
+          isNewAccount = true;
+        } else if (!guestUser.firstName && dto.shippingAddress.firstName) {
+          // Update existing guest user with name/phone if missing
+          guestUser = await tx.user.update({
+            where: { id: guestUser.id },
+            data: {
+              firstName: dto.shippingAddress.firstName,
+              lastName: dto.shippingAddress.lastName || undefined,
+              phone: dto.shippingAddress.phone || guestUser.phone || undefined,
             },
           });
         }
@@ -274,6 +291,13 @@ export class CheckoutService {
     this.mailgunService
       .notifyAdminNewOrder(orderDetails, email)
       .catch((err) => console.error('Failed to send admin notification:', err));
+
+    // 9b. Send welcome email for new auto-created accounts (non-blocking)
+    if (isNewAccount) {
+      this.mailgunService
+        .sendWelcomeEmail(email, firstName)
+        .catch((err) => console.error('Failed to send welcome email:', err));
+    }
 
     // 10. Track affiliate referral (non-blocking)
     if (dto.affiliateReferralCode) {

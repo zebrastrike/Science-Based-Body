@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Account | Science Based Body</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400&family=Sora:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5NLZQKVWBW"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-5NLZQKVWBW');
+    </script>
+  </head>
+  <body class="page-checkout">
+    <header class="site-header">
+      <div class="container header-grid">
+        <a class="logo" href="index.html">
+          <img src="/logo.png" alt="Science Based Body" />
+        </a>
+        <div class="site-search" id="site-search">
+          <input type="text" class="site-search-input" id="search-input" placeholder="Search peptides..." autocomplete="off" aria-label="Search products" />
+          <button type="button" class="site-search-btn" aria-label="Search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          </button>
+          <div class="search-results" id="search-results"></div>
+        </div>
+        <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+          <span class="menu-icon"></span>
+        </button>
+        <button type="button" class="mobile-search-toggle" id="mobile-search-toggle" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </button>
+        <nav class="site-nav">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="shop.html" class="nav-link">Shop</a>
+          <a href="product.html" class="nav-link">Peptide Library</a>
+          <button type="button" class="cart-toggle" data-cart-toggle aria-label="Open cart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 6h15l-1.5 9h-12z"/>
+              <circle cx="9" cy="20" r="1"/>
+              <circle cx="18" cy="20" r="1"/>
+              <path d="M6 6L5 3H2"/>
+            </svg>
+            <span class="cart-badge is-hidden">0</span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="section checkout-section">
+        <div class="container" style="max-width:520px;">
+          <div class="checkout-header">
+            <span class="label">ACCOUNT</span>
+            <h1 id="page-title">Sign In</h1>
+          </div>
+
+          <!-- ═══ AUTH FORMS (shown when NOT logged in) ═══ -->
+          <div id="auth-panel">
+            <!-- Tab toggle -->
+            <div class="auth-tabs">
+              <button class="auth-tab active" data-tab="login">Sign In</button>
+              <button class="auth-tab" data-tab="register">Create Account</button>
+            </div>
+
+            <!-- Error banner -->
+            <div id="auth-error" class="auth-error" style="display:none;"></div>
+
+            <!-- ── Login Form ── -->
+            <div id="login-form-container" class="card auth-card">
+              <form id="login-form">
+                <div class="form-group">
+                  <label for="login-email">Email Address</label>
+                  <input type="email" id="login-email" name="email" required placeholder="your@email.com" />
+                </div>
+                <div class="form-group">
+                  <label for="login-password">Password</label>
+                  <input type="password" id="login-password" name="password" required minlength="8" />
+                </div>
+                <button type="submit" class="btn btn-primary btn-large auth-submit" id="login-btn">Sign In</button>
+                <p class="auth-link-row">
+                  <a href="#" id="forgot-link" class="text-link">Forgot your password?</a>
+                </p>
+              </form>
+            </div>
+
+            <!-- ── Register Form ── -->
+            <div id="register-form-container" class="card auth-card" style="display:none;">
+              <form id="register-form">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label for="reg-firstName">First Name</label>
+                    <input type="text" id="reg-firstName" name="firstName" required minlength="2" />
+                  </div>
+                  <div class="form-group">
+                    <label for="reg-lastName">Last Name</label>
+                    <input type="text" id="reg-lastName" name="lastName" required minlength="2" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="reg-email">Email Address</label>
+                  <input type="email" id="reg-email" name="email" required placeholder="your@email.com" />
+                </div>
+                <div class="form-group">
+                  <label for="reg-phone">Phone Number</label>
+                  <input type="tel" id="reg-phone" name="phone" placeholder="(555) 123-4567" />
+                </div>
+                <div class="form-group">
+                  <label for="reg-password">Password</label>
+                  <input type="password" id="reg-password" name="password" required minlength="8"
+                    placeholder="Min 8 chars, uppercase, lowercase, number" />
+                </div>
+                <div class="form-group">
+                  <label for="reg-confirm">Confirm Password</label>
+                  <input type="password" id="reg-confirm" name="confirmPassword" required minlength="8" />
+                </div>
+                <button type="submit" class="btn btn-primary btn-large auth-submit" id="register-btn">Create Account</button>
+              </form>
+            </div>
+
+            <!-- ── Forgot Password Form ── -->
+            <div id="forgot-form-container" class="card auth-card" style="display:none;">
+              <p style="margin-bottom:16px;font-size:0.9rem;color:#666;">Enter your email and we'll send you a password reset link.</p>
+              <form id="forgot-form">
+                <div class="form-group">
+                  <label for="forgot-email">Email Address</label>
+                  <input type="email" id="forgot-email" name="email" required placeholder="your@email.com" />
+                </div>
+                <button type="submit" class="btn btn-primary btn-large auth-submit">Send Reset Link</button>
+                <p class="auth-link-row">
+                  <a href="#" id="back-to-login" class="text-link">Back to Sign In</a>
+                </p>
+              </form>
+            </div>
+          </div>
+
+          <!-- ═══ ACCOUNT PANEL (shown when logged in) ═══ -->
+          <div id="account-panel" style="display:none;">
+            <div class="card auth-card">
+              <div class="account-greeting">
+                <div class="account-avatar" id="account-avatar">?</div>
+                <div>
+                  <h2 id="account-name" style="margin:0;font-size:1.2rem;">Welcome</h2>
+                  <p id="account-email" style="margin:4px 0 0;font-size:0.85rem;color:#666;"></p>
+                  <span class="account-role-badge" id="account-role"></span>
+                </div>
+              </div>
+
+              <div class="account-details">
+                <div class="account-row">
+                  <span class="account-label">Phone</span>
+                  <span id="account-phone">—</span>
+                </div>
+                <div class="account-row">
+                  <span class="account-label">Member Since</span>
+                  <span id="account-since">—</span>
+                </div>
+              </div>
+
+              <div class="account-actions">
+                <a href="shop.html" class="btn btn-primary" style="flex:1;">Continue Shopping</a>
+                <button type="button" class="btn btn-outline" id="logout-btn" style="flex:1;">Sign Out</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <div class="footer-brand">
+            <a class="footer-logo" href="index.html">
+              <img src="/logo.png" alt="Science Based Body" />
+            </a>
+            <span class="label">SCIENCE BASED BODY</span>
+          </div>
+          <p>Research peptide supply with transparent batch standards.</p>
+        </div>
+        <div class="footer-links">
+          <a href="terms.html" class="text-link">Terms</a>
+          <a href="privacy.html" class="text-link">Privacy</a>
+          <a href="shipping.html" class="text-link">Shipping</a>
+          <a href="returns.html" class="text-link">Returns</a>
+          <a href="research-use.html" class="text-link">Research Use Only</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Cart Overlay -->
+    <div class="cart-overlay" id="cart-overlay"></div>
+    <aside class="cart-drawer" id="cart-drawer" aria-hidden="true">
+      <div class="cart-drawer-header">
+        <h2>Your Cart</h2>
+        <button type="button" class="cart-drawer-close" data-cart-close aria-label="Close cart">&times;</button>
+      </div>
+      <div class="cart-drawer-body">
+        <p id="cart-empty" class="cart-empty">Your cart is empty.</p>
+        <div id="cart-items"></div>
+      </div>
+      <div class="cart-drawer-footer">
+        <div class="cart-subtotal">
+          <span>Subtotal</span>
+          <span id="cart-subtotal">$0.00</span>
+        </div>
+        <a href="checkout.html" class="btn btn-primary cart-checkout-btn is-hidden" id="cart-checkout-btn">Proceed to Checkout</a>
+      </div>
+    </aside>
+
+    <script src="scripts.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const API_BASE = window.location.hostname === 'localhost'
+          ? 'http://localhost:3001/api/v1'
+          : 'https://api.sbbpeptides.com/api/v1';
+
+        const authPanel    = document.getElementById('auth-panel');
+        const accountPanel = document.getElementById('account-panel');
+        const pageTitle    = document.getElementById('page-title');
+        const authError    = document.getElementById('auth-error');
+
+        const loginContainer    = document.getElementById('login-form-container');
+        const registerContainer = document.getElementById('register-form-container');
+        const forgotContainer   = document.getElementById('forgot-form-container');
+
+        /* ── Helpers ─────────────────────────── */
+        const showError = (msg) => {
+          authError.textContent = msg;
+          authError.style.display = 'block';
+          authError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => { authError.style.display = 'none'; }, 8000);
+        };
+
+        const setLoading = (btn, loading) => {
+          btn.disabled = loading;
+          btn.dataset.origText = btn.dataset.origText || btn.textContent;
+          btn.textContent = loading ? 'Please wait…' : btn.dataset.origText;
+        };
+
+        /* ── Tab switching ─────────────────── */
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+          tab.addEventListener('click', () => {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            authError.style.display = 'none';
+
+            if (tab.dataset.tab === 'login') {
+              loginContainer.style.display = '';
+              registerContainer.style.display = 'none';
+              forgotContainer.style.display = 'none';
+              pageTitle.textContent = 'Sign In';
+            } else {
+              loginContainer.style.display = 'none';
+              registerContainer.style.display = '';
+              forgotContainer.style.display = 'none';
+              pageTitle.textContent = 'Create Account';
+            }
+          });
+        });
+
+        /* ── Forgot password toggle ─────── */
+        document.getElementById('forgot-link').addEventListener('click', (e) => {
+          e.preventDefault();
+          loginContainer.style.display = 'none';
+          forgotContainer.style.display = '';
+          pageTitle.textContent = 'Reset Password';
+        });
+        document.getElementById('back-to-login').addEventListener('click', (e) => {
+          e.preventDefault();
+          forgotContainer.style.display = 'none';
+          loginContainer.style.display = '';
+          pageTitle.textContent = 'Sign In';
+        });
+
+        /* ── Role-based redirect ───────── */
+        const ROLE_REDIRECTS = {
+          SUPER_ADMIN:   '/admin',
+          ADMIN:         '/admin',
+          AFFILIATE:     '/affiliate-program',
+          BRAND_PARTNER: '/brand-partnerships',
+          CLIENT:        '/shop'
+        };
+
+        const ROLE_LABELS = {
+          SUPER_ADMIN:   'Admin',
+          ADMIN:         'Admin',
+          AFFILIATE:     'Affiliate Partner',
+          BRAND_PARTNER: 'Wholesale Partner',
+          CLIENT:        'Customer'
+        };
+
+        /* ── Fetch user profile ────────── */
+        const fetchProfile = async (token) => {
+          const res = await fetch(API_BASE + '/auth/me', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          if (!res.ok) throw new Error('Token invalid');
+          return res.json();
+        };
+
+        /* ── Show account panel ────────── */
+        const showAccount = (user) => {
+          authPanel.style.display = 'none';
+          accountPanel.style.display = '';
+          pageTitle.textContent = 'My Account';
+
+          const name = [user.firstName, user.lastName].filter(Boolean).join(' ') || 'Researcher';
+          document.getElementById('account-name').textContent = 'Welcome, ' + name;
+          document.getElementById('account-email').textContent = user.email || '';
+          document.getElementById('account-phone').textContent = user.phone || '—';
+          document.getElementById('account-avatar').textContent = (user.firstName || '?')[0].toUpperCase();
+
+          const role = user.role || 'CLIENT';
+          const badge = document.getElementById('account-role');
+          badge.textContent = ROLE_LABELS[role] || role;
+          badge.className = 'account-role-badge role-' + role.toLowerCase().replace('_', '-');
+
+          const since = user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '—';
+          document.getElementById('account-since').textContent = since;
+
+          // Store user for checkout pre-fill
+          localStorage.setItem('sbb_user', JSON.stringify(user));
+        };
+
+        /* ── Check existing session ────── */
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+          fetchProfile(token)
+            .then(showAccount)
+            .catch(() => {
+              localStorage.removeItem('accessToken');
+              localStorage.removeItem('refreshToken');
+              localStorage.removeItem('sbb_user');
+            });
+        }
+
+        /* ── LOGIN ─────────────────────── */
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById('login-btn');
+          setLoading(btn, true);
+          authError.style.display = 'none';
+
+          try {
+            const res = await fetch(API_BASE + '/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: document.getElementById('login-email').value.trim(),
+                password: document.getElementById('login-password').value,
+              })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Login failed');
+
+            localStorage.setItem('accessToken', data.accessToken);
+            localStorage.setItem('refreshToken', data.refreshToken);
+
+            const user = await fetchProfile(data.accessToken);
+            localStorage.setItem('sbb_user', JSON.stringify(user));
+
+            // Redirect based on role
+            const role = user.role || 'CLIENT';
+            const redirect = ROLE_REDIRECTS[role] || '/shop';
+            window.location.href = redirect;
+
+          } catch (err) {
+            showError(err.message || 'Invalid email or password.');
+          } finally {
+            setLoading(btn, false);
+          }
+        });
+
+        /* ── REGISTER ──────────────────── */
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById('register-btn');
+          setLoading(btn, true);
+          authError.style.display = 'none';
+
+          const password = document.getElementById('reg-password').value;
+          const confirm  = document.getElementById('reg-confirm').value;
+
+          if (password !== confirm) {
+            showError('Passwords do not match.');
+            setLoading(btn, false);
+            return;
+          }
+
+          try {
+            const res = await fetch(API_BASE + '/auth/register', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                firstName: document.getElementById('reg-firstName').value.trim(),
+                lastName:  document.getElementById('reg-lastName').value.trim(),
+                email:     document.getElementById('reg-email').value.trim(),
+                phone:     document.getElementById('reg-phone').value.trim() || undefined,
+                password:  password,
+              })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Registration failed');
+
+            // Auto-login after register
+            localStorage.setItem('accessToken', data.accessToken);
+            localStorage.setItem('refreshToken', data.refreshToken);
+
+            const user = await fetchProfile(data.accessToken);
+            localStorage.setItem('sbb_user', JSON.stringify(user));
+
+            window.location.href = '/shop';
+
+          } catch (err) {
+            showError(err.message || 'Could not create account. Please try again.');
+          } finally {
+            setLoading(btn, false);
+          }
+        });
+
+        /* ── FORGOT PASSWORD ───────────── */
+        document.getElementById('forgot-form').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const btn = e.target.querySelector('.auth-submit');
+          setLoading(btn, true);
+
+          try {
+            const res = await fetch(API_BASE + '/auth/forgot-password', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: document.getElementById('forgot-email').value.trim() })
+            });
+
+            // Always show success to prevent email enumeration
+            forgotContainer.innerHTML = '<div style="text-align:center;padding:20px 0;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg><h3 style="margin:16px 0 8px;">Check Your Email</h3><p style="color:#666;font-size:0.9rem;">If an account exists for that email, we\'ve sent password reset instructions.</p><p style="margin-top:16px;"><a href="login.html" class="text-link">Back to Sign In</a></p></div>';
+          } catch (err) {
+            showError('Something went wrong. Please try again.');
+            setLoading(btn, false);
+          }
+        });
+
+        /* ── LOGOUT ────────────────────── */
+        document.getElementById('logout-btn').addEventListener('click', () => {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('sbb_user');
+          window.location.reload();
+        });
+      });
+    </script>
+  </body>
+</html>

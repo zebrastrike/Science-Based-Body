@@ -410,6 +410,17 @@
         let subtotal = 0;
         let taxAmount = 0;
 
+        /* ── Pre-fill from logged-in user ──────────── */
+        try {
+          var savedUser = JSON.parse(localStorage.getItem('sbb_user'));
+          if (savedUser && localStorage.getItem('accessToken')) {
+            if (savedUser.email) document.getElementById('email').value = savedUser.email;
+            if (savedUser.phone) document.getElementById('phone').value = savedUser.phone;
+            if (savedUser.firstName) document.getElementById('firstName').value = savedUser.firstName;
+            if (savedUser.lastName) document.getElementById('lastName').value = savedUser.lastName;
+          }
+        } catch (e) {}
+
         /* ── Master compliance "Agree to All" toggle ── */
         const masterCheckbox = document.getElementById('compliance-all');
         const individualBoxes = document.querySelectorAll('.compliance-checkbox:not(.compliance-master) input[type="checkbox"]');
