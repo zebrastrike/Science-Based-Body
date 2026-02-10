@@ -246,6 +246,13 @@
                   </p>
 
                   <div class="compliance-checkboxes">
+                    <!-- Master "Agree to All" checkbox -->
+                    <label class="compliance-checkbox compliance-master">
+                      <input type="checkbox" id="compliance-all" />
+                      <span class="checkbox-mark"></span>
+                      <span class="checkbox-text"><strong>I acknowledge and agree to all of the following statements</strong></span>
+                    </label>
+
                     <label class="compliance-checkbox">
                       <input type="checkbox" id="compliance1" name="researchPurposeOnly" required />
                       <span class="checkbox-mark"></span>
@@ -255,7 +262,7 @@
                     <label class="compliance-checkbox">
                       <input type="checkbox" id="compliance2" name="ageConfirmation" required />
                       <span class="checkbox-mark"></span>
-                      <span class="checkbox-text">I confirm I am <strong>18 years of age or older</strong>.</span>
+                      <span class="checkbox-text">I confirm I am <strong>21 years of age or older</strong>.</span>
                     </label>
 
                     <label class="compliance-checkbox">
@@ -402,6 +409,21 @@
         let resolvedItems = [];
         let subtotal = 0;
         let taxAmount = 0;
+
+        /* ── Master compliance "Agree to All" toggle ── */
+        const masterCheckbox = document.getElementById('compliance-all');
+        const individualBoxes = document.querySelectorAll('.compliance-checkbox:not(.compliance-master) input[type="checkbox"]');
+
+        if (masterCheckbox) {
+          masterCheckbox.addEventListener('change', function () {
+            individualBoxes.forEach(function (cb) { cb.checked = masterCheckbox.checked; });
+          });
+          individualBoxes.forEach(function (cb) {
+            cb.addEventListener('change', function () {
+              masterCheckbox.checked = Array.from(individualBoxes).every(function (c) { return c.checked; });
+            });
+          });
+        }
 
         /* ── Field validation ────────────────────────────── */
         const validators = {

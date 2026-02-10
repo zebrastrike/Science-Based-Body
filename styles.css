@@ -2604,7 +2604,7 @@ body.is-ready .reveal {
   border-radius: var(--radius-md);
 }
 
-.checkout-step {
+.checkout-steps .checkout-step {
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -2658,7 +2658,7 @@ body.is-ready .reveal {
     padding: 20px;
     align-items: flex-start;
   }
-  .checkout-step {
+  .checkout-steps .checkout-step {
     max-width: 100%;
   }
   .checkout-step-divider {
@@ -2677,6 +2677,8 @@ body.is-ready .reveal {
   position: sticky;
   top: 100px;
   padding: 24px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--line);
 }
 
 .checkout-summary h2 {
@@ -2766,8 +2768,10 @@ body.is-ready .reveal {
   gap: 24px;
 }
 
-.checkout-step {
+.checkout-form-container .card.checkout-step {
   padding: 28px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--line);
 }
 
 .checkout-step h2 {
@@ -2946,6 +2950,16 @@ body.is-ready .reveal {
 
 .checkbox-text a {
   color: var(--rose);
+}
+
+.compliance-master {
+  background: rgba(227, 167, 161, 0.1);
+  border: 2px solid var(--rose);
+  margin-bottom: 8px;
+}
+
+.compliance-master .checkbox-text {
+  font-size: 0.95rem;
 }
 
 .compliance-warning {

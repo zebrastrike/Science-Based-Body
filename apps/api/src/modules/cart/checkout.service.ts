@@ -29,7 +29,7 @@ export class CheckoutService {
     private taxService: TaxService,
     private config: ConfigService,
   ) {
-    this.minimumAge = this.config.get('MINIMUM_AGE', 18);
+    this.minimumAge = this.config.get('MINIMUM_AGE', 21);
   }
 
   /**

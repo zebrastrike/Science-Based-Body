@@ -10,7 +10,7 @@ export class CreateComplianceAckDto {
   researchPurposeOnly: boolean;
 
   @ApiProperty({
-    description: 'Confirms user is 18 years of age or older',
+    description: 'Confirms user is 21 years of age or older',
     example: true,
   })
   @IsBoolean()
