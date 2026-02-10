@@ -56,27 +56,29 @@ body.page-policy {
   color: var(--ink);
 }
 
-body.page-home .nav-link,
-body.page-shop .nav-link,
-body.page-library .nav-link,
-body.page-brand .nav-link,
-body.page-branded .nav-link,
-body.page-affiliate .nav-link,
-body.page-checkout .nav-link,
-body.page-policy .nav-link {
-  color: rgba(31, 42, 54, 0.88);
-  opacity: 0.85;
-}
+@media (min-width: 769px) {
+  body.page-home .nav-link,
+  body.page-shop .nav-link,
+  body.page-library .nav-link,
+  body.page-brand .nav-link,
+  body.page-branded .nav-link,
+  body.page-affiliate .nav-link,
+  body.page-checkout .nav-link,
+  body.page-policy .nav-link {
+    color: rgba(31, 42, 54, 0.88);
+    opacity: 0.85;
+  }
 
-body.page-home .nav-link:hover,
-body.page-shop .nav-link:hover,
-body.page-library .nav-link:hover,
-body.page-brand .nav-link:hover,
-body.page-branded .nav-link:hover,
-body.page-affiliate .nav-link:hover,
-body.page-checkout .nav-link:hover,
-body.page-policy .nav-link:hover {
-  opacity: 1;
+  body.page-home .nav-link:hover,
+  body.page-shop .nav-link:hover,
+  body.page-library .nav-link:hover,
+  body.page-brand .nav-link:hover,
+  body.page-branded .nav-link:hover,
+  body.page-affiliate .nav-link:hover,
+  body.page-checkout .nav-link:hover,
+  body.page-policy .nav-link:hover {
+    opacity: 1;
+  }
 }
 
 body.page-home {
