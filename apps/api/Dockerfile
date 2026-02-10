@@ -22,17 +22,21 @@ RUN npm run build
 # Production stage
 FROM node:20-alpine AS production
 
+# Install OpenSSL for Prisma engine compatibility on Alpine
+RUN apk add --no-cache openssl
+
 WORKDIR /app
 
-# Copy package files
+# Copy package files and install all deps (need prisma CLI for generate)
 COPY package*.json ./
+RUN npm ci
 
-# Install production dependencies only
-RUN npm ci --only=production
-
-# Copy Prisma schema and generate client
+# Copy Prisma schema and generate client with correct binary target
 COPY --from=builder /app/prisma ./prisma
 RUN npx prisma generate
+
+# Prune dev dependencies for smaller image
+RUN npm prune --production
 
 # Copy built application
 COPY --from=builder /app/dist ./dist
