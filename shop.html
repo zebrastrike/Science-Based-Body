@@ -1664,6 +1664,23 @@
         </div>
       </section>
 
+      <!-- WHOLESALE / B2B CTA -->
+      <section class="section" id="wholesale">
+        <div class="container" style="max-width: 720px; text-align: center;">
+          <div class="card reveal" style="padding: 2.5rem;">
+            <span class="label">WHOLESALE &amp; B2B</span>
+            <h2 style="margin: 0.75rem 0 1rem;">We Produce Every Peptide We Sell</h2>
+            <p style="font-size: 1.05rem; opacity: 0.85; margin-bottom: 1.25rem;">
+              We keep our most popular peptides in stock and ready to ship. Every product in our catalog is produced to the same standard&mdash;dual-lab verified, COA included&mdash;whether it ships today or is made to order for your research group.
+            </p>
+            <p style="font-size: 1.05rem; opacity: 0.85; margin-bottom: 1.5rem;">
+              Physicians, med spas, and research organizations qualify for wholesale pricing with a $30,000 minimum initial order. Apply to become a brand partner for volume rates and priority fulfillment.
+            </p>
+            <a class="btn btn-primary" href="brand-partnerships.html">Apply for Brand Partnership</a>
+          </div>
+        </div>
+      </section>
+
     </main>
 
     <!-- BACK TO TOP -->
@@ -1778,14 +1795,27 @@
               if (info && info.qty > 0) {
                 badge.className = 'stock-badge stock-in';
                 badge.textContent = 'In Stock';
+                card.setAttribute('data-stock', 'in');
               } else {
                 badge.className = 'stock-badge stock-special';
-                badge.textContent = 'Available for Special Order';
+                badge.textContent = 'Special Order';
+                card.setAttribute('data-stock', 'out');
               }
               var priceEl = card.querySelector('.price');
               if (priceEl && priceEl.parentNode) {
                 priceEl.parentNode.insertBefore(badge, priceEl.nextSibling);
               }
+            });
+
+            /* ---- Reorder each shop-grid: in-stock first, special order last ---- */
+            document.querySelectorAll('.shop-grid').forEach(function(grid) {
+              var cards = Array.from(grid.querySelectorAll('.card.product-card'));
+              cards.sort(function(a, b) {
+                var aStock = a.getAttribute('data-stock') === 'in' ? 0 : 1;
+                var bStock = b.getAttribute('data-stock') === 'in' ? 0 : 1;
+                return aStock - bStock;
+              });
+              cards.forEach(function(card) { grid.appendChild(card); });
             });
 
             /* ---- In-Stock Carousel ---- */
