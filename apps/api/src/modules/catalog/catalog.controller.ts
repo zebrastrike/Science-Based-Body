@@ -50,7 +50,7 @@ export class CatalogController {
       sort,
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
-      inStock: inStock === true || inStock === 'true' as any,
+      inStock: inStock !== undefined ? (inStock === true || inStock === 'true' as any) : undefined,
     });
   }
 

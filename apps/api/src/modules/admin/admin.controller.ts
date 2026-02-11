@@ -234,7 +234,7 @@ export class AdminController {
       limit: limit ? Number(limit) : undefined,
       category,
       search,
-      isActive: isActive === true || isActive === 'true' as any,
+      isActive: isActive !== undefined ? (isActive === true || isActive === 'true' as any) : undefined,
     });
   }
 
