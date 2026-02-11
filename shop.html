@@ -1818,7 +1818,7 @@
 
             // Carousel navigation
             var idx = 0;
-            var perPage = window.innerWidth <= 480 ? 1 : (window.innerWidth <= 768 ? 2 : 3);
+            var perPage = window.innerWidth <= 768 ? 1 : 3;
             var maxIdx = Math.max(0, inStockProducts.length - perPage);
             function slideTo(i) {
               idx = Math.max(0, Math.min(i, maxIdx));
@@ -1847,7 +1847,7 @@
 
             // Update perPage on resize
             window.addEventListener('resize', function() {
-              perPage = window.innerWidth <= 480 ? 1 : (window.innerWidth <= 768 ? 2 : 3);
+              perPage = window.innerWidth <= 768 ? 1 : 3;
               maxIdx = Math.max(0, inStockProducts.length - perPage);
               slideTo(Math.min(idx, maxIdx));
             });

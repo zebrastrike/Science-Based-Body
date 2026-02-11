@@ -505,11 +505,8 @@ button.btn {
   box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
 }
 @media (max-width: 768px) {
-  .carousel-track .card { flex: 0 0 calc(50% - 0.625rem); }
-  .carousel-wrap { padding: 0 40px; }
-}
-@media (max-width: 480px) {
   .carousel-track .card { flex: 0 0 100%; }
+  .carousel-wrap { padding: 0 40px; }
 }
 
 .site-header {
