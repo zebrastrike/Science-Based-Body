@@ -420,10 +420,10 @@ button.btn {
   border: 1px solid rgba(22, 163, 74, 0.3);
 }
 .stock-special {
-  color: #92400e;
-  background: rgba(217, 119, 6, 0.12);
-  border: 1px solid rgba(217, 119, 6, 0.3);
-  font-size: 0.72rem;
+  color: #78350f;
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  font-size: 0.78rem;
 }
 
 /* In-Stock Carousel */

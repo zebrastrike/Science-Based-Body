@@ -1792,6 +1792,13 @@
             var track = document.getElementById('instock-carousel');
             if (!track || inStockProducts.length === 0) return;
 
+            // Retatrutide first (flagship metabolic)
+            inStockProducts.sort(function(a, b) {
+              if (a.slug === 'retatrutide') return -1;
+              if (b.slug === 'retatrutide') return 1;
+              return 0;
+            });
+
             inStockProducts.forEach(function(p) {
               // Use first variant price if available, else basePrice
               var firstVariant = (p.variants && p.variants.length > 0) ? p.variants[0] : null;
