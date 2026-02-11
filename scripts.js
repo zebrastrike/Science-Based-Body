@@ -1502,7 +1502,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(function() {
         if (MarketingPopup.popup) MarketingPopup.popup.classList.remove("is-closing");
         document.body.style.overflow = "";
-      }, 400);
+      }, 500);
 
       // Mark as shown
       var storageKey = this.storagePrefix + this.config.id;
@@ -1538,7 +1538,12 @@ document.addEventListener("DOMContentLoaded", () => {
       var wrap = document.getElementById("promo-form-wrap");
       var success = document.getElementById("promo-success");
       if (wrap) wrap.style.display = "none";
-      if (success) success.classList.add("is-visible");
+      setTimeout(function() {
+        if (success) success.classList.add("is-visible");
+        // Scroll popup to top so success content is visible on small screens
+        var popup = document.getElementById("promo-popup");
+        if (popup) popup.scrollTop = 0;
+      }, 200);
     },
 
     bindEvents() {
