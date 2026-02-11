@@ -1807,6 +1807,30 @@
               }
             });
 
+            /* ---- Hide wholesale-only variants & sync default ATC ---- */
+            document.querySelectorAll('.variant-select[data-product-slug]').forEach(function(sel) {
+              var info = slugMap[sel.getAttribute('data-product-slug')];
+              if (!info || !info.variants.length) return;
+              var apiVariants = {};
+              info.variants.forEach(function(v) { apiVariants[v.name.toLowerCase()] = v; });
+              var opts = Array.from(sel.options);
+              var firstRetail = null;
+              opts.forEach(function(opt) {
+                var label = opt.textContent.split(' - ')[0].trim().toLowerCase();
+                var v = apiVariants[label];
+                if (v && v.wholesaleOnly) {
+                  opt.style.display = 'none';
+                  opt.disabled = true;
+                } else if (!firstRetail) {
+                  firstRetail = opt;
+                }
+              });
+              if (firstRetail && sel.selectedIndex !== firstRetail.index) {
+                sel.selectedIndex = firstRetail.index;
+                sel.dispatchEvent(new Event('change'));
+              }
+            });
+
             /* ---- Reorder each shop-grid: in-stock first, special order last ---- */
             document.querySelectorAll('.shop-grid').forEach(function(grid) {
               var cards = Array.from(grid.querySelectorAll('.card.product-card'));
@@ -1830,8 +1854,14 @@
             });
 
             inStockProducts.forEach(function(p) {
-              // Use first variant price if available, else basePrice
-              var firstVariant = (p.variants && p.variants.length > 0) ? p.variants[0] : null;
+              // Use first retail (non-wholesale) variant price
+              var firstVariant = null;
+              if (p.variants && p.variants.length > 0) {
+                for (var vi = 0; vi < p.variants.length; vi++) {
+                  if (!p.variants[vi].wholesaleOnly) { firstVariant = p.variants[vi]; break; }
+                }
+                if (!firstVariant) firstVariant = p.variants[0];
+              }
               var displayPrice = firstVariant ? firstVariant.price : (p.price || 0);
               var variantName = firstVariant ? firstVariant.name : '';
               var cartSlug = p.slug + (variantName ? '-' + variantName.toLowerCase().replace(/[^a-z0-9]+/g, '') : '');
