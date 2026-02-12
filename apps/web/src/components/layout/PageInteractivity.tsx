@@ -89,25 +89,25 @@ export default function PageInteractivity() {
 
     ensureAddToCartButtons();
 
-    // Wire up [data-add-to-cart] buttons to CartContext via window.SBBCart
-    document.querySelectorAll('[data-add-to-cart]').forEach(btn => {
-      const handler = (event: Event) => {
-        event.preventDefault();
-        const el = btn as HTMLElement;
-        const cart = (window as any).SBBCart;
-        if (cart?.add) {
-          cart.add({
-            id: el.dataset.productId || el.dataset.addToCart,
-            name: el.dataset.productName || 'Product',
-            variant: el.dataset.productVariant || '',
-            price: el.dataset.productPrice || 0,
-            quantity: parseInt(el.dataset.productQty || '1', 10) || 1,
-            image: el.dataset.productImage || '/images/products/vial.png',
-          });
-        }
-      };
-      on(btn, 'click', handler);
-    });
+    // Wire up [data-add-to-cart] buttons via event delegation on document
+    // This catches both static buttons AND dynamically created ones (e.g. carousel)
+    const atcHandler = (event: Event) => {
+      const target = (event.target as Element)?.closest('[data-add-to-cart]') as HTMLElement | null;
+      if (!target) return;
+      event.preventDefault();
+      const cart = (window as any).SBBCart;
+      if (cart?.add) {
+        cart.add({
+          id: target.dataset.productId || target.dataset.addToCart,
+          name: target.dataset.productName || 'Product',
+          variant: target.dataset.productVariant || '',
+          price: target.dataset.productPrice || 0,
+          quantity: parseInt(target.dataset.productQty || '1', 10) || 1,
+          image: target.dataset.productImage || '/images/products/vial.png',
+        });
+      }
+    };
+    on(document, 'click', atcHandler);
 
     // Variant selectors
     document.querySelectorAll('.variant-select').forEach(select => {
