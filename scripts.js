@@ -877,9 +877,22 @@ document.addEventListener("DOMContentLoaded", () => {
         vx: Math.cos(angle) * baseSpeed,
         vy: Math.sin(angle) * baseSpeed,
         seed: seed,
-        isPopping: false
+        isPopping: false,
+        isMagnifier: false
       };
     });
+
+    // Move magnifier bubble (bubble-1) to its own overlay so it floats
+    // ABOVE text — this lets backdrop-filter create the lens effect
+    const magnifierEl = bubbleEls[0];
+    if (magnifierEl && magnifierEl.classList.contains("bubble-1")) {
+      const magnifierField = document.createElement("div");
+      magnifierField.className = "magnifier-field";
+      document.body.appendChild(magnifierField);
+      magnifierField.appendChild(magnifierEl);
+      bubbleState[0].isMagnifier = true;
+      bubbleState[0].size = 180; // updated size
+    }
 
     const popDuration = 420;
     const respawnBubble = (bubble) => {
@@ -988,7 +1001,8 @@ document.addEventListener("DOMContentLoaded", () => {
           bubble.vy = -Math.abs(bubble.vy) * 0.8;
         }
 
-        // Obstacle avoidance — bounce off cards & text
+        // Obstacle avoidance — bounce off cards & text (magnifier floats over)
+        if (!bubble.isMagnifier)
         for (let i = 0; i < obstacles.length; i += 1) {
           const rect = obstacles[i];
           const left = rect.left - pad;

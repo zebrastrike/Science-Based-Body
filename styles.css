@@ -2507,13 +2507,39 @@ body.is-ready .reveal {
   box-shadow: 0 0 18px rgba(255, 255, 255, 0.55);
 }
 
+/* ── Magnifier lens (replaces bubble-1) ── */
 .bubble-1 {
-  width: 120px;
-  height: 120px;
+  width: 180px;
+  height: 180px;
   top: 12%;
   left: 6%;
-  animation-duration: 18s;
   --bubble-hue: 330;
+  /* Glass lens — nearly transparent so backdrop-filter shows through */
+  background: radial-gradient(
+    circle at 28% 28%,
+    hsla(330, 60%, 92%, 0.18),
+    hsla(330, 40%, 80%, 0.06) 50%,
+    transparent 70%
+  );
+  backdrop-filter: saturate(1.5) contrast(1.15) brightness(1.03);
+  -webkit-backdrop-filter: saturate(1.5) contrast(1.15) brightness(1.03);
+  border: 1.5px solid hsla(330, 70%, 88%, 0.5);
+  box-shadow:
+    0 8px 32px rgba(227, 167, 161, 0.12),
+    inset 0 0 30px rgba(255, 255, 255, 0.25),
+    inset 0 -4px 12px rgba(31, 42, 54, 0.05);
+  mix-blend-mode: normal;
+  opacity: 0.92;
+  filter: none;
+}
+
+.bubble-1::after {
+  top: 12%;
+  left: 16%;
+  width: 20%;
+  height: 20%;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
 }
 
 .bubble-2 {
@@ -2727,6 +2753,15 @@ body.is-ready .reveal {
 
 /* ── Bubbles: always behind text & cards on all pages ── */
 .bubble-field { z-index: 0; }
+
+/* ── Magnifier lens overlay — sits above text so backdrop-filter works ── */
+.magnifier-field {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
 .card,
 .product-card,
 .section-heading,
@@ -2737,6 +2772,7 @@ body.is-ready .reveal {
 
 /* ── No bubbles on policy/terms/footer-linked pages ── */
 body.page-policy .bubble-field { display: none; }
+body.page-policy .magnifier-field { display: none; }
 
 /* ── Fewer bubbles on mobile (hide 7-20 → only 6 on mobile) ── */
 @media (max-width: 768px) {
