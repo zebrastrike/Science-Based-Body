@@ -805,6 +805,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
+  // ============================================
+  // BUBBLE PHYSICS — gentle scientific float
+  // ============================================
   const prefersReducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
   ).matches;
@@ -814,14 +817,17 @@ document.addEventListener("DOMContentLoaded", () => {
     : [];
 
   if (!prefersReducedMotion && bubbleField && bubbleEls.length) {
+    // Elements bubbles should bounce off (cards, headings, hero text)
     const obstacleSelectors = [
       ".hero-copy",
       ".section-heading",
-      ".card:not(.product-card)",
+      ".card",
       ".product-hero-copy",
       ".subscription-block",
       ".accordion-panel",
-      ".modal-card"
+      ".modal-card",
+      ".policy-content",
+      ".footer-grid"
     ];
     let obstacles = [];
     let needsRefresh = true;
@@ -840,46 +846,38 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     };
 
-    const scheduleRefresh = () => {
-      needsRefresh = true;
-    };
-
+    const scheduleRefresh = () => { needsRefresh = true; };
     window.addEventListener("resize", scheduleRefresh, { passive: true });
     window.addEventListener("scroll", scheduleRefresh, { passive: true });
 
+    const isMobile = () => window.innerWidth <= 768;
+
+    // Initialize each bubble at its CSS position (no off-screen entry)
     const bubbleState = bubbleEls.map((bubble, index) => {
       const size = bubble.offsetWidth;
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      // Alternate left/right edges for visible two-sided cascade
-      const fromLeft = index % 2 === 0;
-      // Start just barely off-screen so entry is immediate
-      const startX = fromLeft ? -size : width;
-      // Spread vertically across upper 60% with stagger
-      const startY = (index / bubbleEls.length) * height * 0.55 + Math.random() * height * 0.1;
+      const rect = bubble.getBoundingClientRect();
+      const scrollY = window.scrollY || window.pageYOffset;
+      const x = rect.left;
+      const y = rect.top + scrollY;
       bubble.style.left = "0px";
       bubble.style.top = "0px";
-      const isMobile = width <= 768;
-      const speed = isMobile
-        ? 0.3 + Math.random() * 0.4
-        : 0.9 + Math.random() * 1.0;
-      const vx = fromLeft ? speed : -speed;
-      const vy = 0.12 + Math.random() * 0.2;
-      // Stagger spawn: each bubble enters 120ms after the previous
-      const spawnDelay = index * 120;
-      bubble.style.opacity = "0";
-      bubble.style.transform = `translate3d(${startX}px, ${startY}px, 0)`;
+      bubble.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+
+      // Unique seed per bubble for organic phase offsets
+      const seed = (index * 1.618 + 0.5) * Math.PI;
+      // Gentle random initial direction
+      const angle = Math.random() * Math.PI * 2;
+      const mobile = isMobile();
+      const baseSpeed = mobile ? 0.08 + Math.random() * 0.12 : 0.15 + Math.random() * 0.2;
       return {
         el: bubble,
         size,
-        x: startX,
-        y: startY,
-        vx: vx,
-        vy: vy,
-        seed: Math.random() * Math.PI * 2,
-        isPopping: false,
-        spawnDelay: spawnDelay,
-        hasEntered: false
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * baseSpeed,
+        vy: Math.sin(angle) * baseSpeed,
+        seed: seed,
+        isPopping: false
       };
     });
 
@@ -887,17 +885,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const respawnBubble = (bubble) => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      const fromLeft = Math.random() < 0.5;
-      // Respawn just off-screen on left or right edge
-      bubble.x = fromLeft ? -bubble.size : width;
-      bubble.y = Math.random() * height * 0.5; // upper half
-      const mobile = width <= 768;
-      const speed = mobile
-        ? 0.3 + Math.random() * 0.4
-        : 0.9 + Math.random() * 1.0;
-      bubble.vx = fromLeft ? speed : -speed;
-      bubble.vy = 0.12 + Math.random() * 0.2;
-      bubble.hasEntered = false;
+      // Respawn at a random position within the viewport (no off-screen)
+      bubble.x = Math.random() * (width - bubble.size);
+      bubble.y = Math.random() * (height - bubble.size);
+      const mobile = isMobile();
+      const angle = Math.random() * Math.PI * 2;
+      const speed = mobile ? 0.08 + Math.random() * 0.12 : 0.15 + Math.random() * 0.2;
+      bubble.vx = Math.cos(angle) * speed;
+      bubble.vy = Math.sin(angle) * speed;
       bubble.el.style.transform = `translate3d(${bubble.x}px, ${bubble.y}px, 0)`;
     };
 
@@ -941,13 +936,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.addEventListener("pointerdown", handleBubblePop, { passive: true });
 
-    const animStart = performance.now();
-    let lastTime = animStart;
+    let lastTime = performance.now();
     const animateBubbles = (time) => {
       const delta = Math.min(40, time - lastTime);
       const dt = delta / 16.67;
       lastTime = time;
-      const elapsed = time - animStart;
 
       if (needsRefresh || time - lastRefresh > 1200) {
         refreshObstacles();
@@ -957,97 +950,96 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const width = window.innerWidth;
       const height = window.innerHeight;
-      const pad = 10;
+      const pad = 12;
+      const mobile = isMobile();
+      // Speed limit: prevent bubbles from ever going too fast
+      const maxSpeed = mobile ? 0.25 : 0.4;
 
       bubbleState.forEach((bubble) => {
-        // Staggered spawn: skip until this bubble's delay has passed
-        if (elapsed < bubble.spawnDelay) return;
-        // Fade in on first visible frame
-        if (bubble.el.style.opacity === "0") {
-          bubble.el.style.opacity = "";
-        }
+        if (bubble.isPopping) return;
 
-        const mobileScale = window.innerWidth <= 768 ? 0.4 : 1;
-        const driftX = Math.sin(time / 1400 + bubble.seed) * 0.3 * mobileScale;
-        const driftY = Math.cos(time / 1600 + bubble.seed) * 0.3 * mobileScale;
-        // Gentle gravity — bubbles drift downward
-        bubble.vy += 0.002 * dt;
+        // Organic drift: layered sine waves at different frequencies
+        // Creates gentle figure-8 / orbital feel
+        const t = time * 0.001; // seconds
+        const s = bubble.seed;
+        const driftScale = mobile ? 0.06 : 0.12;
+        const driftX = (Math.sin(t * 0.4 + s) * 0.6 + Math.sin(t * 0.7 + s * 1.3) * 0.4) * driftScale;
+        const driftY = (Math.cos(t * 0.35 + s * 0.8) * 0.5 + Math.cos(t * 0.6 + s * 1.5) * 0.5) * driftScale;
+
+        // Apply drift + velocity
         bubble.x += (bubble.vx + driftX) * dt;
         bubble.y += (bubble.vy + driftY) * dt;
 
-        // Check if bubble has fully entered the viewport
-        if (!bubble.hasEntered) {
-          if (bubble.x >= 0 && bubble.x + bubble.size <= width) {
-            bubble.hasEntered = true;
-          }
+        // Gentle edge bouncing — all 4 walls, soft reversal
+        if (bubble.x <= 0) {
+          bubble.x = 0;
+          bubble.vx = Math.abs(bubble.vx) * 0.8;
         }
-
-        // Side walls: bounce (only after bubble has entered the viewport)
-        if (bubble.hasEntered) {
-          if (bubble.x <= 0) {
-            bubble.x = 0;
-            bubble.vx = Math.abs(bubble.vx);
-          }
-          if (bubble.x + bubble.size >= width) {
-            bubble.x = width - bubble.size;
-            bubble.vx = -Math.abs(bubble.vx);
-          }
+        if (bubble.x + bubble.size >= width) {
+          bubble.x = width - bubble.size;
+          bubble.vx = -Math.abs(bubble.vx) * 0.8;
         }
-        // Top wall: bounce
         if (bubble.y <= 0) {
           bubble.y = 0;
-          bubble.vy = Math.abs(bubble.vy);
+          bubble.vy = Math.abs(bubble.vy) * 0.8;
         }
-        // Bottom: respawn from a side edge (falling back in)
-        if (bubble.y > height + bubble.size) {
-          respawnBubble(bubble);
-          return;
+        if (bubble.y + bubble.size >= height) {
+          bubble.y = height - bubble.size;
+          bubble.vy = -Math.abs(bubble.vy) * 0.8;
         }
 
-        // Obstacle avoidance (only when fully inside viewport)
-        if (bubble.hasEntered) {
-          for (let i = 0; i < obstacles.length; i += 1) {
-            const rect = obstacles[i];
-            const left = rect.left - pad;
-            const right = rect.right + pad;
-            const top = rect.top - pad;
-            const bottom = rect.bottom + pad;
+        // Obstacle avoidance — bounce off cards & text
+        for (let i = 0; i < obstacles.length; i += 1) {
+          const rect = obstacles[i];
+          const left = rect.left - pad;
+          const right = rect.right + pad;
+          const top = rect.top - pad;
+          const bottom = rect.bottom + pad;
 
-            if (
-              bubble.x + bubble.size > left &&
-              bubble.x < right &&
-              bubble.y + bubble.size > top &&
-              bubble.y < bottom
-            ) {
-              const overlapX = Math.min(
-                bubble.x + bubble.size - left,
-                right - bubble.x
-              );
-              const overlapY = Math.min(
-                bubble.y + bubble.size - top,
-                bottom - bubble.y
-              );
+          if (
+            bubble.x + bubble.size > left &&
+            bubble.x < right &&
+            bubble.y + bubble.size > top &&
+            bubble.y < bottom
+          ) {
+            const overlapL = bubble.x + bubble.size - left;
+            const overlapR = right - bubble.x;
+            const overlapT = bubble.y + bubble.size - top;
+            const overlapB = bottom - bubble.y;
+            const minOverlap = Math.min(overlapL, overlapR, overlapT, overlapB);
 
-              if (overlapX < overlapY) {
-                if (bubble.x + bubble.size / 2 < (left + right) / 2) {
-                  bubble.x = left - bubble.size;
-                } else {
-                  bubble.x = right;
-                }
-                bubble.vx *= -1;
-              } else {
-                if (bubble.y + bubble.size / 2 < (top + bottom) / 2) {
-                  bubble.y = top - bubble.size;
-                } else {
-                  bubble.y = bottom;
-                }
-                bubble.vy *= -1;
-              }
-
-              bubble.vx += (Math.random() - 0.5) * 0.2;
-              bubble.vy += (Math.random() - 0.5) * 0.2;
+            if (minOverlap === overlapL) {
+              bubble.x = left - bubble.size;
+              bubble.vx = -Math.abs(bubble.vx) * 0.6;
+            } else if (minOverlap === overlapR) {
+              bubble.x = right;
+              bubble.vx = Math.abs(bubble.vx) * 0.6;
+            } else if (minOverlap === overlapT) {
+              bubble.y = top - bubble.size;
+              bubble.vy = -Math.abs(bubble.vy) * 0.6;
+            } else {
+              bubble.y = bottom;
+              bubble.vy = Math.abs(bubble.vy) * 0.6;
             }
+
+            // Tiny random nudge for organic feel
+            bubble.vx += (Math.random() - 0.5) * 0.04;
+            bubble.vy += (Math.random() - 0.5) * 0.04;
           }
+        }
+
+        // Clamp speed — no lightning-fast bubbles
+        const speed = Math.sqrt(bubble.vx * bubble.vx + bubble.vy * bubble.vy);
+        if (speed > maxSpeed) {
+          const scale = maxSpeed / speed;
+          bubble.vx *= scale;
+          bubble.vy *= scale;
+        }
+        // If bubble almost stops, give it a gentle nudge
+        if (speed < 0.03) {
+          const nudgeAngle = Math.random() * Math.PI * 2;
+          bubble.vx += Math.cos(nudgeAngle) * 0.05;
+          bubble.vy += Math.sin(nudgeAngle) * 0.05;
         }
 
         bubble.el.style.transform = `translate3d(${bubble.x}px, ${bubble.y}px, 0)`;
@@ -1258,7 +1250,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // ANTIMICROBIAL
         { name: "LL-37", desc: "Cathelicidin peptide", label: "ANTIMICROBIAL", price: "$110.00", img: "/images/products/vial.png", sectionId: "antimicrobial" },
         // ANTIOXIDANT
-        { name: "Glutathione", desc: "Tripeptide antioxidant", label: "ANTIOXIDANT", price: "$110.00", img: "/images/products/vial.png", sectionId: "antioxidant" },
+        { name: "Glutathione", desc: "Tripeptide antioxidant", label: "ANTIOXIDANT", price: "$110.00", img: "/images/products/vial.png", sectionId: "longevity" },
         // IMMUNE
         { name: "Thymalin", desc: "Thymic peptide bioregulator", label: "IMMUNE", price: "$85.00", img: "/images/products/vial.png", sectionId: "immune" },
         { name: "Thymosin Alpha-1", desc: "Thymic peptide", label: "IMMUNE", price: "From $110.00", img: "/images/products/vial.png", sectionId: "immune" },
@@ -1278,7 +1270,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // NEUROPEPTIDE
         { name: "VIP", desc: "Vasoactive intestinal peptide", label: "NEUROPEPTIDE", price: "From $100.00", img: "/images/products/vial.png", sectionId: "neuropeptide" },
         // NEUROPROTECTIVE
-        { name: "ARA-290", desc: "EPO-derived peptide", label: "NEUROPROTECTIVE", price: "$80.00", img: "/images/products/vial.png", sectionId: "neuroprotective" },
+        { name: "ARA-290", desc: "EPO-derived peptide", label: "NEUROPROTECTIVE", price: "$80.00", img: "/images/products/vial.png", sectionId: "neuropeptide" },
         // HORMONE
         { name: "Oxytocin", desc: "Neuropeptide hormone", label: "HORMONE", price: "$65.00", img: "/images/products/vial.png", sectionId: "hormone" },
         // REPRODUCTIVE
@@ -1286,7 +1278,7 @@ document.addEventListener("DOMContentLoaded", () => {
         { name: "Kisspeptin-10", desc: "GnRH stimulator", label: "REPRODUCTIVE", price: "From $80.00", img: "/images/products/vial.png", sectionId: "reproductive" },
         { name: "hCG", desc: "Human chorionic gonadotropin", label: "REPRODUCTIVE", price: "From $100.00", img: "/images/products/vial.png", sectionId: "reproductive" },
         // SEXUAL HEALTH
-        { name: "PT-141", desc: "Bremelanotide", label: "SEXUAL HEALTH", price: "$90.00", img: "/images/products/vial.png", sectionId: "sexual-health" },
+        { name: "PT-141", desc: "Bremelanotide", label: "SEXUAL HEALTH", price: "$90.00", img: "/images/products/vial.png", sectionId: "hormone" },
         // SLEEP
         { name: "DSIP", desc: "Delta sleep-inducing peptide", label: "SLEEP", price: "From $55.00", img: "/images/products/vial.png", sectionId: "sleep" },
         // TANNING

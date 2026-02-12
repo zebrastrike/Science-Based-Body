@@ -17,7 +17,7 @@
   --glass-surface: none;
   --glass-surface-strong: none;
   --glass-shine: inset 0 0.5px 0 rgba(255, 255, 255, 0.35);
-  --bubble-alpha: 0.6;
+  --bubble-alpha: 0.5;
   --radius-lg: 28px;
   --radius-md: 20px;
   --radius-sm: 14px;
@@ -2439,7 +2439,7 @@ body.is-ready .reveal {
 .bubble-field {
   position: fixed;
   inset: 0;
-  z-index: 1;
+  z-index: 0;
   pointer-events: none;
   overflow: hidden;
 }
@@ -2725,16 +2725,22 @@ body.is-ready .reveal {
   }
 }
 
-/* ── Bubbles: behind product cards on shop ── */
-body.page-shop .bubble-field { z-index: 0; }
-body.page-shop .card,
-body.page-shop .product-card { position: relative; z-index: 1; }
+/* ── Bubbles: always behind text & cards on all pages ── */
+.bubble-field { z-index: 0; }
+.card,
+.product-card,
+.section-heading,
+.hero-copy,
+.policy-content,
+.footer-grid,
+.site-footer { position: relative; z-index: 1; }
 
 /* ── No bubbles on policy/terms/footer-linked pages ── */
 body.page-policy .bubble-field { display: none; }
 
-/* ── Fewer bubbles on mobile (hide 11-20) ── */
+/* ── Fewer bubbles on mobile (hide 7-20 → only 6 on mobile) ── */
 @media (max-width: 768px) {
+  .bubble-7, .bubble-8, .bubble-9, .bubble-10,
   .bubble-11, .bubble-12, .bubble-13, .bubble-14, .bubble-15,
   .bubble-16, .bubble-17, .bubble-18, .bubble-19, .bubble-20 {
     display: none;
