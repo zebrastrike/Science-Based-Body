@@ -333,6 +333,127 @@ export class AdminService {
     return updatedOrder;
   }
 
+  /**
+   * Soft-delete an order: sets status to CANCELLED, logs to audit trail.
+   * Also deletes associated order items, payments, and shipment records
+   * for test/cleanup purposes. Requires SUPER_ADMIN.
+   */
+  async deleteOrder(orderId: string, adminId: string, hardDelete = false) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: { user: { select: { email: true, firstName: true, lastName: true } } },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    const orderSnapshot = {
+      orderNumber: order.orderNumber,
+      status: order.status,
+      totalAmount: Number(order.totalAmount),
+      customerEmail: order.user?.email,
+      customerName: [order.user?.firstName, order.user?.lastName].filter(Boolean).join(' '),
+    };
+
+    if (hardDelete) {
+      // Hard delete: DB cascades handle OrderItem, Payment, Shipment, ReturnRequest
+      await this.prisma.$transaction([
+        this.prisma.order.delete({ where: { id: orderId } }),
+        this.prisma.auditLog.create({
+          data: {
+            adminId,
+            action: 'DELETE',
+            resourceType: 'Order',
+            resourceId: orderId,
+            previousState: orderSnapshot,
+            newState: { deleted: true, hardDelete: true },
+            metadata: { reason: 'Admin hard delete' },
+          },
+        }),
+      ]);
+
+      this.logger.warn(`Order ${order.orderNumber} HARD DELETED by admin ${adminId}`);
+      return { deleted: true, orderNumber: order.orderNumber, type: 'hard_delete' };
+    }
+
+    // Soft delete: cancel the order
+    const [updatedOrder] = await this.prisma.$transaction([
+      this.prisma.order.update({
+        where: { id: orderId },
+        data: { status: OrderStatus.CANCELLED, cancelledAt: new Date() },
+      }),
+      this.prisma.auditLog.create({
+        data: {
+          adminId,
+          action: 'DELETE',
+          resourceType: 'Order',
+          resourceId: orderId,
+          previousState: orderSnapshot,
+          newState: { status: 'CANCELLED' },
+          metadata: { reason: 'Admin soft delete' },
+        },
+      }),
+    ]);
+
+    this.logger.log(`Order ${order.orderNumber} soft-deleted (CANCELLED) by admin ${adminId}`);
+    return { deleted: true, orderNumber: order.orderNumber, type: 'soft_delete', order: updatedOrder };
+  }
+
+  /**
+   * Bulk delete orders by customer name(s) — for test data cleanup.
+   */
+  async bulkDeleteOrdersByCustomerName(names: string[], adminId: string, hardDelete = false) {
+    const results: Array<{ orderNumber: string; result: string }> = [];
+
+    for (const name of names) {
+      const nameParts = name.trim().toLowerCase().split(/\s+/);
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      // Find users matching the name
+      const andConditions: any[] = [
+        { firstName: { contains: firstName, mode: 'insensitive' } },
+      ];
+      if (lastName) {
+        andConditions.push({ lastName: { contains: lastName, mode: 'insensitive' } });
+      }
+
+      const orConditions: any[] = [{ AND: andConditions }];
+      if (nameParts.length === 1) {
+        orConditions.push({ firstName: { equals: firstName, mode: 'insensitive' } });
+      }
+
+      const users = await this.prisma.user.findMany({
+        where: { OR: orConditions },
+        select: { id: true, firstName: true, lastName: true, email: true },
+      });
+
+      if (users.length === 0) {
+        results.push({ orderNumber: `No users found for "${name}"`, result: 'skipped' });
+        continue;
+      }
+
+      for (const user of users) {
+        const orders = await this.prisma.order.findMany({
+          where: { userId: user.id },
+          select: { id: true, orderNumber: true },
+        });
+
+        for (const order of orders) {
+          try {
+            await this.deleteOrder(order.id, adminId, hardDelete);
+            results.push({ orderNumber: order.orderNumber, result: hardDelete ? 'hard_deleted' : 'cancelled' });
+          } catch (err: any) {
+            results.push({ orderNumber: order.orderNumber, result: `error: ${err.message}` });
+          }
+        }
+      }
+    }
+
+    return { processed: results.length, results };
+  }
+
   // ==========================================================================
   // PRODUCTS
   // ==========================================================================

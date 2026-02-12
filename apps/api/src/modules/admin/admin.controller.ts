@@ -235,6 +235,39 @@ export class AdminController {
   }
 
   // ==========================================================================
+  // ORDER DELETION
+  // ==========================================================================
+
+  @Delete('orders/:id')
+  @ApiOperation({ summary: 'Delete an order (soft delete = cancel, hard delete = remove)' })
+  @ApiParam({ name: 'id', description: 'Order ID' })
+  @ApiQuery({ name: 'hard', required: false, type: Boolean, description: 'Hard delete (permanently remove) vs soft delete (cancel)' })
+  @ApiResponse({ status: 200, description: 'Order deleted' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  deleteOrder(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Query('hard') hard?: string,
+  ) {
+    const hardDelete = hard === 'true' || hard === '1';
+    return this.adminService.deleteOrder(id, req.user.id, hardDelete);
+  }
+
+  @Post('orders/bulk-delete')
+  @ApiOperation({ summary: 'Bulk delete orders by customer name(s) — for test data cleanup' })
+  @ApiResponse({ status: 200, description: 'Bulk delete results' })
+  bulkDeleteOrders(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: { names: string[]; hardDelete?: boolean },
+  ) {
+    return this.adminService.bulkDeleteOrdersByCustomerName(
+      body.names,
+      req.user.id,
+      body.hardDelete ?? false,
+    );
+  }
+
+  // ==========================================================================
   // ORDER FULFILLMENT (Shippo + Manual Payment Approval)
   // ==========================================================================
 
