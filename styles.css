@@ -426,6 +426,96 @@ button.btn {
   font-size: 0.78rem;
 }
 
+/* COA Badge — overlaid on product image */
+.product-card { position: relative; }
+.coa-badge {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--sage);
+  color: #166534;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  z-index: 3;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  text-decoration: none;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(31,42,54,0.08);
+}
+.coa-badge:hover {
+  background: #e8f5e9;
+  box-shadow: 0 4px 16px rgba(22,163,74,0.18);
+  transform: translateY(-1px);
+}
+.coa-badge svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+/* COA Lightbox (for image COAs) */
+.coa-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(31,42,54,0.85);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+.coa-lightbox.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+.coa-lightbox-inner {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+.coa-lightbox-inner img {
+  max-width: 100%;
+  max-height: 85vh;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+.coa-lightbox-close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  color: var(--ink);
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+.coa-lightbox-title {
+  text-align: center;
+  color: #fff;
+  font-size: 0.85rem;
+  margin-top: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
 /* In-Stock Carousel */
 .carousel-wrap {
   position: relative;
