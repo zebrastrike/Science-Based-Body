@@ -137,6 +137,11 @@ export class SmtpService {
     return this.sendEmail({ to, subject, html, text, tags: ['password-reset', 'account'] });
   }
 
+  async sendClaimAccountCode(to: string, firstName: string, code: string) {
+    const { subject, html, text } = this.templates.claimAccountCode(firstName, code);
+    return this.sendEmail({ to, subject, html, text, tags: ['claim-account', 'verification'] });
+  }
+
   // ===========================================================================
   // ORDER EMAILS
   // ===========================================================================

@@ -33,6 +33,18 @@ export class AuthService {
     });
 
     if (existingUser) {
+      // Guest account (no password) — tell frontend to use claim flow
+      if (!existingUser.passwordHash) {
+        const orderCount = await this.prisma.order.count({
+          where: { userId: existingUser.id },
+        });
+        throw new ConflictException({
+          statusCode: 409,
+          message: 'Guest account found',
+          isGuest: true,
+          orderCount,
+        });
+      }
       throw new ConflictException('Email already registered');
     }
 
@@ -367,5 +379,215 @@ export class AuthService {
     });
 
     return { message: 'Password changed successfully' };
+  }
+
+  // ===========================================================================
+  // GUEST ACCOUNT CLAIM (convert guest checkout to full account)
+  // ===========================================================================
+
+  async claimAccount(
+    email: string,
+    firstName: string,
+    lastName: string,
+    phone: string,
+    ipAddress: string,
+  ) {
+    const normalizedEmail = email.toLowerCase();
+    const user = await this.prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (!user) {
+      throw new NotFoundException('No account found with this email');
+    }
+
+    // If user already has a password, they should log in instead
+    if (user.passwordHash) {
+      throw new BadRequestException(
+        'This account already has a password. Please log in or use forgot password.',
+      );
+    }
+
+    // Check that user has orders (confirm they're a real guest checkout customer)
+    const orderCount = await this.prisma.order.count({
+      where: { userId: user.id },
+    });
+
+    if (orderCount === 0) {
+      throw new BadRequestException('No orders found for this email');
+    }
+
+    // Generate 4-digit code
+    const code = String(Math.floor(1000 + Math.random() * 9000));
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    // Store code + submitted info in Settings
+    await this.prisma.setting.upsert({
+      where: { key: `claim_code_${user.id}` },
+      create: {
+        key: `claim_code_${user.id}`,
+        value: JSON.stringify({
+          code,
+          firstName,
+          lastName,
+          phone,
+          expiresAt: expiresAt.toISOString(),
+          attempts: 0,
+        }),
+        type: 'json',
+        description: 'Account claim verification code',
+      },
+      update: {
+        value: JSON.stringify({
+          code,
+          firstName,
+          lastName,
+          phone,
+          expiresAt: expiresAt.toISOString(),
+          attempts: 0,
+        }),
+      },
+    });
+
+    // Log audit
+    await this.prisma.auditLog.create({
+      data: {
+        userId: user.id,
+        action: 'UPDATE',
+        resourceType: 'User',
+        resourceId: user.id,
+        ipAddress,
+        metadata: { event: 'claim_account_code_sent' },
+      },
+    });
+
+    // Send verification code email
+    const displayName = firstName || user.firstName || 'Researcher';
+    this.mailgunService
+      .sendClaimAccountCode(user.email, displayName, code)
+      .catch((err) =>
+        this.logger.error(`Failed to send claim code email: ${err.message}`),
+      );
+
+    return {
+      message: 'Verification code sent to your email',
+      orderCount,
+    };
+  }
+
+  async claimAccountVerify(
+    email: string,
+    code: string,
+    password: string,
+    ipAddress: string,
+  ) {
+    const normalizedEmail = email.toLowerCase();
+    const user = await this.prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (!user) {
+      throw new NotFoundException('No account found with this email');
+    }
+
+    if (user.passwordHash) {
+      throw new BadRequestException('Account already has a password');
+    }
+
+    // Look up the stored code
+    const setting = await this.prisma.setting.findUnique({
+      where: { key: `claim_code_${user.id}` },
+    });
+
+    if (!setting) {
+      throw new BadRequestException(
+        'No verification code found. Please request a new one.',
+      );
+    }
+
+    const data = JSON.parse(setting.value);
+
+    // Check expiration
+    if (new Date(data.expiresAt) < new Date()) {
+      await this.prisma.setting.delete({
+        where: { key: `claim_code_${user.id}` },
+      });
+      throw new BadRequestException(
+        'Verification code has expired. Please request a new one.',
+      );
+    }
+
+    // Check attempts (max 5)
+    if (data.attempts >= 5) {
+      await this.prisma.setting.delete({
+        where: { key: `claim_code_${user.id}` },
+      });
+      throw new BadRequestException(
+        'Too many failed attempts. Please request a new code.',
+      );
+    }
+
+    // Verify code
+    if (data.code !== code) {
+      // Increment attempts
+      data.attempts += 1;
+      await this.prisma.setting.update({
+        where: { key: `claim_code_${user.id}` },
+        data: {
+          value: JSON.stringify(data),
+        },
+      });
+      throw new BadRequestException('Invalid verification code');
+    }
+
+    // Validate password
+    if (!password || password.length < 8) {
+      throw new BadRequestException('Password must be at least 8 characters');
+    }
+
+    // Hash password and update user
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash,
+        firstName: data.firstName || user.firstName,
+        lastName: data.lastName || user.lastName,
+        phone: data.phone || user.phone,
+      },
+    });
+
+    // Delete the claim code
+    await this.prisma.setting.delete({
+      where: { key: `claim_code_${user.id}` },
+    });
+
+    // Generate tokens
+    const tokens = await this.generateTokens(user.id, user.email, user.role);
+
+    // Log audit
+    await this.prisma.auditLog.create({
+      data: {
+        userId: user.id,
+        action: 'UPDATE',
+        resourceType: 'User',
+        resourceId: user.id,
+        ipAddress,
+        metadata: { event: 'guest_account_claimed' },
+      },
+    });
+
+    return {
+      message: 'Account set up successfully',
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: data.firstName || user.firstName,
+        lastName: data.lastName || user.lastName,
+        role: user.role,
+      },
+      ...tokens,
+    };
   }
 }

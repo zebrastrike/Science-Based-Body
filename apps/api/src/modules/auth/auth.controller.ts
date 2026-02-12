@@ -104,4 +104,42 @@ export class AuthController {
       ipAddress,
     );
   }
+
+  @Post('claim-account')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Request verification code to claim a guest account' })
+  @ApiResponse({ status: 200, description: 'Verification code sent' })
+  @ApiResponse({ status: 404, description: 'No account found' })
+  @ApiResponse({ status: 400, description: 'Account already has password' })
+  async claimAccount(
+    @Body() body: { email: string; firstName: string; lastName: string; phone: string },
+    @Req() req: Request,
+  ) {
+    const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
+    return this.authService.claimAccount(
+      body.email,
+      body.firstName,
+      body.lastName,
+      body.phone,
+      ipAddress,
+    );
+  }
+
+  @Post('claim-account/verify')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify code and set password to claim guest account' })
+  @ApiResponse({ status: 200, description: 'Account claimed successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired code' })
+  async claimAccountVerify(
+    @Body() body: { email: string; code: string; password: string },
+    @Req() req: Request,
+  ) {
+    const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
+    return this.authService.claimAccountVerify(
+      body.email,
+      body.code,
+      body.password,
+      ipAddress,
+    );
+  }
 }

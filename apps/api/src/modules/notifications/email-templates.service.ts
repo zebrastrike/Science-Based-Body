@@ -248,6 +248,27 @@ export class EmailTemplatesService {
     return { subject, html, text };
   }
 
+  claimAccountCode(firstName: string, code: string): { subject: string; html: string; text: string } {
+    const subject = 'Your Verification Code - Science Based Body';
+    const html = this.baseTemplate(`
+      <h1 style="margin:0 0 20px 0;font-size:28px;color:${this.ink};font-family:Georgia,'Times New Roman',Times,serif;font-weight:400;">Claim Your Account</h1>
+      <p style="margin:0 0 20px 0;font-size:16px;color:${this.ink};line-height:1.6;">
+        Hi ${firstName}, we found existing orders linked to your email. Use the code below to verify your identity and set up your account.
+      </p>
+      <div style="margin:0 0 30px 0;text-align:center;">
+        <div style="display:inline-block;background:${this.bone};border:2px solid ${this.sage};border-radius:12px;padding:20px 40px;">
+          <span style="font-size:36px;font-weight:700;letter-spacing:12px;color:${this.ink};font-family:'Courier New',Courier,monospace;">${code}</span>
+        </div>
+      </div>
+      <p style="margin:0 0 15px 0;font-size:14px;color:#6b7280;">
+        This code expires in 15 minutes. If you didn't request this, you can safely ignore this email.
+      </p>
+    `, 'Your verification code for Science Based Body');
+
+    const text = `Hi ${firstName},\n\nYour verification code is: ${code}\n\nThis code expires in 15 minutes.`;
+    return { subject, html, text };
+  }
+
   // ===========================================================================
   // ORDER EMAILS
   // ===========================================================================
