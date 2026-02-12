@@ -5003,22 +5003,24 @@ body.page-home .variant-select option {
   color: var(--ink);
   opacity: 0.55;
   border-left: 3px solid transparent;
-  transition: opacity 0.2s, border-color 0.2s, background 0.2s, color 0.2s;
+  transition: all 0.25s ease;
   white-space: nowrap;
 }
 
 .shop-sidebar-link:hover {
-  opacity: 1;
-  background: rgba(199, 215, 230, 0.2);
+  opacity: 0.85;
+  color: var(--rose);
+  background: rgba(227, 167, 161, 0.08);
 }
 
 .shop-sidebar-link.is-active {
   opacity: 1;
-  color: var(--rose);
-  border-left-color: var(--rose);
-  background: rgba(227, 167, 161, 0.13);
-  font-weight: 700;
-  transform: translateX(2px);
+  color: var(--rose) !important;
+  font-weight: 700 !important;
+  border-left: 3px solid var(--rose);
+  background: rgba(227, 167, 161, 0.15);
+  transform: translateX(3px);
+  text-shadow: 0 0 8px rgba(227, 167, 161, 0.3);
 }
 
 /* ============================================
