@@ -1470,7 +1470,10 @@ document.addEventListener("DOMContentLoaded", () => {
           if (self.searchContainer) {
             self.searchContainer.classList.toggle("is-mobile-open");
             if (self.searchContainer.classList.contains("is-mobile-open")) {
+              document.body.classList.add("search-open");
               setTimeout(function() { self.searchInput.focus(); }, 100);
+            } else {
+              document.body.classList.remove("search-open");
             }
           }
         });
