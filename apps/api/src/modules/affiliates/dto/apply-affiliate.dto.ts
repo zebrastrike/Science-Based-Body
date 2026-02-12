@@ -1,4 +1,5 @@
-import { IsString, IsOptional, IsObject, IsEmail } from 'class-validator';
+import { IsString, IsOptional, IsObject, IsEmail, IsBoolean } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class ApplyAffiliateDto {
   @IsString()
@@ -28,4 +29,9 @@ export class ApplyAffiliateDto {
   @IsOptional()
   @IsString()
   whyPartner?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => value === true || value === 'true')
+  applyAsSalesAgent?: boolean;
 }

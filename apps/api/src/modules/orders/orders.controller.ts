@@ -112,6 +112,21 @@ export class OrdersController {
   }
 
   // ===========================================================================
+  // REORDER
+  // ===========================================================================
+
+  @Get(':id/reorder-items')
+  @ApiOperation({ summary: 'Get items from a past order for reordering' })
+  @ApiResponse({ status: 200, description: 'Reorder items returned' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  getReorderItems(
+    @CurrentUser('id') userId: string,
+    @Param('id') orderId: string,
+  ) {
+    return this.ordersService.getReorderItems(orderId, userId);
+  }
+
+  // ===========================================================================
   // EMAIL RESEND
   // ===========================================================================
 

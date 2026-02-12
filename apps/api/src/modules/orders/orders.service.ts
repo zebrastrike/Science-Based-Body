@@ -552,6 +552,47 @@ export class OrdersService {
   }
 
   // ===========================================================================
+  // REORDER ITEMS
+  // ===========================================================================
+
+  /**
+   * Get items from a past order formatted for cart re-add
+   */
+  async getReorderItems(orderId: string, userId: string) {
+    const order = await this.prisma.order.findFirst({
+      where: { id: orderId, userId },
+      include: {
+        items: {
+          include: {
+            product: {
+              select: { id: true, name: true, slug: true, isActive: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return {
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      items: order.items
+        .filter((item) => item.product.isActive)
+        .map((item) => ({
+          productId: item.productId,
+          variantId: item.variantId,
+          productName: item.productName,
+          variantName: item.variantName,
+          slug: item.product.slug,
+          quantity: item.quantity,
+        })),
+    };
+  }
+
+  // ===========================================================================
   // CUSTOMER RETURNS
   // ===========================================================================
 

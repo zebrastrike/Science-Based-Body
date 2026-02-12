@@ -416,6 +416,55 @@ export class CatalogService {
     };
   }
 
+  // ===========================================================================
+  // WHOLESALE CATALOG (no pricing, all products including hidden)
+  // ===========================================================================
+
+  /**
+   * Get full wholesale catalog — ALL products including hidden/inactive,
+   * all variants, alphabetically sorted with stacks at the bottom.
+   * NO pricing fields in response.
+   */
+  async getWholesaleCatalog() {
+    const products = await this.prisma.product.findMany({
+      include: {
+        variants: { orderBy: { sortOrder: 'asc' } },
+        images: { where: { isPrimary: true }, take: 1 },
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    // Separate research combinations (stacks) from individual products
+    const individual = products.filter((p) => p.category !== ProductCategory.RESEARCH_COMBINATIONS);
+    const stacks = products.filter((p) => p.category === ProductCategory.RESEARCH_COMBINATIONS);
+
+    const transform = (p: any) => ({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      sku: p.sku,
+      category: p.category,
+      subcategory: p.subcategory,
+      shortDescription: p.shortDescription,
+      casNumber: p.casNumber,
+      primaryImage: p.images[0]?.url || null,
+      hasVariants: p.variants.length > 0,
+      variants: p.variants.map((v: any) => ({
+        id: v.id,
+        sku: v.sku,
+        name: v.name,
+        strength: v.strength,
+      })),
+    });
+
+    return {
+      products: [...individual.map(transform), ...stacks.map(transform)],
+      totalProducts: products.length,
+      totalIndividual: individual.length,
+      totalStacks: stacks.length,
+    };
+  }
+
   // ========== Helper Methods ==========
 
   private getPriceRange(product: any, excludeWholesale = false): { min: number; max: number } | null {

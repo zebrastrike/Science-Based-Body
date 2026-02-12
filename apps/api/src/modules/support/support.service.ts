@@ -344,6 +344,44 @@ export class SupportService {
   }
 
   // ===========================================================================
+  // CALLBACK REQUEST
+  // ===========================================================================
+
+  async submitCallbackRequest(data: {
+    name: string;
+    email: string;
+    phone: string;
+    reason: string;
+    type: string;
+  }) {
+    if (!data.name || !data.phone || !data.reason) {
+      throw new BadRequestException('Name, phone, and reason are required');
+    }
+
+    // Send callback request email to admin
+    await this.mailgun.sendEmail({
+      to: 'sales@sbbpeptides.com',
+      subject: `Callback Request: ${data.name} — ${data.type || 'General'}`,
+      html: `
+        <h2>Customer Callback Request</h2>
+        <p><strong>Name:</strong> ${data.name}</p>
+        <p><strong>Email:</strong> ${data.email || 'N/A'}</p>
+        <p><strong>Phone:</strong> ${data.phone}</p>
+        <p><strong>Type:</strong> ${data.type || 'General'}</p>
+        <p><strong>Reason:</strong> ${data.reason}</p>
+        <hr />
+        <p><em>Submitted at ${new Date().toISOString()}</em></p>
+      `,
+      tags: ['admin', 'callback-request'],
+    });
+
+    return {
+      success: true,
+      message: 'Your callback request has been submitted. We will reach out shortly.',
+    };
+  }
+
+  // ===========================================================================
   // HELPERS
   // ===========================================================================
 

@@ -39,6 +39,16 @@ export class PartnersController {
     }));
     return this.partnersService.apply(dto, files);
   }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('BRAND_PARTNER')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get my partner info' })
+  @ApiResponse({ status: 200, description: 'Partner info returned' })
+  async getMyInfo(@CurrentUser('id') userId: string) {
+    return this.partnersService.getMyInfo(userId);
+  }
 }
 
 // ===========================================================================

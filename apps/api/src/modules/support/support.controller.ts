@@ -140,4 +140,20 @@ export class SupportController {
   getFAQCategories() {
     return this.supportService.getFAQCategories();
   }
+
+  // ===========================================================================
+  // CALLBACK REQUEST
+  // ===========================================================================
+
+  @Post('callback')
+  @HttpCode(200)
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 requests per minute
+  @ApiOperation({ summary: 'Request a callback from support' })
+  @ApiResponse({ status: 200, description: 'Callback request submitted' })
+  @ApiResponse({ status: 429, description: 'Too many requests' })
+  submitCallbackRequest(
+    @Body() body: { name: string; email: string; phone: string; reason: string; type: string },
+  ) {
+    return this.supportService.submitCallbackRequest(body);
+  }
 }

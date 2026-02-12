@@ -18,7 +18,7 @@ export class LocalStorageService {
   }
 
   private ensureDirectories() {
-    const subdirs = ['affiliates', 'partners'];
+    const subdirs = ['affiliates', 'partners', 'documents'];
     for (const sub of subdirs) {
       const dir = path.join(this.uploadDir, sub);
       try {
@@ -39,7 +39,7 @@ export class LocalStorageService {
   async saveFile(
     buffer: Buffer,
     originalFilename: string,
-    subdir: 'affiliates' | 'partners',
+    subdir: 'affiliates' | 'partners' | 'documents',
   ): Promise<{ storedPath: string; originalName: string; size: number }> {
     // Validate file size
     if (buffer.length > MAX_FILE_SIZE) {

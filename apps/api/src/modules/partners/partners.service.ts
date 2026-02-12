@@ -280,4 +280,40 @@ export class PartnersService {
 
     return { message: 'Application rejected' };
   }
+
+  // ===========================================================================
+  // PARTNER DASHBOARD
+  // ===========================================================================
+
+  /**
+   * Get partner info for dashboard (authenticated partner)
+   */
+  async getMyInfo(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        organization: true,
+        priceList: { select: { id: true, name: true, discountPercent: true, isActive: true } },
+      },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    return {
+      organization: user.organization
+        ? {
+            name: user.organization.name,
+            type: user.organization.type,
+            verificationStatus: user.organization.isVerified ? 'VERIFIED' : 'PENDING',
+          }
+        : null,
+      priceList: user.priceList
+        ? {
+            name: user.priceList.name,
+            discountPercent: Number(user.priceList.discountPercent),
+            isActive: user.priceList.isActive,
+          }
+        : null,
+    };
+  }
 }

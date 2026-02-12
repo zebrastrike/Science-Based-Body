@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { EncryptionService } from '../../common/encryption.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -118,6 +119,48 @@ export class UsersService {
       where: { id: addressId },
       data: { isDefault: true },
     });
+  }
+
+  // ===========================================================================
+  // EMAIL CHANGE
+  // ===========================================================================
+
+  async changeEmail(userId: string, newEmail: string, password: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+    if (!isPasswordValid) {
+      throw new BadRequestException('Incorrect password');
+    }
+
+    // Check if new email is already taken
+    const normalizedEmail = newEmail.toLowerCase();
+    const existing = await this.prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+    if (existing && existing.id !== userId) {
+      throw new BadRequestException('Email is already in use');
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: { email: normalizedEmail },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+      },
+    });
+
+    return { success: true, message: 'Email updated', user: updated };
   }
 
   // ===========================================================================

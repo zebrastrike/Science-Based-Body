@@ -179,6 +179,10 @@ model User {
   // Affiliate
   affiliate         Affiliate?
 
+  // Documents (e-sign hub)
+  assignedDocuments  Document[]  @relation("AssignedDocuments")
+  uploadedDocuments  Document[]  @relation("UploadedDocuments")
+
   // Wholesale/B2B
   organizationId    String?
   organization      Organization? @relation(fields: [organizationId], references: [id])
@@ -1072,6 +1076,7 @@ model AffiliateApplication {
   contentFocus      String?           // fitness, wellness, biohacking, etc.
   whyPartner        String?           // free-text motivation
   resumePath        String?           // local file path for uploaded resume
+  applyAsSalesAgent Boolean           @default(false)
   status            ApplicationStatus @default(PENDING)
   reviewedById      String?
   reviewedAt        DateTime?
@@ -1091,6 +1096,7 @@ model Affiliate {
   referralCode      String            @unique
   commissionRate    Decimal           @default(0.05) @db.Decimal(5, 4) // 5%
   isActive          Boolean           @default(true)
+  isSalesAgent      Boolean           @default(false)
 
   // Stats (denormalized for dashboard performance)
   totalClicks       Int               @default(0)
@@ -1210,4 +1216,48 @@ model MarketingPopup {
 
   @@index([isActive])
   @@index([priority])
+}
+
+// =============================================================================
+// DOCUMENT HUB (E-SIGN)
+// =============================================================================
+
+enum DocumentStatus {
+  PENDING_SIGNATURE
+  SIGNED
+  EXPIRED
+  CANCELLED
+}
+
+model Document {
+  id                String          @id @default(cuid())
+  title             String
+  description       String?
+  filePath          String
+  originalName      String
+  mimeType          String          @default("application/pdf")
+  fileSize          Int
+
+  // Assignment
+  assignedToId      String
+  assignedTo        User            @relation("AssignedDocuments", fields: [assignedToId], references: [id])
+  assignedById      String?
+  assignedBy        User?           @relation("UploadedDocuments", fields: [assignedById], references: [id])
+
+  status            DocumentStatus  @default(PENDING_SIGNATURE)
+  requiresSignature Boolean         @default(true)
+
+  // E-Sign capture
+  signedAt          DateTime?
+  signedName        String?         // Full legal name typed by signer
+  signedIp          String?
+  signedUserAgent   String?
+
+  expiresAt         DateTime?
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([assignedToId])
+  @@index([status])
 }

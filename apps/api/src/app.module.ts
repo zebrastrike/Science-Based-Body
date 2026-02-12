@@ -31,6 +31,7 @@ import { HealthModule } from './health/health.module';
 import { TaxModule } from './modules/tax/tax.module';
 import { AffiliatesModule } from './modules/affiliates/affiliates.module';
 import { PartnersModule } from './modules/partners/partners.module';
+import { DocumentsModule } from './modules/documents/documents.module';
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { PartnersModule } from './modules/partners/partners.module';
     TaxModule,
     AffiliatesModule,
     PartnersModule,
+    DocumentsModule,
   ],
   providers: [
     // Global rate limiting guard

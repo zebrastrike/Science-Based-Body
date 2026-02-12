@@ -1920,6 +1920,11 @@ document.addEventListener("DOMContentLoaded", () => {
       formData.append("contentFocus", (document.getElementById("affiliate-focus") || {}).value || "");
       formData.append("whyPartner", (document.getElementById("affiliate-notes") || {}).value || "");
 
+      var salesAgentCheckbox = document.getElementById("affiliate-sales-agent");
+      if (salesAgentCheckbox && salesAgentCheckbox.checked) {
+        formData.append("applyAsSalesAgent", "true");
+      }
+
       var resumeInput = document.getElementById("affiliate-resume");
       if (resumeInput && resumeInput.files[0]) {
         formData.append("resume", resumeInput.files[0]);

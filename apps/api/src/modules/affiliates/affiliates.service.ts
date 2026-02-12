@@ -53,6 +53,7 @@ export class AffiliatesService {
         audienceSize: dto.audienceSize,
         contentFocus: dto.contentFocus,
         whyPartner: dto.whyPartner,
+        applyAsSalesAgent: dto.applyAsSalesAgent || false,
         resumePath,
       },
     });
@@ -80,6 +81,7 @@ export class AffiliatesService {
           <p><strong>Content Focus:</strong> ${dto.contentFocus || 'N/A'}</p>
           <p><strong>Why Partner:</strong> ${dto.whyPartner || 'N/A'}</p>
           <p><strong>Social Links:</strong> ${JSON.stringify(dto.socialLinks, null, 2)}</p>
+          <p><strong>Apply as Sales Agent:</strong> ${dto.applyAsSalesAgent ? 'YES' : 'No'}</p>
           ${resumeFile ? '<p><em>Resume attached.</em></p>' : ''}
         `,
         tags: ['admin', 'affiliate-application'],
@@ -203,11 +205,13 @@ export class AffiliatesService {
         });
       }
 
-      // Create affiliate record
+      // Create affiliate record (with sales agent flag if applied)
       const affiliate = await tx.affiliate.create({
         data: {
           userId: user.id,
           referralCode,
+          isSalesAgent: application.applyAsSalesAgent || false,
+          commissionRate: application.applyAsSalesAgent ? 0.10 : 0.05,
         },
       });
 
@@ -308,6 +312,7 @@ export class AffiliatesService {
       referralLink: `https://api.sbbpeptides.com/api/v1/affiliates/r/${affiliate.referralCode}`,
       legacyLink: `https://sbbpeptides.com?ref=${affiliate.referralCode}`,
       commissionRate: Number(affiliate.commissionRate),
+      isSalesAgent: affiliate.isSalesAgent,
       totalClicks: affiliate.totalClicks,
       totalOrders: affiliate.totalOrders,
       totalRevenue: Number(affiliate.totalRevenue),

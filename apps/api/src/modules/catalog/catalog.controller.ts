@@ -1,13 +1,17 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiQuery,
   ApiResponse,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CatalogService, SortOption } from './catalog.service';
 import { Public } from '../auth/decorators/public.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { ProductCategory } from '@prisma/client';
 
 @ApiTags('catalog')
@@ -122,5 +126,19 @@ export class CatalogController {
   @ApiResponse({ status: 200, description: 'Featured products' })
   getFeatured(@Query('limit') limit?: number) {
     return this.catalogService.getFeatured(limit ? Number(limit) : undefined);
+  }
+
+  // ===========================================================================
+  // WHOLESALE CATALOG (Authenticated affiliates/partners only)
+  // ===========================================================================
+
+  @Get('wholesale')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('AFFILIATE', 'BRAND_PARTNER', 'ADMIN', 'SUPER_ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get wholesale product catalog (no pricing)' })
+  @ApiResponse({ status: 200, description: 'Wholesale catalog returned' })
+  getWholesaleCatalog() {
+    return this.catalogService.getWholesaleCatalog();
   }
 }
