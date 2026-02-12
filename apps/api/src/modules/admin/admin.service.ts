@@ -858,7 +858,7 @@ export class AdminService {
       }),
       // Orders grouped by day
       this.prisma.$queryRaw`
-        SELECT DATE("createdAt") as date, COUNT(*) as orders, SUM("totalAmount") as revenue
+        SELECT DATE("createdAt") as date, COUNT(*)::int as orders, SUM("totalAmount") as revenue
         FROM "Order"
         WHERE "createdAt" >= ${startDate} AND "createdAt" <= ${endDate}
         AND status NOT IN ('CANCELLED', 'REFUNDED')
