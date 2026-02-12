@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wholesale Catalog | Science Based Body</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400&family=Sora:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css?v=20260212" />
+  </head>
+  <body class="page-shop">
+    <div class="bubble-field" aria-hidden="true">
+      <span class="bubble bubble-1"></span>
+      <span class="bubble bubble-2"></span>
+      <span class="bubble bubble-3"></span>
+      <span class="bubble bubble-4"></span>
+      <span class="bubble bubble-5"></span>
+      <span class="bubble bubble-6"></span>
+      <span class="bubble bubble-7"></span>
+      <span class="bubble bubble-8"></span>
+      <span class="bubble bubble-9"></span>
+      <span class="bubble bubble-10"></span>
+      <span class="bubble bubble-11"></span>
+      <span class="bubble bubble-12"></span>
+      <span class="bubble bubble-13"></span>
+      <span class="bubble bubble-14"></span>
+      <span class="bubble bubble-15"></span>
+      <span class="bubble bubble-16"></span>
+      <span class="bubble bubble-17"></span>
+      <span class="bubble bubble-18"></span>
+      <span class="bubble bubble-19"></span>
+      <span class="bubble bubble-20"></span>
+    </div>
+    <header class="site-header">
+      <div class="container header-grid">
+        <a class="logo" href="index.html">
+          <img src="/logo.png" alt="Science Based Body" />
+        </a>
+        <div class="site-search" id="site-search">
+          <input type="text" class="site-search-input" id="search-input" placeholder="Search peptides..." autocomplete="off" aria-label="Search products" />
+          <button type="button" class="site-search-btn" aria-label="Search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          </button>
+          <div class="search-results" id="search-results"></div>
+        </div>
+        <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+          <span class="menu-icon"></span>
+        </button>
+        <button type="button" class="mobile-search-toggle" id="mobile-search-toggle" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </button>
+        <nav class="site-nav">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="shop.html" class="nav-link">Shop</a>
+          <a href="product.html" class="nav-link">Peptide Library</a>
+          <a href="branded-for-science.html" class="nav-link">Branded for Science</a>
+          <a href="brand-partnerships.html" class="nav-link">Brand Partners &amp; Affiliates</a>
+          <button type="button" class="cart-toggle" id="inquiry-toggle" aria-label="Open inquiry list">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+              <rect x="9" y="3" width="6" height="4" rx="1"/>
+              <path d="M9 12h6"/><path d="M9 16h6"/>
+            </svg>
+            <span class="cart-badge is-hidden" id="inquiry-badge">0</span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- AUTH GATE — shown when not authenticated or wrong role -->
+      <section class="section" id="auth-gate" style="min-height: 60vh; display: flex; align-items: center;">
+        <div class="container" style="max-width: 520px; text-align: center;">
+          <div class="card reveal" style="padding: 3rem 2rem;">
+            <span class="label">WHOLESALE ACCESS</span>
+            <h1 style="margin: 1rem 0;">Partner Catalog</h1>
+            <p style="font-size: 1.05rem; opacity: 0.85; margin-bottom: 1.5rem;">
+              This catalog is restricted to approved wholesale partners and sales affiliates. Sign in with your partner credentials to browse our full product line.
+            </p>
+            <p id="auth-error-msg" style="color: var(--rose); font-size: 0.9rem; margin-bottom: 1rem; display: none;"></p>
+            <a class="btn btn-primary" href="login.html?redirect=wholesale-shop" id="auth-sign-in-btn">Sign In to Continue</a>
+            <p style="font-size: 0.82rem; opacity: 0.6; margin-top: 1.25rem;">
+              Not a partner yet? <a href="brand-partnerships.html" class="text-link">Apply for a brand partnership</a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- LOADING STATE -->
+      <section class="section" id="loading-state" style="display: none; min-height: 40vh; display: none; align-items: center;">
+        <div class="container" style="text-align: center;">
+          <span class="label">LOADING</span>
+          <h2>Loading catalog...</h2>
+        </div>
+      </section>
+
+      <!-- MAIN CATALOG — shown when authenticated with correct role -->
+      <div id="wholesale-catalog" style="display: none;">
+        <!-- Hero -->
+        <section class="section shop-hero" style="min-height: 36vh;">
+          <div class="container hero-overlay">
+            <div class="hero-copy reveal">
+              <span class="label">WHOLESALE CATALOG</span>
+              <h1>Full Product Line</h1>
+              <p>Browse our complete catalog including all sizes and variants. Contact your sales representative for pricing and availability.</p>
+              <p id="user-greeting" style="font-size: 0.88rem; color: var(--powder); margin-top: 0.5rem;"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Category navigation -->
+        <nav class="shop-nav" id="ws-shop-nav">
+          <div class="container">
+            <div class="shop-nav-inner">
+              <div class="shop-nav-scroll" id="ws-category-nav"></div>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Product sections (dynamically built) -->
+        <div id="ws-product-sections"></div>
+
+        <!-- Contact CTA -->
+        <section class="section">
+          <div class="container" style="max-width: 720px; text-align: center;">
+            <div class="card reveal" style="padding: 2.5rem;">
+              <span class="label">WHOLESALE PRICING</span>
+              <h2 style="margin: 0.75rem 0 1rem;">Ready to Order?</h2>
+              <p style="font-size: 1.05rem; opacity: 0.85; margin-bottom: 1.25rem;">
+                Build your inquiry list and submit it to our sales team for a custom quote. All wholesale orders include priority fulfillment and dedicated account support.
+              </p>
+              <a class="btn btn-primary" href="mailto:sales@sbbpeptides.com?subject=Wholesale%20Inquiry">Contact Sales Team</a>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- BACK TO TOP -->
+    <a href="#ws-shop-nav" class="back-to-top" id="back-to-top" aria-label="Back to top">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 15l-6-6-6 6"/>
+      </svg>
+    </a>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <div class="footer-brand">
+            <a class="footer-logo" href="index.html">
+              <img src="/logo.png" alt="Science Based Body" />
+            </a>
+            <span class="label">SCIENCE BASED BODY</span>
+          </div>
+          <p>Research peptide supply with transparent batch standards.</p>
+        </div>
+        <div class="footer-links">
+          <a href="about.html" class="text-link">About</a>
+          <a href="support.html" class="text-link">Support</a>
+          <a href="faq.html" class="text-link">FAQ</a>
+          <a href="shipping.html" class="text-link">Shipping</a>
+          <a href="returns.html" class="text-link">Returns</a>
+          <a href="tracking.html" class="text-link">Order Tracking</a>
+          <a href="terms.html" class="text-link">Terms</a>
+          <a href="privacy.html" class="text-link">Privacy</a>
+          <a href="cookies.html" class="text-link">Cookies</a>
+          <a href="accessibility.html" class="text-link">Accessibility</a>
+          <a href="testing-standards.html" class="text-link">Quality Assurance</a>
+          <a href="storage-guidelines.html" class="text-link">Storage Guidelines</a>
+          <a href="coa-verification.html" class="text-link">COA Verification</a>
+          <a href="research-use.html" class="text-link">Research Use Only</a>
+          <a href="compliance.html" class="text-link">Compliance</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Inquiry Overlay -->
+    <div class="cart-overlay" id="inquiry-overlay"></div>
+
+    <!-- Inquiry Drawer (reuses cart-drawer CSS) -->
+    <aside class="cart-drawer" id="inquiry-drawer" aria-hidden="true">
+      <div class="cart-drawer-header">
+        <h2>Inquiry List</h2>
+        <button type="button" class="cart-drawer-close" id="inquiry-close" aria-label="Close inquiry list">&times;</button>
+      </div>
+      <div class="cart-drawer-body">
+        <p id="inquiry-empty" class="cart-empty">No products selected yet. Browse the catalog and click "Add to Inquiry" on products you're interested in.</p>
+        <div id="inquiry-items"></div>
+      </div>
+      <div class="cart-drawer-footer">
+        <div class="cart-subtotal">
+          <span>Products Selected</span>
+          <span id="inquiry-count">0</span>
+        </div>
+        <button type="button" class="btn btn-primary cart-checkout-btn" id="inquiry-submit-btn" style="display: none;">
+          Submit Inquiry to Sales
+        </button>
+      </div>
+    </aside>
+
+    <script src="scripts.js?v=20260212"></script>
+    <script>
+    (function() {
+      'use strict';
+
+      var IS_LOCAL_DEV = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      var API_BASE = IS_LOCAL_DEV
+        ? 'http://localhost:3001/api/v1'
+        : 'https://api.sbbpeptides.com/api/v1';
+
+      var ALLOWED_ROLES = ['BRAND_PARTNER', 'AFFILIATE', 'ADMIN', 'SUPER_ADMIN'];
+
+      var authGate = document.getElementById('auth-gate');
+      var loadingState = document.getElementById('loading-state');
+      var catalog = document.getElementById('wholesale-catalog');
+      var authError = document.getElementById('auth-error-msg');
+      var userGreeting = document.getElementById('user-greeting');
+      var currentUser = null;
+
+      // ============================================
+      // INQUIRY LIST SYSTEM
+      // ============================================
+      var InquiryList = {
+        items: [],
+        storageKey: 'sbb_wholesale_inquiry',
+
+        init: function() {
+          try {
+            this.items = JSON.parse(sessionStorage.getItem(this.storageKey) || '[]');
+          } catch (e) { this.items = []; }
+          this.render();
+          this.bindEvents();
+        },
+
+        add: function(product) {
+          var existing = this.items.findIndex(function(item) {
+            return item.id === product.id && item.variant === product.variant;
+          });
+          if (existing > -1) {
+            this.items[existing].quantity += 1;
+          } else {
+            this.items.push({
+              id: product.id,
+              name: product.name,
+              variant: product.variant || '',
+              quantity: 1,
+              image: product.image || '/images/products/vial.png'
+            });
+          }
+          this.save();
+          this.render();
+          this.openDrawer();
+          this.showToast(product.name + ' added to inquiry');
+        },
+
+        remove: function(index) {
+          this.items.splice(index, 1);
+          this.save();
+          this.render();
+        },
+
+        updateQty: function(index, delta) {
+          this.items[index].quantity += delta;
+          if (this.items[index].quantity <= 0) {
+            this.items.splice(index, 1);
+          }
+          this.save();
+          this.render();
+        },
+
+        save: function() {
+          sessionStorage.setItem(this.storageKey, JSON.stringify(this.items));
+          var badge = document.getElementById('inquiry-badge');
+          var total = this.items.reduce(function(s, i) { return s + i.quantity; }, 0);
+          if (badge) {
+            badge.textContent = total;
+            badge.classList.toggle('is-hidden', total === 0);
+          }
+        },
+
+        render: function() {
+          var container = document.getElementById('inquiry-items');
+          var empty = document.getElementById('inquiry-empty');
+          var submitBtn = document.getElementById('inquiry-submit-btn');
+          var countEl = document.getElementById('inquiry-count');
+          if (!container) return;
+
+          var total = this.items.reduce(function(s, i) { return s + i.quantity; }, 0);
+          if (countEl) countEl.textContent = total;
+
+          if (this.items.length === 0) {
+            container.innerHTML = '';
+            if (empty) empty.style.display = '';
+            if (submitBtn) submitBtn.style.display = 'none';
+            return;
+          }
+          if (empty) empty.style.display = 'none';
+          if (submitBtn) submitBtn.style.display = '';
+
+          var html = '';
+          this.items.forEach(function(item, i) {
+            html += '<div class="cart-item" data-inquiry-index="' + i + '">' +
+              '<img src="' + item.image + '" alt="" class="cart-item-img" />' +
+              '<div class="cart-item-info">' +
+              '<div class="cart-item-name">' + item.name + '</div>' +
+              (item.variant ? '<div class="cart-item-variant">' + item.variant + '</div>' : '') +
+              '<div class="cart-item-qty">' +
+              '<button type="button" class="cart-qty-btn" data-inquiry-qty="-1">-</button>' +
+              '<span>' + item.quantity + '</span>' +
+              '<button type="button" class="cart-qty-btn" data-inquiry-qty="1">+</button>' +
+              '</div></div>' +
+              '<button type="button" class="cart-item-remove" data-inquiry-remove="' + i + '">&times;</button>' +
+              '</div>';
+          });
+          container.innerHTML = html;
+        },
+
+        openDrawer: function() {
+          var drawer = document.getElementById('inquiry-drawer');
+          var overlay = document.getElementById('inquiry-overlay');
+          if (drawer) { drawer.classList.add('is-open'); drawer.setAttribute('aria-hidden', 'false'); }
+          if (overlay) overlay.classList.add('is-visible');
+          document.body.style.overflow = 'hidden';
+        },
+
+        closeDrawer: function() {
+          var drawer = document.getElementById('inquiry-drawer');
+          var overlay = document.getElementById('inquiry-overlay');
+          if (drawer) { drawer.classList.remove('is-open'); drawer.setAttribute('aria-hidden', 'true'); }
+          if (overlay) overlay.classList.remove('is-visible');
+          document.body.style.overflow = '';
+        },
+
+        submitInquiry: function() {
+          if (!this.items.length || !currentUser) return;
+
+          var lines = this.items.map(function(item) {
+            var line = '- ' + item.name;
+            if (item.variant) line += ' (' + item.variant + ')';
+            line += ' x' + item.quantity;
+            return line;
+          });
+
+          var body = 'Partner: ' + (currentUser.firstName || '') + ' ' + (currentUser.lastName || '') +
+            '\nEmail: ' + (currentUser.email || '') +
+            '\nRole: ' + (currentUser.role || '') +
+            '\n\nRequested Products:\n' + lines.join('\n') +
+            '\n\nPlease provide pricing and availability.';
+
+          var subject = 'Wholesale Inquiry from ' +
+            ((currentUser.firstName || '') + ' ' + (currentUser.lastName || '')).trim() +
+            ' (' + (currentUser.role || '') + ')';
+
+          window.location.href = 'mailto:sales@sbbpeptides.com?subject=' +
+            encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+        },
+
+        showToast: function(message) {
+          var toast = document.getElementById('cart-toast');
+          if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'cart-toast';
+            toast.className = 'cart-toast';
+            document.body.appendChild(toast);
+          }
+          toast.textContent = message;
+          toast.classList.add('is-visible');
+          setTimeout(function() { toast.classList.remove('is-visible'); }, 2500);
+        },
+
+        bindEvents: function() {
+          var self = this;
+
+          // Toggle button
+          var toggle = document.getElementById('inquiry-toggle');
+          if (toggle) {
+            toggle.addEventListener('click', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              self.openDrawer();
+            });
+          }
+
+          // Close
+          var closeBtn = document.getElementById('inquiry-close');
+          if (closeBtn) closeBtn.addEventListener('click', function() { self.closeDrawer(); });
+          var overlay = document.getElementById('inquiry-overlay');
+          if (overlay) overlay.addEventListener('click', function() { self.closeDrawer(); });
+          document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') self.closeDrawer();
+          });
+
+          // Qty and remove (delegated)
+          var container = document.getElementById('inquiry-items');
+          if (container) {
+            container.addEventListener('click', function(e) {
+              var qtyBtn = e.target.closest('[data-inquiry-qty]');
+              if (qtyBtn) {
+                var item = qtyBtn.closest('[data-inquiry-index]');
+                var idx = parseInt(item.getAttribute('data-inquiry-index'), 10);
+                self.updateQty(idx, parseInt(qtyBtn.getAttribute('data-inquiry-qty'), 10));
+                return;
+              }
+              var removeBtn = e.target.closest('[data-inquiry-remove]');
+              if (removeBtn) {
+                self.remove(parseInt(removeBtn.getAttribute('data-inquiry-remove'), 10));
+              }
+            });
+          }
+
+          // Submit
+          var submitBtn = document.getElementById('inquiry-submit-btn');
+          if (submitBtn) {
+            submitBtn.addEventListener('click', function() { self.submitInquiry(); });
+          }
+
+          // Add to inquiry (delegated on body)
+          document.body.addEventListener('click', function(e) {
+            var btn = e.target.closest('[data-inquiry-add]');
+            if (!btn) return;
+            e.preventDefault();
+
+            var card = btn.closest('.product-card');
+            var name = btn.getAttribute('data-product-name') || 'Product';
+            var image = btn.getAttribute('data-product-image') || '/images/products/vial.png';
+            var productId = btn.getAttribute('data-product-id') || '';
+            var variant = '';
+
+            var sel = card ? card.querySelector('.variant-select') : null;
+            if (sel && sel.options[sel.selectedIndex]) {
+              variant = sel.options[sel.selectedIndex].textContent.trim();
+            }
+
+            self.add({ id: productId + (variant ? '-' + variant : ''), name: name, variant: variant, image: image });
+          });
+        }
+      };
+
+      // Prevent scripts.js cart toggle from interfering
+      var origCartToggle = document.querySelector('[data-cart-toggle]');
+      if (origCartToggle) origCartToggle.style.display = 'none';
+
+      // ============================================
+      // AUTH FLOW
+      // ============================================
+      async function checkAuth() {
+        // Local dev bypass — skip API auth, show catalog with mock data
+        if (IS_LOCAL_DEV) {
+          currentUser = { email: 'dev@localhost', role: 'BRAND_PARTNER', firstName: 'Dev', lastName: 'Preview' };
+          var mockProducts = [
+            { name: 'Retatrutide', slug: 'retatrutide', category: 'peptide', subcategory: 'metabolic', basePrice: 250, wholesalePrice: 175, inStock: true, stockQuantity: 50, variants: [{name:'10mg',price:250,wholesalePrice:175},{name:'15mg',price:275,wholesalePrice:190}] },
+            { name: 'Semaglutide', slug: 'semaglutide', category: 'peptide', subcategory: 'metabolic', basePrice: 70, wholesalePrice: 45, inStock: true, stockQuantity: 100, variants: [{name:'2mg',price:40,wholesalePrice:25},{name:'5mg',price:50,wholesalePrice:32},{name:'10mg',price:70,wholesalePrice:45}] },
+            { name: 'BPC-157', slug: 'bpc-157', category: 'peptide', subcategory: 'recovery', basePrice: 100, wholesalePrice: 65, inStock: true, stockQuantity: 75, variants: [{name:'5mg',price:55,wholesalePrice:35},{name:'10mg',price:100,wholesalePrice:65}] },
+            { name: 'GHK-Cu', slug: 'ghk-cu', category: 'peptide', subcategory: 'cosmetic', basePrice: 100, wholesalePrice: 65, inStock: true, stockQuantity: 30, variants: [{name:'50mg',price:55,wholesalePrice:35},{name:'100mg',price:100,wholesalePrice:65}] },
+            { name: 'TB-500', slug: 'tb-500', category: 'peptide', subcategory: 'recovery', basePrice: 110, wholesalePrice: 72, inStock: true, stockQuantity: 40, variants: [{name:'5mg',price:60,wholesalePrice:38},{name:'10mg',price:110,wholesalePrice:72}] },
+          ];
+          renderCatalog(mockProducts);
+          showCatalog();
+          if (userGreeting) userGreeting.textContent = 'Welcome, Dev Preview.';
+          return;
+        }
+
+        var token = localStorage.getItem('accessToken');
+        if (!token) {
+          showAuthGate();
+          return;
+        }
+
+        try {
+          var res = await fetch(API_BASE + '/auth/me', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          if (!res.ok) {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('sbb_user');
+            showAuthGate();
+            return;
+          }
+          currentUser = await res.json();
+        } catch (e) {
+          showAuthGate();
+          return;
+        }
+
+        if (ALLOWED_ROLES.indexOf(currentUser.role) === -1) {
+          showAuthGate('Your account does not have wholesale catalog access. Contact sales@sbbpeptides.com for partnership inquiries.');
+          return;
+        }
+
+        // Authenticated + authorized
+        showLoading();
+        await loadCatalog(token);
+      }
+
+      function showAuthGate(msg) {
+        authGate.style.display = '';
+        loadingState.style.display = 'none';
+        catalog.style.display = 'none';
+        if (msg && authError) {
+          authError.textContent = msg;
+          authError.style.display = '';
+        }
+      }
+
+      function showLoading() {
+        authGate.style.display = 'none';
+        loadingState.style.display = '';
+        catalog.style.display = 'none';
+      }
+
+      function showCatalog() {
+        authGate.style.display = 'none';
+        loadingState.style.display = 'none';
+        catalog.style.display = '';
+      }
+
+      // ============================================
+      // CATALOG LOADING & RENDERING
+      // ============================================
+      var CATEGORY_ORDER = [
+        'RESEARCH_PEPTIDES',
+        'ANALYTICAL_REFERENCE_MATERIALS',
+        'RESEARCH_COMBINATIONS',
+        'LABORATORY_ADJUNCTS',
+        'MATERIALS_SUPPLIES',
+        'MERCHANDISE'
+      ];
+
+      var SUBCATEGORY_ORDER = [
+        'metabolic', 'recovery', 'growth-hormone', 'nootropic', 'longevity',
+        'mitochondrial', 'immune', 'anti-inflammatory', 'cosmetic', 'antimicrobial',
+        'neuropeptide', 'reproductive', 'hormone', 'sleep', 'tanning', 'research'
+      ];
+
+      function formatCategoryName(cat) {
+        return cat.split('_').map(function(w) {
+          return w.charAt(0) + w.slice(1).toLowerCase();
+        }).join(' ');
+      }
+
+      function formatSubcategoryName(sub) {
+        return sub.split('-').map(function(w) {
+          return w.charAt(0).toUpperCase() + w.slice(1);
+        }).join(' ');
+      }
+
+      async function loadCatalog(token) {
+        try {
+          var res = await fetch(API_BASE + '/wholesale/browse?limit=200', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          if (!res.ok) throw new Error('Failed to load catalog');
+          var data = await res.json();
+          renderCatalog(data.products || []);
+          showCatalog();
+
+          // Set greeting
+          if (currentUser && userGreeting) {
+            var name = [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' ') || 'Partner';
+            userGreeting.textContent = 'Welcome, ' + name + '.';
+          }
+        } catch (e) {
+          showAuthGate('Failed to load catalog. Please try again or contact support.');
+        }
+      }
+
+      function renderCatalog(products) {
+        // Group by subcategory first, then by category
+        var groups = {};
+        products.forEach(function(p) {
+          var key = p.subcategory || p.category || 'other';
+          if (!groups[key]) groups[key] = { category: p.category, products: [] };
+          groups[key].products.push(p);
+        });
+
+        // Sort groups: subcategory order first, then category order
+        var sortedKeys = Object.keys(groups).sort(function(a, b) {
+          var aIdx = SUBCATEGORY_ORDER.indexOf(a.toLowerCase());
+          var bIdx = SUBCATEGORY_ORDER.indexOf(b.toLowerCase());
+          if (aIdx === -1) aIdx = 999;
+          if (bIdx === -1) bIdx = 999;
+          if (aIdx !== bIdx) return aIdx - bIdx;
+          // Fall back to category order
+          var aCat = CATEGORY_ORDER.indexOf(groups[a].category);
+          var bCat = CATEGORY_ORDER.indexOf(groups[b].category);
+          return aCat - bCat;
+        });
+
+        // Build nav + sections
+        var navHtml = '';
+        var sectionsHtml = '';
+
+        sortedKeys.forEach(function(key) {
+          var group = groups[key];
+          var sectionId = 'ws-' + key.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+          var displayName = formatSubcategoryName(key);
+
+          navHtml += '<a href="#' + sectionId + '" class="shop-nav-link">' + displayName + '</a>';
+
+          var cardsHtml = '';
+          group.products.forEach(function(p) {
+            cardsHtml += buildProductCard(p);
+          });
+
+          sectionsHtml += '<section class="section" id="' + sectionId + '">' +
+            '<div class="container">' +
+            '<div class="section-heading reveal">' +
+            '<span class="label">' + formatCategoryName(group.category || key).toUpperCase() + '</span>' +
+            '<h2>' + displayName + '</h2>' +
+            '</div>' +
+            '<div class="shop-grid">' + cardsHtml + '</div>' +
+            '</div></section>';
+        });
+
+        document.getElementById('ws-category-nav').innerHTML = navHtml;
+        document.getElementById('ws-product-sections').innerHTML = sectionsHtml;
+
+        // Trigger reveal animations
+        document.querySelectorAll('#wholesale-catalog .reveal').forEach(function(el) {
+          setTimeout(function() { el.classList.add('is-visible'); }, 100);
+        });
+      }
+
+      function buildProductCard(product) {
+        var img = product.primaryImage || '/images/products/vial.png';
+        var catLabel = formatCategoryName(product.category || '').toUpperCase();
+
+        // Variant dropdown
+        var variantHtml = '';
+        if (product.variants && product.variants.length > 0) {
+          var options = product.variants.map(function(v) {
+            var label = v.name || v.strength || v.sku;
+            if (v.wholesaleOnly) label += ' (Wholesale)';
+            return '<option value="' + v.id + '">' + label + '</option>';
+          }).join('');
+          variantHtml = '<select class="variant-select">' + options + '</select>';
+        }
+
+        // Stock badge
+        var stockBadge = '';
+        if (product.comingSoon) {
+          stockBadge = '<span class="stock-badge stock-special">Coming Soon</span>';
+        } else if (product.inStock && product.stockQuantity > 0) {
+          stockBadge = '<span class="stock-badge stock-in">In Stock</span>';
+        } else {
+          stockBadge = '<span class="stock-badge stock-special">Special Order</span>';
+        }
+
+        return '<article class="card product-card reveal">' +
+          '<img class="product-image" src="' + img + '" alt="' + (product.name || '') + '" />' +
+          '<div class="product-body">' +
+          '<span class="label">' + catLabel + '</span>' +
+          '<h3>' + (product.name || '') + '</h3>' +
+          (product.shortDescription ? '<p>' + product.shortDescription + '</p>' : '') +
+          variantHtml +
+          stockBadge +
+          '<button type="button" class="btn-add-cart" data-inquiry-add ' +
+          'data-product-id="' + product.id + '" ' +
+          'data-product-name="' + (product.name || '').replace(/"/g, '&quot;') + '" ' +
+          'data-product-image="' + img + '">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+          '<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>' +
+          '<rect x="9" y="3" width="6" height="4" rx="1"/>' +
+          '<path d="M9 12h6"/><path d="M9 16h6"/></svg>' +
+          'Add to Inquiry</button>' +
+          '</div></article>';
+      }
+
+      // ============================================
+      // INIT
+      // ============================================
+      InquiryList.init();
+      checkAuth();
+    })();
+    </script>
+  </body>
+</html>

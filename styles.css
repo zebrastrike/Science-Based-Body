@@ -505,9 +505,13 @@ button.btn {
   box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
 }
 @media (max-width: 768px) {
-  .carousel-track { gap: 0; }
-  .carousel-track .card { flex: 0 0 100%; }
-  .carousel-wrap { padding: 0 40px; }
+  .carousel-track { gap: 16px; }
+  .carousel-track .card { flex: 0 0 100%; min-width: 100%; }
+  .carousel-wrap { padding: 0 36px; }
+}
+@media (max-width: 480px) {
+  .carousel-wrap { padding: 0 28px; }
+  .carousel-arrow { width: 28px; height: 28px; font-size: 1.1rem; }
 }
 
 .site-header {
@@ -3699,6 +3703,24 @@ body.is-ready .reveal {
 
   .footer-brand {
     justify-content: center;
+  }
+
+  /* Mobile modal fixes */
+  .modal-card {
+    padding: 24px 16px;
+    width: 94%;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .modal-body h2 {
+    font-size: 1.3rem;
+  }
+  .modal-body p {
+    font-size: 0.85rem;
+  }
+  .modal-body .btn {
+    font-size: 0.85rem;
+    padding: 10px 16px;
   }
 }
 

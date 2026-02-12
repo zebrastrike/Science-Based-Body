@@ -26,6 +26,7 @@ export class SmtpService {
   private readonly fromEmail: string;
   private readonly fromName: string;
   private readonly adminEmail: string;
+  private readonly ownerCcEmail: string;
   private readonly isEnabled: boolean;
   private readonly testEmailRedirect: string;
   private readonly testEmailDomains = ['@test.com', '@example.com', '@test.local'];
@@ -41,6 +42,7 @@ export class SmtpService {
     this.fromEmail = this.config.get('SMTP_FROM_EMAIL', 'noreply@sbbpeptides.com');
     this.fromName = this.config.get('SMTP_FROM_NAME', 'Science Based Body');
     this.adminEmail = this.config.get('ADMIN_EMAIL', 'sales@sbbpeptides.com');
+    this.ownerCcEmail = this.config.get('OWNER_CC_EMAIL', 'jamieespositofit@gmail.com');
     this.testEmailRedirect = this.config.get('TEST_EMAIL_REDIRECT', '');
     this.isEnabled = !!user && !!pass;
 
@@ -84,9 +86,15 @@ export class SmtpService {
     }
 
     try {
+      // BCC owner on all emails (skip if owner is already a recipient)
+      const bcc = this.ownerCcEmail && !recipients.includes(this.ownerCcEmail)
+        ? this.ownerCcEmail
+        : undefined;
+
       const info = await this.transporter.sendMail({
         from: `${this.fromName} <${this.fromEmail}>`,
         to: recipients.join(', '),
+        bcc,
         subject,
         html,
         text,

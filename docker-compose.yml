@@ -82,6 +82,7 @@ services:
       SMTP_FROM_EMAIL: ${SMTP_FROM_EMAIL:-noreply@sciencebasedbody.com}
       SMTP_FROM_NAME: ${SMTP_FROM_NAME:-Science Based Body}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-sales@sbbpeptides.com}
+      OWNER_CC_EMAIL: ${OWNER_CC_EMAIL:-jamieespositofit@gmail.com}
       # Payment Methods
       PAYMENT_ZELLE_NAME: ${PAYMENT_ZELLE_NAME:-HEALTH SBB}
       PAYMENT_ZELLE_PHONE: ${PAYMENT_ZELLE_PHONE:-702-686-5343}

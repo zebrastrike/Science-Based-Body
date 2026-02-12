@@ -8,7 +8,7 @@
       href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400&family=Sora:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260211" />
+    <link rel="stylesheet" href="styles.css?v=20260212" />
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-5NLZQKVWBW"></script>
     <script>
@@ -1745,7 +1745,7 @@
     <!-- Dynamic marketing popup — loaded from admin API -->
     <div id="marketing-popup-root"></div>
 
-    <script src="scripts.js?v=20260211"></script>
+    <script src="scripts.js?v=20260212"></script>
     <script>
       // Show variant label on single-variant products (no dropdown)
       document.querySelectorAll('.card.product-card').forEach(function(card) {
@@ -1824,8 +1824,8 @@
             });
 
             /* ---- Hide wholesale-only + 5mg variants & sync default ATC ---- */
-            // 5mg kept only for these slugs (sold retail in 5mg)
-            var keep5mg = { 'cjc-1295-with-dac': true, 'ipamorelin': true, 'thymosin-alpha-1': true };
+            // No 5mg sold retail — all 5mg variants are wholesale-only
+            var keep5mg = {};
             document.querySelectorAll('.variant-select[data-product-slug]').forEach(function(sel) {
               var slug = sel.getAttribute('data-product-slug');
               var info = slugMap[slug];
@@ -1876,12 +1876,22 @@
               return 0;
             });
 
+            // Filter carousel: skip products whose only retail variant is 5mg
+            inStockProducts = inStockProducts.filter(function(p) {
+              if (!p.variants || p.variants.length === 0) return true;
+              var hasNon5mg = p.variants.some(function(v) {
+                return !v.wholesaleOnly && !/^5\s*mg$/i.test(v.name);
+              });
+              return hasNon5mg;
+            });
+
             inStockProducts.forEach(function(p) {
-              // Use first retail (non-wholesale) variant price
+              // Use first retail non-wholesale non-5mg variant
               var firstVariant = null;
               if (p.variants && p.variants.length > 0) {
                 for (var vi = 0; vi < p.variants.length; vi++) {
-                  if (!p.variants[vi].wholesaleOnly) { firstVariant = p.variants[vi]; break; }
+                  var v = p.variants[vi];
+                  if (!v.wholesaleOnly && !/^5\s*mg$/i.test(v.name)) { firstVariant = v; break; }
                 }
                 if (!firstVariant) firstVariant = p.variants[0];
               }
@@ -1934,6 +1944,24 @@
                 if (idx >= maxIdx) { slideTo(0); } else { slideTo(idx + 1); }
               }, 5000);
             });
+
+            // Touch swipe support for mobile
+            var touchStartX = 0;
+            var touchEndX = 0;
+            wrap.addEventListener('touchstart', function(e) {
+              touchStartX = e.changedTouches[0].screenX;
+              clearInterval(autoTimer);
+            }, { passive: true });
+            wrap.addEventListener('touchend', function(e) {
+              touchEndX = e.changedTouches[0].screenX;
+              var diff = touchStartX - touchEndX;
+              if (Math.abs(diff) > 50) {
+                if (diff > 0) { slideTo(idx + 1); } else { slideTo(idx - 1); }
+              }
+              autoTimer = setInterval(function() {
+                if (idx >= maxIdx) { slideTo(0); } else { slideTo(idx + 1); }
+              }, 5000);
+            }, { passive: true });
 
             // Update perPage on resize
             window.addEventListener('resize', function() {
