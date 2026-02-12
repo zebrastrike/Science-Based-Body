@@ -300,7 +300,7 @@ export class CheckoutService {
       paymentMethod: dto.paymentMethod,
     };
 
-    const firstName = dto.shippingAddress.firstName;
+    const firstName = dto.shippingAddress.firstName || dto.shippingAddress.lastName || 'Customer';
 
     // Send customer confirmation (non-blocking)
     this.mailgunService
@@ -420,6 +420,7 @@ export class CheckoutService {
       acceptedPaymentMethods: this.paymentsService.getAvailablePaymentMethods(),
       volumeDiscount: this.cartService.getVolumeDiscountInfo(),
       shippingFlat: 25,
+      freeShippingThreshold: 500,
       policies: {
         termsOfService: '/policies/terms',
         privacyPolicy: '/policies/privacy',

@@ -1,5 +1,6 @@
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { CartService, CartItem } from './cart.service';
 import { Public } from '../auth/decorators/public.decorator';
 
@@ -37,6 +38,7 @@ export class CartController {
 
   @Post('apply-discount')
   @Public()
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
   @ApiOperation({ summary: 'Apply discount code to cart' })
   @ApiResponse({ status: 200, description: 'Discount applied' })
   @ApiResponse({ status: 400, description: 'Invalid discount code' })
@@ -47,6 +49,7 @@ export class CartController {
 
   @Get('validate-discount')
   @Public()
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
   @ApiOperation({ summary: 'Validate a discount code without applying it' })
   @ApiResponse({ status: 200, description: 'Discount code is valid' })
   @ApiResponse({ status: 400, description: 'Invalid or expired discount code' })

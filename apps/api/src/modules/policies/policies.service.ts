@@ -280,7 +280,7 @@ Do NOT ship returns without prior authorization.`,
       sections: [
         {
           title: 'Shipping Rates',
-          content: `All orders ship with a flat rate of $25.00 for Standard Shipping, or $50.00 for Expedited Shipping. Rates apply to all orders regardless of order value.`,
+          content: `Orders of $500 or more qualify for FREE standard shipping. Orders under $500 ship at a flat rate of $25.00. Expedited shipping is available for $50.00 on all orders.`,
         },
         {
           title: 'Processing Time',
@@ -288,8 +288,9 @@ Do NOT ship returns without prior authorization.`,
         },
         {
           title: 'Shipping Methods',
-          content: `Standard Shipping (3-5 business days): $25.00 flat rate
-Expedited Shipping (1-2 business days): $50.00
+          content: `Free Standard Shipping (orders $500+): 3-5 business days
+Standard Shipping (under $500): $25.00 flat rate — 3-5 business days
+Expedited Shipping: $50.00 — 1-2 business days
 
 All orders are shipped via USPS, FedEx, or UPS at our discretion based on destination and package requirements.`,
         },

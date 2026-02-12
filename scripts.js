@@ -252,6 +252,32 @@ document.addEventListener("DOMContentLoaded", () => {
       if (subtotalEl) {
         subtotalEl.textContent = `$${this.getSubtotal().toFixed(2)}`;
       }
+
+      // Free shipping progress banner
+      const FREE_SHIP = 500;
+      const sub = this.getSubtotal();
+      let shipBanner = document.getElementById("cart-free-ship-banner");
+      if (!shipBanner) {
+        shipBanner = document.createElement("div");
+        shipBanner.id = "cart-free-ship-banner";
+        shipBanner.style.cssText = "padding:8px 16px;border-radius:6px;font-size:0.82rem;text-align:center;font-weight:500;margin-bottom:10px;";
+        const footer = document.querySelector(".cart-drawer-footer");
+        if (footer) footer.insertBefore(shipBanner, footer.firstChild);
+      }
+      if (sub > 0 && sub < FREE_SHIP) {
+        const rem = (FREE_SHIP - sub).toFixed(2);
+        shipBanner.style.display = "block";
+        shipBanner.style.background = "linear-gradient(135deg, #f7f2ec 0%, rgba(227,167,161,0.25) 100%)";
+        shipBanner.style.color = "#1f2a36";
+        shipBanner.innerHTML = `Add <strong>$${rem}</strong> more for <strong>FREE shipping!</strong>`;
+      } else if (sub >= FREE_SHIP) {
+        shipBanner.style.display = "block";
+        shipBanner.style.background = "linear-gradient(135deg, #b9cbb6 0%, #c7d7e6 100%)";
+        shipBanner.style.color = "#1f2a36";
+        shipBanner.innerHTML = "&#10003; You qualify for <strong>FREE shipping!</strong>";
+      } else {
+        shipBanner.style.display = "none";
+      }
     },
 
     openDrawer() {

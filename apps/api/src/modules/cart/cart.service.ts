@@ -194,9 +194,10 @@ export class CartService {
       }
     }
 
-    // Flat rate shipping: $25 standard
+    // Shipping: free over $500, otherwise $25 flat rate
+    const FREE_SHIPPING_THRESHOLD = 500;
     const STANDARD_SHIPPING = 25;
-    const estimatedShipping = STANDARD_SHIPPING;
+    const estimatedShipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING;
 
     // Tax calculation - configurable via Settings
     const taxRate = await this.getTaxRate();
@@ -345,7 +346,7 @@ export class CartService {
         break;
 
       case DiscountType.FREE_SHIPPING:
-        // Free shipping discount type no longer offered — treat as no-op
+        additionalDiscount = cart.estimatedShipping;
         break;
     }
 
@@ -434,6 +435,7 @@ export class CartService {
       code: discount.code,
       type: discount.type,
       value: Number(discount.value),
+      maxDiscountAmount: discount.maxDiscountAmount ? Number(discount.maxDiscountAmount) : undefined,
       description: discount.description,
     };
   }
@@ -450,19 +452,22 @@ export class CartService {
 
   /**
    * Get shipping rates for cart
-   * Flat Rate: $25 standard, $50 expedited
+   * Free over $500, $25 standard, $50 expedited
    */
   async getShippingRates(cart: Cart, destinationZip: string) {
+    const FREE_SHIPPING_THRESHOLD = 500;
     const STANDARD_SHIPPING_RATE = 25;
     const EXPEDITED_SHIPPING_RATE = 50;
+    const isFreeShipping = cart.subtotal >= FREE_SHIPPING_THRESHOLD;
 
     const rates = [
       {
         id: 'standard',
-        name: 'Standard Shipping',
+        name: isFreeShipping ? 'Free Standard Shipping' : 'Standard Shipping',
         description: '3-5 business days',
-        price: STANDARD_SHIPPING_RATE,
+        price: isFreeShipping ? 0 : STANDARD_SHIPPING_RATE,
         estimatedDays: '3-5',
+        isFree: isFreeShipping,
       },
       {
         id: 'expedited',

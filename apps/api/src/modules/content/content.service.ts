@@ -86,7 +86,7 @@ export class ContentService {
         id: 'promo-same-day',
         location: 'header',
         type: 'text',
-        content: 'Same-day dispatch on orders placed before 12PM CST',
+        content: 'FREE SHIPPING on orders $500+ \u2022 Same-day dispatch before 12PM CST',
         link: '/shipping',
         backgroundColor: '#1a1a1a',
         textColor: '#ffffff',
@@ -123,7 +123,7 @@ export class ContentService {
       messages: [
         {
           id: 'ann-1',
-          text: 'Same-day dispatch before 12PM CST',
+          text: 'FREE SHIPPING on orders $500+',
           link: '/shipping',
         },
         {

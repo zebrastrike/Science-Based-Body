@@ -119,6 +119,8 @@
                     <span id="checkout-total">$0.00</span>
                   </div>
                 </div>
+                <!-- Free shipping progress -->
+                <div id="free-shipping-banner" style="display:none;margin-top:12px;padding:10px 16px;border-radius:8px;font-size:0.88rem;text-align:center;font-weight:500;"></div>
               </div>
             </div>
 
@@ -605,7 +607,8 @@
           });
         }
 
-        /* ── Shipping cost (flat rate, no free shipping) ── */
+        /* ── Shipping cost (free over $500, $25 flat, $50 expedited) ── */
+        const FREE_SHIPPING_THRESHOLD = 500;
         const STANDARD_SHIPPING = 25;
         const EXPEDITED_SHIPPING = 50;
         let discountAmount = 0;
@@ -613,13 +616,32 @@
         const getShippingCost = () => {
           const method = document.getElementById('shippingMethod');
           if (method && method.value === 'expedited') return EXPEDITED_SHIPPING;
-          return STANDARD_SHIPPING;
+          return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING;
+        };
+
+        const updateFreeShippingBanner = () => {
+          var banner = document.getElementById('free-shipping-banner');
+          if (!banner) return;
+          if (subtotal >= FREE_SHIPPING_THRESHOLD) {
+            banner.style.display = 'block';
+            banner.style.background = 'linear-gradient(135deg, #b9cbb6 0%, #c7d7e6 100%)';
+            banner.style.color = '#1f2a36';
+            banner.innerHTML = '&#10003; You qualify for <strong>FREE shipping!</strong>';
+          } else if (subtotal > 0) {
+            var remaining = (FREE_SHIPPING_THRESHOLD - subtotal).toFixed(2);
+            banner.style.display = 'block';
+            banner.style.background = 'linear-gradient(135deg, #f7f2ec 0%, #e3a7a140 100%)';
+            banner.style.color = '#1f2a36';
+            banner.innerHTML = 'Add <strong>$' + remaining + '</strong> more for <strong>FREE shipping!</strong>';
+          } else {
+            banner.style.display = 'none';
+          }
         };
 
         const updateTotals = () => {
           const shipping = getShippingCost();
           checkoutSubtotal.textContent = '$' + subtotal.toFixed(2);
-          checkoutShipping.textContent = '$' + shipping.toFixed(2);
+          checkoutShipping.textContent = shipping === 0 ? 'FREE' : '$' + shipping.toFixed(2);
           checkoutTax.textContent      = taxAmount > 0 ? '$' + taxAmount.toFixed(2) : '$0.00';
 
           // Show discount row if discount is applied
@@ -635,6 +657,7 @@
 
           var total = subtotal - discountAmount + shipping + taxAmount;
           checkoutTotal.textContent = '$' + Math.max(0, total).toFixed(2);
+          updateFreeShippingBanner();
         };
 
         var shippingSelect = document.getElementById('shippingMethod');

@@ -2635,6 +2635,22 @@ body.is-ready .reveal {
   }
 }
 
+/* ── Bubbles: behind product cards on shop ── */
+body.page-shop .bubble-field { z-index: 0; }
+body.page-shop .card,
+body.page-shop .product-card { position: relative; z-index: 1; }
+
+/* ── No bubbles on policy/terms/footer-linked pages ── */
+body.page-policy .bubble-field { display: none; }
+
+/* ── Fewer bubbles on mobile (hide 11-20) ── */
+@media (max-width: 768px) {
+  .bubble-11, .bubble-12, .bubble-13, .bubble-14, .bubble-15,
+  .bubble-16, .bubble-17, .bubble-18, .bubble-19, .bubble-20 {
+    display: none;
+  }
+}
+
 @media (max-width: 1100px) {
   .site-search {
     display: none;
