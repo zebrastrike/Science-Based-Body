@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 interface OrderItem {
   name: string;
@@ -35,8 +36,13 @@ export class EmailTemplatesService {
   private readonly powder = '#c7d7e6';
   private readonly ink = '#1f2a36';
 
-  private readonly logoUrl = 'https://sciencebasedbody.com/logo.png';
-  private readonly supportEmail = 'support@sciencebasedbody.com';
+  private readonly siteUrl: string;
+  private readonly supportEmail: string;
+
+  constructor(private config: ConfigService) {
+    this.siteUrl = this.config.get('FRONTEND_URL', 'https://sbbpeptides.com');
+    this.supportEmail = this.config.get('ADMIN_EMAIL', 'sales@sbbpeptides.com');
+  }
 
   private baseTemplate(content: string, preheader?: string): string {
     return `
@@ -147,9 +153,9 @@ export class EmailTemplatesService {
                     <!-- Legal links -->
                     <p style="margin:0;font-size:11px;color:#9ca3af;text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
                       &copy; ${new Date().getFullYear()} Science Based Body LLC. All rights reserved.<br>
-                      <a href="https://sciencebasedbody.com/policies/privacy" style="color:${this.rose};text-decoration:none;">Privacy Policy</a>
+                      <a href="${this.siteUrl}/privacy" style="color:${this.rose};text-decoration:none;">Privacy Policy</a>
                       &nbsp;&middot;&nbsp;
-                      <a href="https://sciencebasedbody.com/policies/terms" style="color:${this.rose};text-decoration:none;">Terms of Service</a>
+                      <a href="${this.siteUrl}/terms" style="color:${this.rose};text-decoration:none;">Terms of Service</a>
                     </p>
                   </td>
                 </tr>
@@ -187,14 +193,14 @@ export class EmailTemplatesService {
         <li>Exclusive member offers</li>
       </ul>
       <p style="margin:0 0 30px 0;text-align:center;">
-        ${this.button('Start Shopping', 'https://sciencebasedbody.com/shop')}
+        ${this.button('Start Shopping', `${this.siteUrl}/shop`)}
       </p>
       <p style="margin:0;font-size:14px;color:#6b7280;">
         Questions? Contact us at <a href="mailto:${this.supportEmail}" style="color:${this.rose};text-decoration:none;">${this.supportEmail}</a>
       </p>
     `, 'Welcome to Science Based Body - Your account is ready');
 
-    const text = `Welcome, ${firstName}!\n\nThank you for creating an account with Science Based Body.\n\nVisit: https://sciencebasedbody.com/shop`;
+    const text = `Welcome, ${firstName}!\n\nThank you for creating an account with Science Based Body.\n\nVisit: ${this.siteUrl}/shop`;
     return { subject, html, text };
   }
 
@@ -368,7 +374,7 @@ export class EmailTemplatesService {
       </p>
 
       <p style="margin:0 0 30px 0;text-align:center;">
-        ${this.button('View Order', `https://sciencebasedbody.com/account/orders/${order.orderNumber}`)}
+        ${this.button('View Order', `${this.siteUrl}/account/orders/${order.orderNumber}`)}
       </p>
     `, `Order #${order.orderNumber} received - Please complete payment`);
 
@@ -377,7 +383,7 @@ export class EmailTemplatesService {
       : order.paymentMethod === 'ZELLE'
         ? 'Zelle: HEALTH SBB - 702-686-5343'
         : 'Zelle: HEALTH SBB - 702-686-5343\nVenmo: @healthsbb - 702-686-5343';
-    const text = `Thank You for Your Order - #${order.orderNumber}\n\nTotal Due: $${order.total.toFixed(2)}\n\nPlease send payment via:\n\n${paymentText}\n\nIMPORTANT: Include invoice #${order.orderNumber} in the payment note.\n\nOnce payment is received, your order will be processed and shipped.\n\nView order: https://sciencebasedbody.com/account/orders/${order.orderNumber}`;
+    const text = `Thank You for Your Order - #${order.orderNumber}\n\nTotal Due: $${order.total.toFixed(2)}\n\nPlease send payment via:\n\n${paymentText}\n\nIMPORTANT: Include invoice #${order.orderNumber} in the payment note.\n\nOnce payment is received, your order will be processed and shipped.\n\nView order: ${this.siteUrl}/account/orders/${order.orderNumber}`;
     return { subject, html, text };
   }
 
@@ -438,7 +444,7 @@ export class EmailTemplatesService {
       </p>
 
       <p style="margin:0 0 30px 0;text-align:center;">
-        ${this.button('Shop Again', 'https://sciencebasedbody.com/shop')}
+        ${this.button('Shop Again', `${this.siteUrl}/shop`)}
       </p>
 
       <p style="margin:0;font-size:14px;color:#6b7280;">
@@ -490,7 +496,7 @@ export class EmailTemplatesService {
       </div>
 
       <p style="margin:0 0 30px 0;text-align:center;">
-        ${this.button('View Order', `https://sciencebasedbody.com/account/orders/${orderNumber}`)}
+        ${this.button('View Order', `${this.siteUrl}/account/orders/${orderNumber}`)}
       </p>
 
       <p style="margin:0;font-size:14px;color:#6b7280;">
@@ -498,7 +504,7 @@ export class EmailTemplatesService {
       </p>
     `, `Payment confirmed for order #${orderNumber}`);
 
-    const text = `Payment Confirmed!\n\nHi ${firstName},\n\nWe've received your payment of ${formattedAmount} for order #${orderNumber}.\n\nYour order is now being prepared for shipment. You'll receive a tracking email once it ships.\n\nView order: https://sciencebasedbody.com/account/orders/${orderNumber}`;
+    const text = `Payment Confirmed!\n\nHi ${firstName},\n\nWe've received your payment of ${formattedAmount} for order #${orderNumber}.\n\nYour order is now being prepared for shipment. You'll receive a tracking email once it ships.\n\nView order: ${this.siteUrl}/account/orders/${orderNumber}`;
     return { subject, html, text };
   }
 
@@ -528,7 +534,7 @@ export class EmailTemplatesService {
       <pre style="background:${this.bone};padding:15px;border-radius:6px;font-size:14px;overflow:auto;color:${this.ink};border:1px solid ${this.sage};">${itemsList}</pre>
 
       <p style="margin:25px 0 0 0;text-align:center;">
-        ${this.button('View in Admin', `https://sciencebasedbody.com/admin/orders/${order.orderNumber}`)}
+        ${this.button('View in Admin', `${this.siteUrl}/admin/orders/${order.orderNumber}`)}
       </p>
     `);
 
@@ -554,7 +560,7 @@ export class EmailTemplatesService {
       </p>
 
       <p style="margin:0;text-align:center;">
-        ${this.button('Manage Inventory', 'https://sciencebasedbody.com/admin/inventory')}
+        ${this.button('Manage Inventory', `${this.siteUrl}/admin/inventory`)}
       </p>
     `);
 
@@ -590,7 +596,7 @@ export class EmailTemplatesService {
       </ul>
 
       <p style="margin:0;text-align:center;">
-        ${this.button('Review Return', `https://sciencebasedbody.com/admin/orders/${orderNumber}`)}
+        ${this.button('Review Return', `${this.siteUrl}/admin/orders/${orderNumber}`)}
       </p>
     `);
 
@@ -726,14 +732,14 @@ export class EmailTemplatesService {
         <li>Exclusive subscriber offers</li>
       </ul>
       <p style="margin:0 0 30px 0;text-align:center;">
-        ${this.button('Shop Now', 'https://sciencebasedbody.com/shop')}
+        ${this.button('Shop Now', `${this.siteUrl}/shop`)}
       </p>
       <p style="margin:0;font-size:12px;color:#6b7280;text-align:center;">
-        <a href="https://sciencebasedbody.com/unsubscribe?email=${encodeURIComponent(email)}" style="color:#6b7280;">Unsubscribe</a>
+        <a href="${this.siteUrl}/unsubscribe?email=${encodeURIComponent(email)}" style="color:#6b7280;">Unsubscribe</a>
       </p>
     `, 'Welcome to the Science Based Body newsletter');
 
-    const text = `You're subscribed to the SBB newsletter!\n\nVisit: https://sciencebasedbody.com/shop`;
+    const text = `You're subscribed to the SBB newsletter!\n\nVisit: ${this.siteUrl}/shop`;
     return { subject, html, text };
   }
 
@@ -765,7 +771,7 @@ export class EmailTemplatesService {
       </ol>
 
       <p style="margin:0 0 30px 0;text-align:center;">
-        ${this.button('View Return Details', `https://sciencebasedbody.com/account/orders/${orderNumber}`)}
+        ${this.button('View Return Details', `${this.siteUrl}/account/orders/${orderNumber}`)}
       </p>
     `, `Your return for order #${orderNumber} has been approved`);
 
@@ -792,7 +798,7 @@ export class EmailTemplatesService {
       </p>
 
       <p style="margin:0 0 30px 0;text-align:center;">
-        ${this.button('Contact Support', 'https://sciencebasedbody.com/contact')}
+        ${this.button('Contact Support', `${this.siteUrl}/support`)}
       </p>
     `, `Update on your return request for order #${orderNumber}`);
 

@@ -101,7 +101,7 @@ services:
       # Test email redirect (route test@test.com emails to this address)
       TEST_EMAIL_REDIRECT: ${TEST_EMAIL_REDIRECT:-}
       # Compliance
-      MINIMUM_AGE: ${MINIMUM_AGE:-18}
+      MINIMUM_AGE: ${MINIMUM_AGE:-21}
       # Mailgun (legacy - empty, SMTP is primary)
       MAILGUN_API_KEY: ${MAILGUN_API_KEY}
       MAILGUN_DOMAIN: ${MAILGUN_DOMAIN}
