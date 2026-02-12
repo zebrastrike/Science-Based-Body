@@ -280,7 +280,7 @@
                     <label class="compliance-checkbox">
                       <input type="checkbox" id="compliance2" name="ageConfirmation" required />
                       <span class="checkbox-mark"></span>
-                      <span class="checkbox-text">I confirm I am <strong>21 years of age or older</strong>.</span>
+                      <span class="checkbox-text">I confirm I am <strong>18 years of age or older</strong>.</span>
                     </label>
 
                     <label class="compliance-checkbox">
@@ -365,17 +365,21 @@
             <h2>Order Received!</h2>
             <p class="confirmation-order-number">Order #<span id="confirmation-order-id">SBB-XXXXX</span></p>
             <p style="font-size:1.3rem;font-weight:700;margin:8px 0;">Total: <span id="confirmation-total">$0.00</span></p>
-            <p>Thank you for your order. A payment link has been sent to your email address.</p>
-            <div id="payment-instructions" style="display:none;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:16px;margin:16px 0;text-align:left;">
-              <p style="margin-bottom:8px;"><strong>Payment Instructions:</strong></p>
-              <p id="payment-instructions-text" style="white-space:pre-line;"></p>
+
+            <div style="background:linear-gradient(135deg, rgba(227,167,161,0.10), rgba(199,215,230,0.10));border:1px solid rgba(185,203,182,0.3);border-radius:10px;padding:20px;margin:16px 0;text-align:center;">
+              <p style="font-size:1.05rem;font-weight:600;margin:0 0 8px 0;">Check your email for payment instructions!</p>
+              <p style="margin:0;font-size:0.9rem;color:var(--ink,#1f2a36);opacity:0.8;">
+                We've sent payment details to the email you provided.<br>
+                <strong>Please also check your spam/junk folder</strong> if you don't see it within a few minutes.
+              </p>
             </div>
+
             <div class="confirmation-details">
               <p><strong>What happens next:</strong></p>
               <ol>
-                <li>Complete payment using the instructions above</li>
-                <li>We'll verify and process your order</li>
-                <li>You'll receive tracking info once shipped</li>
+                <li>Check your email for payment instructions</li>
+                <li>Complete payment using the details in the email</li>
+                <li>Once paid, you'll receive an order confirmation and tracking info</li>
               </ol>
             </div>
             <a href="index.html" class="btn btn-primary">Return to Homepage</a>
@@ -906,19 +910,6 @@
             document.getElementById('confirmation-order-id').textContent = orderNumber;
             var orderTotal = (data.order && data.order.totalAmount) ? parseFloat(data.order.totalAmount).toFixed(2) : '0.00';
             document.getElementById('confirmation-total').textContent = '$' + orderTotal;
-
-            // Payment instructions
-            var instrEl   = document.getElementById('payment-instructions');
-            var instrText = document.getElementById('payment-instructions-text');
-            if (data.payment && data.payment.instructions) {
-              var pi = data.payment.instructions;
-              if (typeof pi === 'object') {
-                instrText.textContent = pi.instructions || (pi.method + ': ' + JSON.stringify(pi));
-              } else {
-                instrText.textContent = pi;
-              }
-              instrEl.style.display = 'block';
-            }
 
             confirmationModal.classList.add('is-open');
             confirmationModal.setAttribute('aria-hidden', 'false');
