@@ -186,6 +186,7 @@ services:
       - ./styles.css:/etc/nginx/site/styles.css:ro
       - ./scripts.js:/etc/nginx/site/scripts.js:ro
       - ./images:/etc/nginx/site/images:ro
+      - ./coas:/etc/nginx/site/coas:ro
     depends_on:
       - api
       - web
