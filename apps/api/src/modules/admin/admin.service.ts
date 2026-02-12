@@ -858,11 +858,11 @@ export class AdminService {
       }),
       // Orders grouped by day
       this.prisma.$queryRaw`
-        SELECT DATE(created_at) as date, COUNT(*) as orders, SUM(total_amount) as revenue
+        SELECT DATE("createdAt") as date, COUNT(*) as orders, SUM("totalAmount") as revenue
         FROM "Order"
-        WHERE created_at >= ${startDate} AND created_at <= ${endDate}
+        WHERE "createdAt" >= ${startDate} AND "createdAt" <= ${endDate}
         AND status NOT IN ('CANCELLED', 'REFUNDED')
-        GROUP BY DATE(created_at)
+        GROUP BY DATE("createdAt")
         ORDER BY date ASC
       `,
     ]);
@@ -944,11 +944,11 @@ export class AdminService {
 
     const [byCategory, byPaymentMethod] = await Promise.all([
       this.prisma.$queryRaw`
-        SELECT p.category, SUM(oi.total_price) as revenue
+        SELECT p.category, SUM(oi."totalPrice") as revenue
         FROM "OrderItem" oi
-        JOIN "Product" p ON oi.product_id = p.id
-        JOIN "Order" o ON oi.order_id = o.id
-        WHERE o.created_at >= ${startDate}
+        JOIN "Product" p ON oi."productId" = p.id
+        JOIN "Order" o ON oi."orderId" = o.id
+        WHERE o."createdAt" >= ${startDate}
         AND o.status NOT IN ('CANCELLED', 'REFUNDED')
         GROUP BY p.category
         ORDER BY revenue DESC
@@ -956,9 +956,9 @@ export class AdminService {
       this.prisma.$queryRaw`
         SELECT pay.method, SUM(pay.amount) as total
         FROM "Payment" pay
-        JOIN "Order" o ON pay.order_id = o.id
+        JOIN "Order" o ON pay."orderId" = o.id
         WHERE pay.status = 'COMPLETED'
-        AND o.created_at >= ${startDate}
+        AND o."createdAt" >= ${startDate}
         GROUP BY pay.method
       `,
     ]);

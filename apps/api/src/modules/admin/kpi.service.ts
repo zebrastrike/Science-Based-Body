@@ -332,7 +332,7 @@ export class KpiService {
                COALESCE(p.sku, '') as sku,
                SUM(oi.quantity)::int as "unitsSold",
                COALESCE(SUM(oi."totalPrice"), 0) as revenue,
-               COALESCE(p.category, 'UNKNOWN') as category
+               COALESCE(p.category::text, 'OTHER') as category
         FROM "OrderItem" oi
         JOIN "Order" o ON oi."orderId" = o.id
         LEFT JOIN "Product" p ON oi."productId" = p.id
