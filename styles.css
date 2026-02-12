@@ -5014,10 +5014,11 @@ body.page-home .variant-select option {
 
 .shop-sidebar-link.is-active {
   opacity: 1;
-  color: var(--ink);
+  color: var(--rose);
   border-left-color: var(--rose);
-  background: rgba(227, 167, 161, 0.1);
-  font-weight: 600;
+  background: rgba(227, 167, 161, 0.13);
+  font-weight: 700;
+  transform: translateX(2px);
 }
 
 /* ============================================
