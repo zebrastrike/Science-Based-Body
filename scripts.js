@@ -1398,6 +1398,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (this.searchResults) {
         this.searchResults.classList.remove("is-visible");
       }
+      document.body.classList.remove("search-open");
+      var scrim = document.getElementById("search-scrim");
+      if (scrim) scrim.classList.remove("is-visible");
     },
 
     bindEvents() {
@@ -1467,15 +1470,29 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       // Mobile search toggle
+      // Create search scrim element for mobile
+      var scrim = document.createElement("div");
+      scrim.className = "search-scrim";
+      scrim.id = "search-scrim";
+      document.body.appendChild(scrim);
+
+      scrim.addEventListener("click", function() {
+        self.closeMobileSearch();
+        scrim.classList.remove("is-visible");
+        document.body.classList.remove("search-open");
+      });
+
       if (this.mobileToggle) {
         this.mobileToggle.addEventListener("click", function() {
           if (self.searchContainer) {
             self.searchContainer.classList.toggle("is-mobile-open");
             if (self.searchContainer.classList.contains("is-mobile-open")) {
               document.body.classList.add("search-open");
+              scrim.classList.add("is-visible");
               setTimeout(function() { self.searchInput.focus(); }, 100);
             } else {
               document.body.classList.remove("search-open");
+              scrim.classList.remove("is-visible");
             }
           }
         });
@@ -1533,6 +1550,114 @@ document.addEventListener("DOMContentLoaded", () => {
           SiteSearch.scrollToProduct(results[0].sectionId, results[0].name);
         }
       }
+    });
+  })();
+
+  // ============================================
+  // FLOATING MOBILE CATEGORY NAVIGATOR (Shop)
+  // ============================================
+  (function() {
+    var fab = document.getElementById("category-fab");
+    var sheet = document.getElementById("category-sheet");
+    var overlay = document.getElementById("category-sheet-overlay");
+    if (!fab || !sheet || !overlay) return;
+
+    var shopNavEl = document.getElementById("shop-nav");
+
+    function openSheet() {
+      sheet.classList.add("is-open");
+      overlay.classList.add("is-visible");
+      document.body.classList.add("search-open"); // reuse overflow:hidden
+    }
+
+    function closeSheet() {
+      sheet.classList.remove("is-open");
+      overlay.classList.remove("is-visible");
+      document.body.classList.remove("search-open");
+    }
+
+    fab.addEventListener("click", openSheet);
+    overlay.addEventListener("click", closeSheet);
+
+    // Category buttons scroll to section and close
+    sheet.querySelectorAll(".category-sheet-btn").forEach(function(btn) {
+      btn.addEventListener("click", function(e) {
+        e.preventDefault();
+        var href = btn.getAttribute("href");
+        if (href && href.startsWith("#")) {
+          var target = document.querySelector(href);
+          if (target) {
+            var navHeight = shopNavEl ? shopNavEl.offsetHeight : 0;
+            var targetPosition = target.offsetTop - navHeight - 20;
+            window.scrollTo({ top: targetPosition, behavior: "smooth" });
+          }
+        }
+        closeSheet();
+      });
+    });
+
+    // Sync active state of category sheet buttons with scroll
+    function syncSheetActive() {
+      var activeLink = shopNavEl ? shopNavEl.querySelector(".shop-nav-link.is-active") : null;
+      var activeHref = activeLink ? activeLink.getAttribute("href") : null;
+      sheet.querySelectorAll(".category-sheet-btn").forEach(function(btn) {
+        btn.classList.toggle("is-active", btn.getAttribute("href") === activeHref);
+      });
+    }
+    window.addEventListener("scroll", syncSheetActive, { passive: true });
+
+    // Show/hide FAB based on scroll (hide when near top)
+    function toggleFab() {
+      if (window.scrollY > 300) {
+        fab.classList.remove("is-hidden");
+      } else {
+        fab.classList.add("is-hidden");
+      }
+    }
+    window.addEventListener("scroll", toggleFab, { passive: true });
+    toggleFab();
+  })();
+
+  // ============================================
+  // LIBRARY MOBILE CATEGORY NAV
+  // ============================================
+  (function() {
+    var libNav = document.getElementById("library-mobile-nav");
+    if (!libNav) return;
+
+    var btns = libNav.querySelectorAll("[data-lib-nav]");
+    var categoryCards = document.querySelectorAll("[data-category-id]");
+    var azCard = document.querySelector("[data-az-view]");
+
+    btns.forEach(function(btn) {
+      btn.addEventListener("click", function(e) {
+        var catId = btn.getAttribute("data-lib-nav");
+
+        // "all" scrolls back to library section top
+        if (catId === "all") {
+          var libSection = document.getElementById("library");
+          if (libSection) {
+            libSection.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+          btns.forEach(function(b) { b.classList.remove("is-active"); });
+          btn.classList.add("is-active");
+          return;
+        }
+
+        e.preventDefault();
+
+        // Find matching category card and click it to expand
+        var targetCard = document.querySelector('[data-category-id="' + catId + '"]');
+        if (targetCard) {
+          targetCard.click();
+          setTimeout(function() {
+            targetCard.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 100);
+        }
+
+        btns.forEach(function(b) { b.classList.remove("is-active"); });
+        btn.classList.add("is-active");
+      });
     });
   })();
 
