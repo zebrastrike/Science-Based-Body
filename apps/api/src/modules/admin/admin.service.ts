@@ -116,11 +116,13 @@ export class AdminService {
     page?: number;
     limit?: number;
     status?: OrderStatus;
+    paymentStatus?: string;
+    shippingStatus?: string;
     search?: string;
     dateFrom?: Date;
     dateTo?: Date;
   }) {
-    const { page = 1, limit = 20, status, search, dateFrom, dateTo } = options;
+    const { page = 1, limit = 20, status, paymentStatus, shippingStatus, search, dateFrom, dateTo } = options;
     const skip = (page - 1) * limit;
 
     const where: any = {};
@@ -129,13 +131,42 @@ export class AdminService {
       where.status = status;
     }
 
-    if (search) {
+    if (paymentStatus) {
+      where.paymentStatus = paymentStatus;
+    }
+
+    if (shippingStatus === 'NOT_SHIPPED') {
+      // Orders without a shipment or with PENDING shipment status
       where.OR = [
+        ...(where.OR || []),
+        { shipment: null },
+        { shipment: { status: 'PENDING' } },
+      ];
+      // If there was already an OR from search, we need AND logic
+      if (search) {
+        // Handle separately below
+      }
+    } else if (shippingStatus) {
+      where.shipment = { status: shippingStatus };
+    }
+
+    if (search) {
+      const searchConditions = [
         { orderNumber: { contains: search, mode: 'insensitive' } },
         { user: { email: { contains: search, mode: 'insensitive' } } },
         { user: { firstName: { contains: search, mode: 'insensitive' } } },
         { user: { lastName: { contains: search, mode: 'insensitive' } } },
       ];
+      if (where.OR) {
+        // Combine shipping OR with search OR via AND
+        where.AND = [
+          { OR: where.OR },
+          { OR: searchConditions },
+        ];
+        delete where.OR;
+      } else {
+        where.OR = searchConditions;
+      }
     }
 
     if (dateFrom || dateTo) {
@@ -161,30 +192,41 @@ export class AdminService {
           shipment: {
             select: { status: true, trackingNumber: true },
           },
+          shippingAddress: true,
         },
       }),
       this.prisma.order.count({ where }),
     ]);
 
     return {
-      data: orders.map((order) => ({
-        id: order.id,
-        orderNumber: order.orderNumber,
-        customerName: `${order.user.firstName || ''} ${order.user.lastName || ''}`.trim() || order.user.email,
-        customerEmail: order.user.email,
-        status: order.status,
-        paymentStatus: order.payments[0]?.status || 'PENDING',
-        paymentMethod: order.payments[0]?.method,
-        shippingStatus: order.shipment?.status,
-        trackingNumber: order.shipment?.trackingNumber,
-        subtotal: Number(order.subtotal),
-        shippingCost: Number(order.shippingCost),
-        taxAmount: Number(order.taxAmount),
-        discountAmount: Number(order.discountAmount),
-        totalAmount: Number(order.totalAmount),
-        itemCount: order.items.length,
-        createdAt: order.createdAt,
-      })),
+      data: orders.map((order) => {
+        const addr = order.shippingAddress;
+        return {
+          id: order.id,
+          orderNumber: order.orderNumber,
+          customerName: `${order.user.firstName || ''} ${order.user.lastName || ''}`.trim() || order.user.email,
+          customerEmail: order.user.email,
+          status: order.status,
+          paymentStatus: order.paymentStatus || order.payments[0]?.status || 'PENDING',
+          paymentMethod: order.payments[0]?.method,
+          shippingStatus: order.shipment?.status || null,
+          trackingNumber: order.shipment?.trackingNumber,
+          subtotal: Number(order.subtotal),
+          shippingCost: Number(order.shippingCost),
+          taxAmount: Number(order.taxAmount),
+          discountAmount: Number(order.discountAmount),
+          totalAmount: Number(order.totalAmount),
+          itemCount: order.items.length,
+          shippingAddress: addr ? {
+            city: addr.city,
+            state: addr.state,
+            postalCode: addr.postalCode,
+            country: addr.country || 'US',
+          } : null,
+          paidAt: order.paidAt || null,
+          createdAt: order.createdAt,
+        };
+      }),
       pagination: {
         page,
         limit,
@@ -2154,9 +2196,10 @@ export class AdminService {
   // ==========================================================================
 
   /**
-   * Admin approves a pending Zelle/Venmo payment
+   * Admin approves a pending Zelle/Venmo payment.
+   * By default, also auto-creates a shipping label (cheapest USPS rate).
    */
-  async approvePayment(orderId: string, adminId: string, notes?: string) {
+  async approvePayment(orderId: string, adminId: string, notes?: string, autoShip = true) {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },
       include: { payments: { orderBy: { createdAt: 'desc' }, take: 1 } },
@@ -2190,15 +2233,39 @@ export class AdminService {
         .catch((err) => this.logger.error('Failed to send payment confirmation email:', err));
     }
 
+    // Auto-create shipping label if enabled (non-blocking — don't fail the payment approval)
+    let shippingResult: any = null;
+    if (autoShip) {
+      try {
+        const ratesResult = await this.getShippingRates(orderId);
+        if (ratesResult.rates?.length > 0) {
+          // Prefer cheapest USPS rate, fallback to cheapest overall
+          const uspsRates = ratesResult.rates.filter(
+            (r: any) => r.carrier?.toUpperCase().includes('USPS'),
+          );
+          const selectedRate = uspsRates.length > 0
+            ? uspsRates.reduce((cheapest: any, r: any) => r.amount < cheapest.amount ? r : cheapest)
+            : ratesResult.rates.reduce((cheapest: any, r: any) => r.amount < cheapest.amount ? r : cheapest);
+
+          shippingResult = await this.createShippingLabel(orderId, selectedRate.id || selectedRate.rateId, adminId);
+          this.logger.log(`Auto-shipped order ${order.orderNumber} via ${selectedRate.carrier} (${selectedRate.serviceName})`);
+        }
+      } catch (err) {
+        this.logger.error(`Auto-ship failed for order ${orderId}:`, err);
+        shippingResult = { error: 'Auto-ship failed — create label manually from the Shipping page' };
+      }
+    }
+
     return {
       success: true,
-      message: 'Payment approved',
+      message: autoShip && shippingResult?.success ? 'Payment approved & label created' : 'Payment approved',
       order: updated ? {
         id: updated.id,
         orderNumber: updated.orderNumber,
         status: updated.status,
         paidAt: updated.paidAt,
       } : { id: orderId },
+      shipping: shippingResult,
     };
   }
 
@@ -2255,12 +2322,14 @@ export class AdminService {
     return {
       shipmentId: result.shipmentId,
       rates: result.rates.map((rate: any) => ({
+        id: rate.object_id,
         rateId: rate.object_id,
-        provider: rate.provider,
-        servicelevel: rate.servicelevel?.name || rate.servicelevel_name,
-        amount: rate.amount,
-        currency: rate.currency,
-        estimatedDays: rate.estimated_days || rate.days,
+        carrier: rate.provider,
+        service: rate.servicelevel?.token || rate.servicelevel_token || rate.provider?.toLowerCase(),
+        serviceName: rate.servicelevel?.name || rate.servicelevel_name || rate.service,
+        amount: parseFloat(rate.amount) || 0,
+        currency: rate.currency || 'USD',
+        estimatedDays: parseInt(rate.estimated_days || rate.days, 10) || 0,
         durationTerms: rate.duration_terms,
       })),
     };
@@ -2361,6 +2430,9 @@ export class AdminService {
     return {
       success: true,
       message: 'Shipping label created',
+      labelUrl: shipment.labelUrl,
+      trackingNumber: shipment.trackingNumber,
+      trackingUrl: shipment.trackingUrl,
       shipment: {
         id: shipment.id,
         carrier: shipment.carrier,
@@ -2376,8 +2448,8 @@ export class AdminService {
    * One-click fulfillment: approve payment + get rates + create cheapest label
    */
   async fulfillOrder(orderId: string, adminId: string, notes?: string) {
-    // Step 1: Approve payment
-    const paymentResult = await this.approvePayment(orderId, adminId, notes);
+    // Step 1: Approve payment (skip auto-ship — we handle shipping below)
+    const paymentResult = await this.approvePayment(orderId, adminId, notes, false);
 
     // Step 2: Get shipping rates
     const ratesResult = await this.getShippingRates(orderId);
@@ -2391,25 +2463,25 @@ export class AdminService {
 
     // Step 3: Pick cheapest rate (prefer USPS, then cheapest overall)
     const uspsRates = ratesResult.rates.filter(
-      (r: any) => r.provider?.toUpperCase().includes('USPS'),
+      (r: any) => r.carrier?.toUpperCase().includes('USPS'),
     );
     const selectedRate = uspsRates.length > 0
       ? uspsRates.reduce((cheapest: any, r: any) =>
-          parseFloat(r.amount) < parseFloat(cheapest.amount) ? r : cheapest,
+          r.amount < cheapest.amount ? r : cheapest,
         )
       : ratesResult.rates.reduce((cheapest: any, r: any) =>
-          parseFloat(r.amount) < parseFloat(cheapest.amount) ? r : cheapest,
+          r.amount < cheapest.amount ? r : cheapest,
         );
 
     // Step 4: Create label
-    const labelResult = await this.createShippingLabel(orderId, selectedRate.rateId, adminId);
+    const labelResult = await this.createShippingLabel(orderId, selectedRate.id || selectedRate.rateId, adminId);
 
     return {
       payment: paymentResult,
       shipping: labelResult,
       selectedRate: {
-        provider: selectedRate.provider,
-        service: selectedRate.servicelevel,
+        carrier: selectedRate.carrier,
+        service: selectedRate.serviceName,
         cost: selectedRate.amount,
       },
     };

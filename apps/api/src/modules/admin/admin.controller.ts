@@ -136,6 +136,8 @@ export class AdminController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'status', required: false, enum: OrderStatus })
+  @ApiQuery({ name: 'paymentStatus', required: false, description: 'Filter by payment status (PENDING, AWAITING_PAYMENT, PAID, FAILED)' })
+  @ApiQuery({ name: 'shippingStatus', required: false, description: 'Filter by shipping status (NOT_SHIPPED, LABEL_CREATED, SHIPPED, IN_TRANSIT, DELIVERED)' })
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'dateFrom', required: false })
   @ApiQuery({ name: 'dateTo', required: false })
@@ -144,6 +146,8 @@ export class AdminController {
     @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('status') status?: OrderStatus,
+    @Query('paymentStatus') paymentStatus?: string,
+    @Query('shippingStatus') shippingStatus?: string,
     @Query('search') search?: string,
     @Query('dateFrom') dateFrom?: string,
     @Query('dateTo') dateTo?: string,
@@ -152,6 +156,8 @@ export class AdminController {
       page: page ? Number(page) : undefined,
       limit: limit ? Number(limit) : undefined,
       status,
+      paymentStatus,
+      shippingStatus,
       search,
       dateFrom: dateFrom ? new Date(dateFrom) : undefined,
       dateTo: dateTo ? new Date(dateTo) : undefined,
@@ -280,9 +286,10 @@ export class AdminController {
   approvePayment(
     @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
-    @Body() body: { notes?: string },
+    @Body() body: { notes?: string; autoShip?: boolean },
   ) {
-    return this.adminService.approvePayment(id, req.user.id, body?.notes);
+    const autoShip = body?.autoShip !== undefined ? (body.autoShip === true || (body.autoShip as any) === 'true') : true;
+    return this.adminService.approvePayment(id, req.user.id, body?.notes, autoShip);
   }
 
   @Get('orders/:id/shipping-rates')
