@@ -69,7 +69,7 @@ export class AffiliatesService {
 
     this.mailService
       .sendEmail({
-        to: 'admin@sciencebasedbody.com',
+        to: 'sales@sbbpeptides.com',
         subject: `New Affiliate Application: ${dto.fullName}`,
         html: `
           <h2>New Affiliate Application</h2>

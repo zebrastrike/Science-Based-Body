@@ -742,6 +742,13 @@ button.btn {
   box-shadow: 0 14px 30px rgba(31, 42, 54, 0.12);
 }
 
+.btn-outline-rose {
+  border-color: var(--rose);
+  background: transparent;
+  color: var(--rose);
+  box-shadow: 0 14px 30px rgba(227, 167, 161, 0.2);
+}
+
 .btn:hover {
   opacity: 0.85;
   transform: translateY(-3px) scale(1.01);

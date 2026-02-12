@@ -62,7 +62,7 @@ export class PartnersService {
     // Notify admin (non-blocking)
     this.mailService
       .sendEmail({
-        to: 'admin@sciencebasedbody.com',
+        to: 'sales@sbbpeptides.com',
         subject: `New Brand Partner Application: ${dto.organizationName}`,
         html: `
           <h2>New Brand Partner Application</h2>
