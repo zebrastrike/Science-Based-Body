@@ -18,6 +18,7 @@ COPY checkout.html about.html support.html faq.html tracking.html login.html ./
 COPY testing-standards.html storage-guidelines.html coa-verification.html ./
 COPY terms.html privacy.html shipping.html returns.html ./
 COPY research-use.html compliance.html cookies.html accessibility.html ./
+COPY reset-password.html wholesale-shop.html ./
 COPY styles.css scripts.js ./
 
 # Set build-time environment variables
