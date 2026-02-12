@@ -8,7 +8,7 @@
       href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400&family=Sora:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260213" />
+    <link rel="stylesheet" href="styles.css?v=20260211b" />
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-5NLZQKVWBW"></script>
     <script>
@@ -1763,7 +1763,7 @@
               var info = { inStock: p.inStock, qty: p.stockQuantity || 0, lead: p.leadTimeDays,
                            name: p.name, slug: p.slug, category: p.category || '',
                            price: p.basePrice, priceRange: p.priceRange, primaryImage: p.primaryImage,
-                           variants: p.variants || [] };
+                           variants: p.variants || [], shortDescription: p.shortDescription || '' };
               slugMap[p.slug] = info;
               nameMap[p.name.toLowerCase().trim()] = info;
               if (info.qty > 0) inStockProducts.push(info);
@@ -1885,11 +1885,14 @@
               var cat = (p.category || '').replace(/_/g, ' ');
               var card = document.createElement('article');
               card.className = 'card product-card reveal';
+              var desc = p.shortDescription || '';
+              if (desc.length > 90) desc = desc.substring(0, 87) + '...';
               card.innerHTML =
                 '<img class="product-image" src="' + (p.primaryImage || '/images/products/vial.png') + '" alt="' + p.name + '" />' +
                 '<div class="product-body">' +
                   '<span class="carousel-card-cat">' + cat + '</span>' +
                   '<h3>' + p.name + '</h3>' +
+                  (desc ? '<p class="carousel-card-desc">' + desc + '</p>' : '') +
                   '<span class="price">$' + displayPrice.toFixed(2) + '</span>' +
                   '<span class="stock-badge stock-in">In Stock</span>' +
                   '<button type="button" class="btn-add-cart carousel-atc" data-add-to-cart="' + cartSlug + '" data-product-name="' + p.name + '" data-product-variant="' + variantName + '" data-product-price="' + displayPrice.toFixed(2) + '">' +
@@ -1921,12 +1924,12 @@
             // Auto-advance every 5s
             var autoTimer = setInterval(function() {
               if (idx >= maxIdx) { slideTo(0); } else { slideTo(idx + 1); }
-            }, 5000);
+            }, 7000);
             wrap.addEventListener('mouseenter', function() { clearInterval(autoTimer); });
             wrap.addEventListener('mouseleave', function() {
               autoTimer = setInterval(function() {
                 if (idx >= maxIdx) { slideTo(0); } else { slideTo(idx + 1); }
-              }, 5000);
+              }, 7000);
             });
 
             // Touch swipe support for mobile
@@ -1944,7 +1947,7 @@
               }
               autoTimer = setInterval(function() {
                 if (idx >= maxIdx) { slideTo(0); } else { slideTo(idx + 1); }
-              }, 5000);
+              }, 7000);
             }, { passive: true });
 
             // Update perPage on resize
