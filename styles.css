@@ -2444,10 +2444,12 @@ body.is-ready .reveal {
   overflow: hidden;
 }
 
+/* Glassy bubbles — original colors + magnify lens effect */
 .bubble {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(
+  background:
+    radial-gradient(
       circle at 28% 28%,
       hsla(var(--bubble-hue, 200), 85%, 92%, 0.85),
       hsla(var(--bubble-hue, 200), 78%, 70%, 0.45) 45%,
@@ -2460,14 +2462,17 @@ body.is-ready .reveal {
       transparent 65%
     );
   border: 1px solid hsla(var(--bubble-hue, 200), 85%, 85%, 0.55);
-  box-shadow: 0 16px 32px rgba(31, 42, 54, 0.12),
-    inset 0 12px 24px rgba(255, 255, 255, 0.55),
+  box-shadow:
+    0 16px 32px rgba(31, 42, 54, 0.12),
+    inset 0 12px 24px rgba(255, 255, 255, 0.35),
     inset 0 -12px 22px rgba(31, 42, 54, 0.08);
+  backdrop-filter: saturate(1.5) contrast(1.12) brightness(1.04);
+  -webkit-backdrop-filter: saturate(1.5) contrast(1.12) brightness(1.04);
   mix-blend-mode: screen;
   opacity: var(--bubble-alpha);
+  filter: saturate(1.2);
   animation: none;
   will-change: transform;
-  filter: saturate(1.2);
   cursor: pointer;
 }
 
@@ -2477,69 +2482,28 @@ body.is-ready .reveal {
 
 @keyframes bubble-pop {
   0% {
-    opacity: var(--bubble-alpha);
-    filter: saturate(1.2);
-    box-shadow: 0 16px 32px rgba(31, 42, 54, 0.12),
-      inset 0 12px 24px rgba(255, 255, 255, 0.55),
-      inset 0 -12px 22px rgba(31, 42, 54, 0.08);
+    opacity: 0.9;
+    box-shadow: 0 4px 20px rgba(31, 42, 54, 0.06),
+      inset 0 0 20px rgba(255, 255, 255, 0.15);
   }
   60% {
-    opacity: 0.35;
-    filter: saturate(1.8) blur(1px);
-    box-shadow: 0 0 0 12px rgba(255, 255, 255, 0.35);
+    opacity: 0.3;
+    filter: blur(2px);
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.25);
   }
   100% {
     opacity: 0;
-    filter: saturate(2) blur(6px);
-    box-shadow: 0 0 0 28px rgba(255, 255, 255, 0.2);
+    filter: blur(6px);
+    box-shadow: 0 0 0 24px rgba(255, 255, 255, 0.1);
   }
 }
 
-.bubble::after {
-  content: "";
-  position: absolute;
-  top: 18%;
-  left: 22%;
-  width: 30%;
-  height: 30%;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.7);
-  box-shadow: 0 0 18px rgba(255, 255, 255, 0.55);
-}
-
-/* ── Magnifier lens (replaces bubble-1) ── */
 .bubble-1 {
   width: 180px;
   height: 180px;
   top: 12%;
   left: 6%;
   --bubble-hue: 330;
-  /* Glass lens — nearly transparent so backdrop-filter shows through */
-  background: radial-gradient(
-    circle at 28% 28%,
-    hsla(330, 60%, 92%, 0.18),
-    hsla(330, 40%, 80%, 0.06) 50%,
-    transparent 70%
-  );
-  backdrop-filter: saturate(1.5) contrast(1.15) brightness(1.03);
-  -webkit-backdrop-filter: saturate(1.5) contrast(1.15) brightness(1.03);
-  border: 1.5px solid hsla(330, 70%, 88%, 0.5);
-  box-shadow:
-    0 8px 32px rgba(227, 167, 161, 0.12),
-    inset 0 0 30px rgba(255, 255, 255, 0.25),
-    inset 0 -4px 12px rgba(31, 42, 54, 0.05);
-  mix-blend-mode: normal;
-  opacity: 0.92;
-  filter: none;
-}
-
-.bubble-1::after {
-  top: 12%;
-  left: 16%;
-  width: 20%;
-  height: 20%;
-  background: rgba(255, 255, 255, 0.45);
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
 }
 
 .bubble-2 {
@@ -2751,36 +2715,29 @@ body.is-ready .reveal {
   }
 }
 
-/* ── Bubbles: always behind text & cards on all pages ── */
-.bubble-field { z-index: 0; }
-
-/* ── Magnifier lens overlay — sits above text so backdrop-filter works ── */
-.magnifier-field {
-  position: fixed;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  overflow: hidden;
-}
-.card,
+/* ── Bubble z-layering: bubbles OVER text, BEHIND product cards ── */
+.bubble-field { z-index: 2; }
+/* Product cards & footer render ABOVE bubbles */
 .product-card,
-.section-heading,
-.hero-copy,
-.policy-content,
-.footer-grid,
-.site-footer { position: relative; z-index: 1; }
+.site-footer { position: relative; z-index: 3; }
+/* Everything else stays below bubbles — lens magnify effect on text */
 
 /* ── No bubbles on policy/terms/footer-linked pages ── */
 body.page-policy .bubble-field { display: none; }
-body.page-policy .magnifier-field { display: none; }
 
-/* ── Fewer bubbles on mobile (hide 7-20 → only 6 on mobile) ── */
+/* ── Mobile: 5 small bubbles ── */
 @media (max-width: 768px) {
-  .bubble-7, .bubble-8, .bubble-9, .bubble-10,
+  .bubble-6, .bubble-7, .bubble-8, .bubble-9, .bubble-10,
   .bubble-11, .bubble-12, .bubble-13, .bubble-14, .bubble-15,
   .bubble-16, .bubble-17, .bubble-18, .bubble-19, .bubble-20 {
     display: none;
   }
+  /* Shrink remaining 5 bubbles on mobile */
+  .bubble-1 { width: 70px; height: 70px; }
+  .bubble-2 { width: 55px; height: 55px; }
+  .bubble-3 { width: 65px; height: 65px; }
+  .bubble-4 { width: 50px; height: 50px; }
+  .bubble-5 { width: 60px; height: 60px; }
 }
 
 @media (max-width: 1100px) {

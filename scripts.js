@@ -817,17 +817,14 @@ document.addEventListener("DOMContentLoaded", () => {
     : [];
 
   if (!prefersReducedMotion && bubbleField && bubbleEls.length) {
-    // Elements bubbles should bounce off (cards, headings, hero text)
+    // Elements bubbles bounce off — product cards, section headers, title cards
+    // Bubbles float freely over text (magnify lens effect)
     const obstacleSelectors = [
-      ".hero-copy",
-      ".section-heading",
+      ".product-card",
       ".card",
-      ".product-hero-copy",
+      ".section-heading",
       ".subscription-block",
-      ".accordion-panel",
-      ".modal-card",
-      ".policy-content",
-      ".footer-grid"
+      ".modal-card"
     ];
     let obstacles = [];
     let needsRefresh = true;
@@ -868,7 +865,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Gentle random initial direction
       const angle = Math.random() * Math.PI * 2;
       const mobile = isMobile();
-      const baseSpeed = mobile ? 0.08 + Math.random() * 0.12 : 0.15 + Math.random() * 0.2;
+      const baseSpeed = mobile ? 0.25 + Math.random() * 0.15 : 0.42 + Math.random() * 0.3;
       return {
         el: bubble,
         size,
@@ -877,22 +874,9 @@ document.addEventListener("DOMContentLoaded", () => {
         vx: Math.cos(angle) * baseSpeed,
         vy: Math.sin(angle) * baseSpeed,
         seed: seed,
-        isPopping: false,
-        isMagnifier: false
+        isPopping: false
       };
     });
-
-    // Move magnifier bubble (bubble-1) to its own overlay so it floats
-    // ABOVE text — this lets backdrop-filter create the lens effect
-    const magnifierEl = bubbleEls[0];
-    if (magnifierEl && magnifierEl.classList.contains("bubble-1")) {
-      const magnifierField = document.createElement("div");
-      magnifierField.className = "magnifier-field";
-      document.body.appendChild(magnifierField);
-      magnifierField.appendChild(magnifierEl);
-      bubbleState[0].isMagnifier = true;
-      bubbleState[0].size = 180; // updated size
-    }
 
     const popDuration = 420;
     const respawnBubble = (bubble) => {
@@ -903,7 +887,7 @@ document.addEventListener("DOMContentLoaded", () => {
       bubble.y = Math.random() * (height - bubble.size);
       const mobile = isMobile();
       const angle = Math.random() * Math.PI * 2;
-      const speed = mobile ? 0.08 + Math.random() * 0.12 : 0.15 + Math.random() * 0.2;
+      const speed = mobile ? 0.15 + Math.random() * 0.15 : 0.25 + Math.random() * 0.25;
       bubble.vx = Math.cos(angle) * speed;
       bubble.vy = Math.sin(angle) * speed;
       bubble.el.style.transform = `translate3d(${bubble.x}px, ${bubble.y}px, 0)`;
@@ -966,7 +950,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const pad = 12;
       const mobile = isMobile();
       // Speed limit: prevent bubbles from ever going too fast
-      const maxSpeed = mobile ? 0.25 : 0.4;
+      const maxSpeed = mobile ? 0.55 : 0.9;
 
       bubbleState.forEach((bubble) => {
         if (bubble.isPopping) return;
@@ -975,9 +959,9 @@ document.addEventListener("DOMContentLoaded", () => {
         // Creates gentle figure-8 / orbital feel
         const t = time * 0.001; // seconds
         const s = bubble.seed;
-        const driftScale = mobile ? 0.06 : 0.12;
-        const driftX = (Math.sin(t * 0.4 + s) * 0.6 + Math.sin(t * 0.7 + s * 1.3) * 0.4) * driftScale;
-        const driftY = (Math.cos(t * 0.35 + s * 0.8) * 0.5 + Math.cos(t * 0.6 + s * 1.5) * 0.5) * driftScale;
+        const driftScale = mobile ? 0.015 : 0.025;
+        const driftX = (Math.sin(t * 0.12 + s) * 0.8 + Math.sin(t * 0.2 + s * 1.3) * 0.2) * driftScale;
+        const driftY = (Math.cos(t * 0.1 + s * 0.8) * 0.7 + Math.cos(t * 0.18 + s * 1.5) * 0.3) * driftScale;
 
         // Apply drift + velocity
         bubble.x += (bubble.vx + driftX) * dt;
@@ -1001,8 +985,7 @@ document.addEventListener("DOMContentLoaded", () => {
           bubble.vy = -Math.abs(bubble.vy) * 0.8;
         }
 
-        // Obstacle avoidance — bounce off cards & text (magnifier floats over)
-        if (!bubble.isMagnifier)
+        // Obstacle bounce — deflect off product cards, section headers, title cards
         for (let i = 0; i < obstacles.length; i += 1) {
           const rect = obstacles[i];
           const left = rect.left - pad;
@@ -1022,23 +1005,25 @@ document.addEventListener("DOMContentLoaded", () => {
             const overlapB = bottom - bubble.y;
             const minOverlap = Math.min(overlapL, overlapR, overlapT, overlapB);
 
+            // Playful bounce — deflect with a random kick
+            const bounceFactor = 0.7;
             if (minOverlap === overlapL) {
               bubble.x = left - bubble.size;
-              bubble.vx = -Math.abs(bubble.vx) * 0.6;
+              bubble.vx = -Math.abs(bubble.vx) * bounceFactor;
             } else if (minOverlap === overlapR) {
               bubble.x = right;
-              bubble.vx = Math.abs(bubble.vx) * 0.6;
+              bubble.vx = Math.abs(bubble.vx) * bounceFactor;
             } else if (minOverlap === overlapT) {
               bubble.y = top - bubble.size;
-              bubble.vy = -Math.abs(bubble.vy) * 0.6;
+              bubble.vy = -Math.abs(bubble.vy) * bounceFactor;
             } else {
               bubble.y = bottom;
-              bubble.vy = Math.abs(bubble.vy) * 0.6;
+              bubble.vy = Math.abs(bubble.vy) * bounceFactor;
             }
 
-            // Tiny random nudge for organic feel
-            bubble.vx += (Math.random() - 0.5) * 0.04;
-            bubble.vy += (Math.random() - 0.5) * 0.04;
+            // Double-bounce jitter — random perpendicular kick for playful deflection
+            bubble.vx += (Math.random() - 0.5) * 0.12;
+            bubble.vy += (Math.random() - 0.5) * 0.12;
           }
         }
 
