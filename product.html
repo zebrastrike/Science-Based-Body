@@ -8,7 +8,7 @@
       href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400&family=Sora:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260212" />
+    <link rel="stylesheet" href="styles.css?v=20260213" />
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-5NLZQKVWBW"></script>
     <script>
@@ -112,6 +112,14 @@
           <div class="library-shell" data-library>
             <div class="library-category-view" data-library-category-view>
               <div class="library-category-grid">
+                <button class="library-category-card library-az-card" type="button" data-az-view style="--category-accent: 227 167 161;">
+                  <span class="category-icon" aria-hidden="true">A-Z</span>
+                  <div class="library-category-meta">
+                    <span class="label">Browse A-Z</span>
+                    <p class="category-desc">View all peptides sorted alphabetically.</p>
+                  </div>
+                  <span class="library-category-count" data-az-count>0 peptides</span>
+                </button>
                 <button class="library-category-card" type="button" data-category-id="weight-management" data-category-name="Weight Management" data-category-description="GLP-1, amylin, and metabolic regulation research." data-category-icon="WM" data-category-accent="227 167 161" style="--category-accent: 227 167 161;">
                   <span class="category-icon" aria-hidden="true">WM</span>
                   <div class="library-category-meta">
@@ -1148,6 +1156,26 @@
                 </article>
               </div>
             </div>
+
+            <!-- A-Z View (all peptides sorted alphabetically) -->
+            <div class="library-az-view is-hidden" data-library-az-view>
+              <div class="library-peptide-header">
+                <button class="library-back" type="button" data-az-back>
+                  Back to categories
+                </button>
+                <div class="library-category-header card" style="--category-accent: 227 167 161;">
+                  <span class="category-icon" aria-hidden="true">A-Z</span>
+                  <div class="library-category-title">
+                    <span class="label">ALL PEPTIDES</span>
+                    <h3>Alphabetical Index</h3>
+                    <p>Browse every peptide in our library, sorted A to Z.</p>
+                  </div>
+                  <span class="library-category-count" data-az-header-count>0 peptides</span>
+                </div>
+              </div>
+              <nav class="az-letter-nav" data-az-letter-nav></nav>
+              <div class="az-peptide-list" data-az-peptide-list></div>
+            </div>
           </div>
         </div>
       </section>
@@ -1267,6 +1295,6 @@
       </div>
     </aside>
 
-    <script src="scripts.js?v=20260212"></script>
+    <script src="scripts.js?v=20260213"></script>
   </body>
 </html>

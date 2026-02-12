@@ -579,6 +579,11 @@ document.addEventListener("DOMContentLoaded", () => {
         categoryCards.forEach((card) => {
           card.classList.toggle("is-selected", card.dataset.categoryId === id);
         });
+        // Also deselect A-Z card and hide A-Z view
+        const azCardEl = library.querySelector("[data-az-view]");
+        if (azCardEl) azCardEl.classList.remove("is-selected");
+        const azViewEl = library.querySelector("[data-library-az-view]");
+        if (azViewEl) azViewEl.classList.add("is-hidden");
         if (categoryView) categoryView.classList.add("is-hidden");
         if (peptideView) peptideView.classList.remove("is-hidden");
       if (activeName) activeName.textContent = category.name;
@@ -636,6 +641,141 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     });
+
+    /* ── A-Z View ──────────────────────────────────────────── */
+    const azCard = library.querySelector("[data-az-view]");
+    const azView = library.querySelector("[data-library-az-view]");
+    const azBack = library.querySelector("[data-az-back]");
+    const azLetterNav = library.querySelector("[data-az-letter-nav]");
+    const azPeptideList = library.querySelector("[data-az-peptide-list]");
+    const azCountEl = library.querySelector("[data-az-count]");
+    const azHeaderCount = library.querySelector("[data-az-header-count]");
+
+    if (azCard && azView) {
+      // Set total count on the A-Z card
+      const totalPeptides = peptideCards.length;
+      if (azCountEl) azCountEl.textContent = totalPeptides + " peptides";
+      if (azHeaderCount) azHeaderCount.textContent = totalPeptides + " peptides";
+
+      // Build alphabetical index
+      const buildAzView = () => {
+        if (!azPeptideList) return;
+        // Collect peptide data from all cards
+        const peptides = peptideCards.map((card) => {
+          const name = card.querySelector("h3") ? card.querySelector("h3").textContent.trim() : "";
+          return { name, card };
+        }).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+
+        // Group by first letter
+        const groups = {};
+        peptides.forEach((p) => {
+          const letter = /^[A-Za-z]/.test(p.name) ? p.name[0].toUpperCase() : "#";
+          if (!groups[letter]) groups[letter] = [];
+          groups[letter].push(p);
+        });
+
+        // Build letter nav
+        if (azLetterNav) {
+          azLetterNav.innerHTML = "";
+          const allLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#".split("");
+          allLetters.forEach((letter) => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.textContent = letter;
+            if (!groups[letter]) {
+              btn.disabled = true;
+            } else {
+              btn.addEventListener("click", () => {
+                const target = azPeptideList.querySelector('[data-az-letter="' + letter + '"]');
+                if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+                azLetterNav.querySelectorAll("button").forEach((b) => b.classList.remove("is-active"));
+                btn.classList.add("is-active");
+              });
+            }
+            azLetterNav.appendChild(btn);
+          });
+        }
+
+        // Build peptide list grouped by letter
+        azPeptideList.innerHTML = "";
+        const sortedLetters = Object.keys(groups).sort((a, b) => {
+          if (a === "#") return 1;
+          if (b === "#") return -1;
+          return a.localeCompare(b);
+        });
+
+        sortedLetters.forEach((letter) => {
+          const group = document.createElement("div");
+          group.className = "az-letter-group";
+          group.setAttribute("data-az-letter", letter);
+          const heading = document.createElement("h3");
+          heading.textContent = letter;
+          group.appendChild(heading);
+
+          groups[letter].forEach((p) => {
+            // Clone the peptide card for the A-Z view
+            const clone = p.card.cloneNode(true);
+            clone.classList.remove("is-hidden", "is-expanded");
+            const details = clone.querySelector(".peptide-details");
+            if (details) details.hidden = true;
+            const toggle = clone.querySelector("[data-peptide-toggle]");
+            if (toggle) {
+              toggle.setAttribute("aria-expanded", "false");
+              toggle.addEventListener("click", () => {
+                const isExp = clone.classList.contains("is-expanded");
+                // Collapse all in A-Z view
+                azPeptideList.querySelectorAll(".peptide-card.is-expanded").forEach((c) => {
+                  c.classList.remove("is-expanded");
+                  const t = c.querySelector("[data-peptide-toggle]");
+                  if (t) t.setAttribute("aria-expanded", "false");
+                  const d = c.querySelector(".peptide-details");
+                  if (d) d.hidden = true;
+                });
+                if (!isExp) {
+                  clone.classList.add("is-expanded");
+                  toggle.setAttribute("aria-expanded", "true");
+                  if (details) details.hidden = false;
+                }
+              });
+            }
+            // Set category label to all categories
+            const catLabel = clone.querySelector("[data-peptide-category]");
+            if (catLabel) {
+              const ids = (p.card.dataset.categories || "").split(",").map((s) => s.trim()).filter(Boolean);
+              const names = ids.map((id) => categoryMap.get(id) ? categoryMap.get(id).name : "").filter(Boolean);
+              catLabel.textContent = names.join(", ");
+            }
+            group.appendChild(clone);
+          });
+
+          azPeptideList.appendChild(group);
+        });
+      };
+
+      buildAzView();
+
+      // Show A-Z view on card click
+      azCard.addEventListener("click", () => {
+        categoryCards.forEach((c) => c.classList.remove("is-selected"));
+        azCard.classList.add("is-selected");
+        if (categoryView) categoryView.classList.add("is-hidden");
+        if (peptideView) peptideView.classList.add("is-hidden");
+        azView.classList.remove("is-hidden");
+        collapseAll();
+        library.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      // Back from A-Z view
+      if (azBack) {
+        azBack.addEventListener("click", () => {
+          azView.classList.add("is-hidden");
+          if (categoryView) categoryView.classList.remove("is-hidden");
+          categoryCards.forEach((c) => c.classList.remove("is-selected"));
+          azCard.classList.remove("is-selected");
+          library.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+    }
   }
 
 
