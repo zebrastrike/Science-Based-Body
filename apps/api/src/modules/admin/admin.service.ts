@@ -521,9 +521,22 @@ export class AdminService {
       throw new NotFoundException('Product not found');
     }
 
+    // Only pick fields that exist on the Product model to avoid Prisma errors
+    const allowedFields = [
+      'name', 'slug', 'category', 'basePrice', 'shortDescription', 'longDescription',
+      'purityPercent', 'molecularWeight', 'sequence', 'casNumber', 'isActive', 'isFeatured',
+      'costPerUnit', 'wholesaleOnly', 'comingSoon', 'subcategory', 'compareAtPrice',
+    ];
+    const cleanData: Record<string, any> = {};
+    for (const key of allowedFields) {
+      if ((data as any)[key] !== undefined) {
+        cleanData[key] = (data as any)[key];
+      }
+    }
+
     const product = await this.prisma.product.update({
       where: { id: productId },
-      data,
+      data: cleanData,
     });
 
     await this.prisma.auditLog.create({

@@ -279,8 +279,8 @@ Do NOT ship returns without prior authorization.`,
       content: `We are committed to fast, reliable shipping for all orders. Most orders ship same-day when placed before our cutoff time.`,
       sections: [
         {
-          title: 'Free Shipping',
-          content: `FREE standard shipping is available on all orders over $99 within the continental United States. Orders under $99 have a flat rate shipping fee of $9.99.`,
+          title: 'Shipping Rates',
+          content: `All orders ship with a flat rate of $25.00 for Standard Shipping, or $50.00 for Expedited Shipping. Rates apply to all orders regardless of order value.`,
         },
         {
           title: 'Processing Time',
@@ -288,9 +288,8 @@ Do NOT ship returns without prior authorization.`,
         },
         {
           title: 'Shipping Methods',
-          content: `Standard Shipping (3-5 business days): FREE on orders $99+, otherwise $9.99
-Express Shipping (1-2 business days): $19.99
-Overnight Shipping (Next business day): $39.99
+          content: `Standard Shipping (3-5 business days): $25.00 flat rate
+Expedited Shipping (1-2 business days): $50.00
 
 All orders are shipped via USPS, FedEx, or UPS at our discretion based on destination and package requirements.`,
         },

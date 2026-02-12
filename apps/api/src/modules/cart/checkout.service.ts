@@ -12,6 +12,7 @@ import { MailgunService } from '../notifications/mailgun.service';
 import { TaxService } from '../tax/tax.service';
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
 import { PaymentMethod } from '@prisma/client';
 import { CreateOrderDto, ResolveCartItemDto } from './dto/create-order.dto';
 
@@ -65,9 +66,9 @@ export class CheckoutService {
     // 2. Validate and enrich cart (passes userId for wholesale pricing)
     let cart = await this.cartService.validateAndEnrichCart(dto.items, userId || undefined);
 
-    // 3. Apply discount code if provided
+    // 3. Apply discount code if provided (pass email for guest per-user limit check)
     if (dto.discountCode) {
-      cart = await this.cartService.applyDiscountCode(cart, dto.discountCode, userId || undefined);
+      cart = await this.cartService.applyDiscountCode(cart, dto.discountCode, userId || undefined, dto.guestEmail || undefined);
     }
 
     // 4. Calculate shipping
@@ -112,12 +113,18 @@ export class CheckoutService {
           where: { email: dto.guestEmail.toLowerCase() },
         });
 
+        // Hash password if createAccount was selected
+        let passwordHash = '';
+        if (dto.createAccount && dto.password && dto.password.length >= 8) {
+          passwordHash = await bcrypt.hash(dto.password, 12);
+        }
+
         if (!guestUser) {
           // Auto-create customer account from checkout info
           guestUser = await tx.user.create({
             data: {
               email: dto.guestEmail.toLowerCase(),
-              passwordHash: '', // Will be set via password-reset flow
+              passwordHash,
               firstName: dto.shippingAddress.firstName || undefined,
               lastName: dto.shippingAddress.lastName || undefined,
               phone: dto.shippingAddress.phone || undefined,
@@ -125,17 +132,27 @@ export class CheckoutService {
               status: 'ACTIVE',
             },
           });
-          isNewAccount = true;
-        } else if (!guestUser.firstName && dto.shippingAddress.firstName) {
-          // Update existing guest user with name/phone if missing
-          guestUser = await tx.user.update({
-            where: { id: guestUser.id },
-            data: {
-              firstName: dto.shippingAddress.firstName,
-              lastName: dto.shippingAddress.lastName || undefined,
-              phone: dto.shippingAddress.phone || guestUser.phone || undefined,
-            },
-          });
+          isNewAccount = !dto.createAccount; // Only send set-password email if they didn't set one at checkout
+        } else {
+          // Update existing user with name/phone if missing
+          const updateData: any = {};
+          if (!guestUser.firstName && dto.shippingAddress.firstName) {
+            updateData.firstName = dto.shippingAddress.firstName;
+            updateData.lastName = dto.shippingAddress.lastName || undefined;
+          }
+          if (!guestUser.phone && dto.shippingAddress.phone) {
+            updateData.phone = dto.shippingAddress.phone;
+          }
+          // If they chose to create an account and had no password before
+          if (passwordHash && !guestUser.passwordHash) {
+            updateData.passwordHash = passwordHash;
+          }
+          if (Object.keys(updateData).length > 0) {
+            guestUser = await tx.user.update({
+              where: { id: guestUser.id },
+              data: updateData,
+            });
+          }
         }
         orderUserId = guestUser.id;
       }
@@ -277,6 +294,7 @@ export class CheckoutService {
       shipping: shippingCost,
       tax: taxAmount,
       discount: cart.discountAmount,
+      discountCode: dto.discountCode || undefined,
       total: totalAmount,
       shippingAddress: dto.shippingAddress,
       paymentMethod: dto.paymentMethod,
@@ -401,7 +419,7 @@ export class CheckoutService {
       disclaimers: this.complianceService.getDisclaimers(),
       acceptedPaymentMethods: this.paymentsService.getAvailablePaymentMethods(),
       volumeDiscount: this.cartService.getVolumeDiscountInfo(),
-      freeShippingThreshold: 500,
+      shippingFlat: 25,
       policies: {
         termsOfService: '/policies/terms',
         privacyPolicy: '/policies/privacy',

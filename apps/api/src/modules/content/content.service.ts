@@ -83,10 +83,10 @@ export class ContentService {
   async getPromoBanners(location?: string) {
     const banners = [
       {
-        id: 'promo-free-shipping',
+        id: 'promo-same-day',
         location: 'header',
         type: 'text',
-        content: 'FREE SHIPPING on orders $99+ | Same-day dispatch before 12PM CST',
+        content: 'Same-day dispatch on orders placed before 12PM CST',
         link: '/shipping',
         backgroundColor: '#1a1a1a',
         textColor: '#ffffff',
@@ -123,7 +123,7 @@ export class ContentService {
       messages: [
         {
           id: 'ann-1',
-          text: 'FREE SHIPPING on orders $99+',
+          text: 'Same-day dispatch before 12PM CST',
           link: '/shipping',
         },
         {

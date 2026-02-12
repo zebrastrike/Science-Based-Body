@@ -42,7 +42,7 @@ export class LoyaltyService {
       benefits: [
         '12.5 points per $1 spent',
         'Early access to sales',
-        'Free shipping on orders $75+',
+        'Priority order processing',
       ],
     },
     {
@@ -52,8 +52,8 @@ export class LoyaltyService {
       benefits: [
         '15 points per $1 spent',
         'Early access to sales',
-        'Free shipping on all orders',
         'Priority support',
+        'Exclusive member offers',
       ],
     },
     {
@@ -63,9 +63,9 @@ export class LoyaltyService {
       benefits: [
         '20 points per $1 spent',
         'Early access to sales',
-        'Free express shipping',
         'Priority support',
         'Exclusive member events',
+        'Dedicated account manager',
       ],
     },
   ];

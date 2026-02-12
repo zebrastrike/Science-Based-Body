@@ -15,6 +15,7 @@ interface OrderDetails {
   shipping: number;
   tax: number;
   discount: number;
+  discountCode?: string;
   total: number;
   shippingAddress: {
     firstName: string;
@@ -346,12 +347,12 @@ export class EmailTemplatesService {
         </tr>
         <tr>
           <td style="padding:5px 0;color:#6b7280;">Shipping</td>
-          <td style="padding:5px 0;text-align:right;color:${this.ink};">${order.shipping === 0 ? 'FREE' : '$' + order.shipping.toFixed(2)}</td>
+          <td style="padding:5px 0;text-align:right;color:${this.ink};">$${order.shipping.toFixed(2)}</td>
         </tr>
         ${order.discount > 0 ? `
         <tr>
-          <td style="padding:5px 0;color:${this.sage};">Discount</td>
-          <td style="padding:5px 0;text-align:right;color:${this.sage};">-$${order.discount.toFixed(2)}</td>
+          <td style="padding:5px 0;color:#166534;font-weight:600;">Discount${order.discountCode ? ` <span style="font-weight:400;font-size:13px;opacity:0.7;">(${order.discountCode})</span>` : ''}</td>
+          <td style="padding:5px 0;text-align:right;color:#166534;font-weight:600;">-$${order.discount.toFixed(2)}</td>
         </tr>
         ` : ''}
         <tr>
@@ -379,7 +380,7 @@ export class EmailTemplatesService {
       </p>
 
       <p style="margin:0 0 30px 0;text-align:center;">
-        ${this.button('View Order', `${this.siteUrl}/account/orders/${order.orderNumber}`)}
+        ${this.button('View Your Account', `${this.siteUrl}/login`)}
       </p>
     `, `Order #${order.orderNumber} received - Please complete payment`);
 
@@ -388,7 +389,7 @@ export class EmailTemplatesService {
       : order.paymentMethod === 'ZELLE'
         ? 'Zelle: HEALTH SBB - 702-686-5343'
         : 'Zelle: HEALTH SBB - 702-686-5343\nVenmo: @healthsbb - 702-686-5343';
-    const text = `Thank You for Your Order - #${order.orderNumber}\n\nTotal Due: $${order.total.toFixed(2)}\n\nPlease send payment via:\n\n${paymentText}\n\nIMPORTANT: Include invoice #${order.orderNumber} in the payment note.\n\nOnce payment is received, your order will be processed and shipped.\n\nView order: ${this.siteUrl}/account/orders/${order.orderNumber}`;
+    const text = `Thank You for Your Order - #${order.orderNumber}\n\nTotal Due: $${order.total.toFixed(2)}\n\nPlease send payment via:\n\n${paymentText}\n\nIMPORTANT: Include invoice #${order.orderNumber} in the payment note.\n\nOnce payment is received, your order will be processed and shipped.\n\nView order: ${this.siteUrl}/login`;
     return { subject, html, text };
   }
 
@@ -501,7 +502,7 @@ export class EmailTemplatesService {
       </div>
 
       <p style="margin:0 0 30px 0;text-align:center;">
-        ${this.button('View Order', `${this.siteUrl}/account/orders/${orderNumber}`)}
+        ${this.button('View Your Account', `${this.siteUrl}/login`)}
       </p>
 
       <p style="margin:0;font-size:14px;color:#6b7280;">
@@ -509,7 +510,7 @@ export class EmailTemplatesService {
       </p>
     `, `Payment confirmed for order #${orderNumber}`);
 
-    const text = `Payment Confirmed!\n\nHi ${firstName},\n\nWe've received your payment of ${formattedAmount} for order #${orderNumber}.\n\nYour order is now being prepared for shipment. You'll receive a tracking email once it ships.\n\nView order: ${this.siteUrl}/account/orders/${orderNumber}`;
+    const text = `Payment Confirmed!\n\nHi ${firstName},\n\nWe've received your payment of ${formattedAmount} for order #${orderNumber}.\n\nYour order is now being prepared for shipment. You'll receive a tracking email once it ships.\n\nView order: ${this.siteUrl}/login`;
     return { subject, html, text };
   }
 
@@ -788,7 +789,7 @@ export class EmailTemplatesService {
       </ol>
 
       <p style="margin:0 0 30px 0;text-align:center;">
-        ${this.button('View Return Details', `${this.siteUrl}/account/orders/${orderNumber}`)}
+        ${this.button('View Return Details', `${this.siteUrl}/login`)}
       </p>
     `, `Your return for order #${orderNumber} has been approved`);
 

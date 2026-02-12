@@ -194,10 +194,9 @@ export class CartService {
       }
     }
 
-    // Free shipping threshold: $500+ = FREE, otherwise $25 flat rate
-    const FREE_SHIPPING_THRESHOLD = 500;
+    // Flat rate shipping: $25 standard
     const STANDARD_SHIPPING = 25;
-    const estimatedShipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING;
+    const estimatedShipping = STANDARD_SHIPPING;
 
     // Tax calculation - configurable via Settings
     const taxRate = await this.getTaxRate();
@@ -225,7 +224,7 @@ export class CartService {
    * Apply discount/promo code to cart
    * Uses the Discount model with full validation
    */
-  async applyDiscountCode(cart: Cart, code: string, userId?: string): Promise<Cart> {
+  async applyDiscountCode(cart: Cart, code: string, userId?: string, email?: string): Promise<Cart> {
     // Lookup discount code in Discount table
     const discount = await this.prisma.discount.findUnique({
       where: { code: code.toUpperCase() },
@@ -255,15 +254,36 @@ export class CartService {
       throw new BadRequestException('This discount code has reached its usage limit');
     }
 
-    // Check per-user limit (if user is logged in)
-    if (userId && discount.perUserLimit) {
-      const userUsageCount = await this.prisma.order.count({
-        where: {
-          userId,
-          discountCode: code.toUpperCase(),
-          status: { notIn: ['CANCELLED', 'REFUNDED'] },
-        },
-      });
+    // Check per-user limit by userId OR by email (for guest checkout)
+    if (discount.perUserLimit) {
+      let userUsageCount = 0;
+
+      if (userId) {
+        // Check by userId for logged-in users
+        userUsageCount = await this.prisma.order.count({
+          where: {
+            userId,
+            discountCode: code.toUpperCase(),
+            status: { notIn: ['CANCELLED', 'REFUNDED'] },
+          },
+        });
+      } else if (email) {
+        // Check by email for guest checkout — find user by email and count their orders
+        const guestUser = await this.prisma.user.findUnique({
+          where: { email: email.toLowerCase() },
+          select: { id: true },
+        });
+        if (guestUser) {
+          userUsageCount = await this.prisma.order.count({
+            where: {
+              userId: guestUser.id,
+              discountCode: code.toUpperCase(),
+              status: { notIn: ['CANCELLED', 'REFUNDED'] },
+            },
+          });
+        }
+      }
+
       if (userUsageCount >= discount.perUserLimit) {
         throw new BadRequestException('You have already used this discount code the maximum number of times');
       }
@@ -325,13 +345,8 @@ export class CartService {
         break;
 
       case DiscountType.FREE_SHIPPING:
-        // For free shipping, set shipping to 0 and return
-        return {
-          ...cart,
-          discountCode: code.toUpperCase(),
-          estimatedShipping: 0,
-          total: cart.subtotal - cart.discountAmount + cart.estimatedTax,
-        };
+        // Free shipping discount type no longer offered — treat as no-op
+        break;
     }
 
     // Round to 2 decimal places
@@ -352,7 +367,7 @@ export class CartService {
    * Validate discount code without applying it
    * Returns discount info or throws error if invalid
    */
-  async validateDiscountCode(code: string, subtotal: number, userId?: string) {
+  async validateDiscountCode(code: string, subtotal: number, userId?: string, email?: string) {
     const discount = await this.prisma.discount.findUnique({
       where: { code: code.toUpperCase() },
     });
@@ -375,6 +390,37 @@ export class CartService {
 
     if (discount.usageLimit && discount.usageCount >= discount.usageLimit) {
       throw new BadRequestException('This discount code has reached its usage limit');
+    }
+
+    // Check per-user limit by userId or email
+    if (discount.perUserLimit) {
+      let userUsageCount = 0;
+      if (userId) {
+        userUsageCount = await this.prisma.order.count({
+          where: {
+            userId,
+            discountCode: code.toUpperCase(),
+            status: { notIn: ['CANCELLED', 'REFUNDED'] },
+          },
+        });
+      } else if (email) {
+        const guestUser = await this.prisma.user.findUnique({
+          where: { email: email.toLowerCase() },
+          select: { id: true },
+        });
+        if (guestUser) {
+          userUsageCount = await this.prisma.order.count({
+            where: {
+              userId: guestUser.id,
+              discountCode: code.toUpperCase(),
+              status: { notIn: ['CANCELLED', 'REFUNDED'] },
+            },
+          });
+        }
+      }
+      if (userUsageCount >= discount.perUserLimit) {
+        throw new BadRequestException('You have already used this discount code the maximum number of times');
+      }
     }
 
     if (discount.minOrderAmount && subtotal < Number(discount.minOrderAmount)) {
@@ -404,37 +450,26 @@ export class CartService {
 
   /**
    * Get shipping rates for cart
-   * Flat Rate: $25 standard, FREE on orders $500+
-   * Expedited: $50 (2-day delivery)
+   * Flat Rate: $25 standard, $50 expedited
    */
   async getShippingRates(cart: Cart, destinationZip: string) {
-    const FREE_SHIPPING_THRESHOLD = 500;
     const STANDARD_SHIPPING_RATE = 25;
     const EXPEDITED_SHIPPING_RATE = 50;
-
-    const standardPrice = cart.subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING_RATE;
-    const isFreeShipping = cart.subtotal >= FREE_SHIPPING_THRESHOLD;
 
     const rates = [
       {
         id: 'standard',
         name: 'Standard Shipping',
-        description: isFreeShipping
-          ? 'FREE Shipping (3-5 business days)'
-          : `Flat Rate $${STANDARD_SHIPPING_RATE} (3-5 business days)`,
-        price: standardPrice,
+        description: '3-5 business days',
+        price: STANDARD_SHIPPING_RATE,
         estimatedDays: '3-5',
-        isFree: isFreeShipping,
-        freeThreshold: FREE_SHIPPING_THRESHOLD,
-        freeThresholdMessage: `Free shipping on orders over $${FREE_SHIPPING_THRESHOLD}`,
       },
       {
         id: 'expedited',
         name: 'Expedited Shipping',
-        description: '2-Day Express Delivery',
+        description: '1-2 business days',
         price: EXPEDITED_SHIPPING_RATE,
         estimatedDays: '1-2',
-        isFree: false,
       },
     ];
 

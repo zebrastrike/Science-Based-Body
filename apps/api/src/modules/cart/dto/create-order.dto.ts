@@ -124,6 +124,14 @@ export class CreateOrderDto {
   @IsOptional()
   @IsString()
   affiliateReferralCode?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  createAccount?: boolean;
+
+  @IsOptional()
+  @IsString()
+  password?: string;
 }
 
 export class ResolveCartItemDto {

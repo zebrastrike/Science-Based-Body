@@ -18,6 +18,7 @@ class ApplyDiscountDto {
     quantity: number;
   }>;
   code: string;
+  email?: string;
 }
 
 @ApiTags('cart')
@@ -41,7 +42,7 @@ export class CartController {
   @ApiResponse({ status: 400, description: 'Invalid discount code' })
   async applyDiscount(@Body() dto: ApplyDiscountDto) {
     const cart = await this.cartService.validateAndEnrichCart(dto.items);
-    return this.cartService.applyDiscountCode(cart, dto.code);
+    return this.cartService.applyDiscountCode(cart, dto.code, undefined, dto.email);
   }
 
   @Get('validate-discount')
@@ -52,8 +53,9 @@ export class CartController {
   async validateDiscount(
     @Query('code') code: string,
     @Query('subtotal') subtotal: string,
+    @Query('email') email?: string,
   ) {
-    return this.cartService.validateDiscountCode(code, Number(subtotal) || 0);
+    return this.cartService.validateDiscountCode(code, Number(subtotal) || 0, undefined, email);
   }
 
   @Get('shipping-rates')
