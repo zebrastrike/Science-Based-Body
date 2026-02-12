@@ -3,7 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ComplianceService } from '../compliance/compliance.service';
 import { MailgunService } from '../notifications/mailgun.service';
 import { v4 as uuidv4 } from 'uuid';
-import { ReturnReason, ReturnStatus, OrderStatus } from '@prisma/client';
+import { ReturnReason, ReturnStatus, OrderStatus, ShipmentStatus } from '@prisma/client';
 
 @Injectable()
 export class OrdersService {
@@ -226,9 +226,131 @@ export class OrdersService {
       this.prisma.order.count({ where: { userId } }),
     ]);
 
+    const ordersWithTimeline = orders.map((order) => ({
+      ...order,
+      statusTimeline: this.buildStatusTimeline(order),
+    }));
+
     return {
-      orders,
+      orders: ordersWithTimeline,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+    };
+  }
+
+  // ===========================================================================
+  // STATUS TIMELINE
+  // ===========================================================================
+
+  /**
+   * Build a 5-stage status timeline for order tracking UI.
+   * Each stage is marked as 'complete', 'current', or 'pending'.
+   */
+  private buildStatusTimeline(order: {
+    status: OrderStatus;
+    createdAt: Date;
+    paidAt: Date | null;
+    shippedAt: Date | null;
+    deliveredAt: Date | null;
+    shipment?: { status: ShipmentStatus; shippedAt: Date | null; deliveredAt: Date | null } | null;
+  }) {
+    // Determine current stage number from order + shipment status
+    let currentStage = 1;
+
+    if (order.status === OrderStatus.PAYMENT_RECEIVED || order.status === OrderStatus.PROCESSING) {
+      currentStage = order.paidAt ? 2 : 2;
+      // If PROCESSING with a shipment label, bump to stage 3
+      if (
+        order.status === OrderStatus.PROCESSING &&
+        order.shipment &&
+        (order.shipment.status === ShipmentStatus.PENDING || order.shipment.status === ShipmentStatus.LABEL_CREATED)
+      ) {
+        currentStage = 3;
+      } else if (order.status === OrderStatus.PROCESSING) {
+        currentStage = 3;
+      }
+    }
+
+    if (order.status === OrderStatus.SHIPPED) {
+      currentStage = 4;
+    }
+
+    if (order.status === OrderStatus.DELIVERED) {
+      currentStage = 5;
+    }
+
+    // For cancelled/refunded, freeze at whatever stage we were at
+    if (order.status === OrderStatus.CANCELLED || order.status === OrderStatus.REFUNDED) {
+      if (order.deliveredAt) currentStage = 5;
+      else if (order.shippedAt) currentStage = 4;
+      else if (order.paidAt) currentStage = 3;
+      else currentStage = 1;
+    }
+
+    const stages = [
+      { stage: 1, label: 'Order Placed', date: order.createdAt },
+      { stage: 2, label: 'Payment Verified', date: order.paidAt },
+      { stage: 3, label: 'Preparing Your Order', date: order.paidAt }, // starts when payment verified
+      { stage: 4, label: 'Shipped', date: order.shippedAt || (order.shipment?.shippedAt ?? null) },
+      { stage: 5, label: 'Delivered', date: order.deliveredAt || (order.shipment?.deliveredAt ?? null) },
+    ];
+
+    return stages.map((s) => ({
+      stage: s.stage,
+      label: s.label,
+      status: s.stage < currentStage ? 'complete' : s.stage === currentStage ? 'current' : 'pending',
+      date: s.stage <= currentStage && s.date ? s.date : null,
+    }));
+  }
+
+  /**
+   * Get order by ID with status timeline attached
+   */
+  async findByIdWithTimeline(orderId: string, userId?: string) {
+    const order = await this.findById(orderId, userId);
+    return {
+      ...order,
+      statusTimeline: this.buildStatusTimeline(order),
+    };
+  }
+
+  /**
+   * Guest order lookup by order number + email (no auth required)
+   */
+  async lookupByOrderNumberAndEmail(orderNumber: string, email: string) {
+    if (!orderNumber || !email) {
+      throw new BadRequestException('Order number and email are required');
+    }
+
+    const order = await this.prisma.order.findFirst({
+      where: {
+        orderNumber: orderNumber.toUpperCase(),
+        user: { email: email.toLowerCase() },
+      },
+      include: {
+        items: { include: { product: true } },
+        shippingAddress: true,
+        shipment: {
+          select: {
+            id: true,
+            status: true,
+            carrier: true,
+            trackingNumber: true,
+            trackingUrl: true,
+            estimatedDelivery: true,
+            shippedAt: true,
+            deliveredAt: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('No order found with that order number and email combination');
+    }
+
+    return {
+      ...order,
+      statusTimeline: this.buildStatusTimeline(order),
     };
   }
 

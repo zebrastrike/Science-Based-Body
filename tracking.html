@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-    <title>Order Tracking | Science Based Body</title>
+    <title>My Orders | Science Based Body</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400&family=Sora:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260213" />
+    <link rel="stylesheet" href="styles.css?v=20260212" />
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-5NLZQKVWBW"></script>
     <script>
@@ -72,32 +72,38 @@
     <main>
       <section class="section">
         <div class="container">
-          <div class="section-heading reveal">
-            <span class="label">ORDER TRACKING</span>
-            <h1>Track Your Order</h1>
-            <p>
-              Use your shipping confirmation to track your order.
-            </p>
+          <div class="section-heading reveal orders-heading">
+            <span class="label">MY ORDERS</span>
+            <h1>Track Your Orders</h1>
           </div>
-          <div class="split-grid">
-            <div class="card reveal">
-              <span class="label">How to track</span>
-              <p>Tracking links are provided by email.</p>
-              <ul>
-                <li>Find tracking in your confirmation email</li>
-                <li>Allow 24 hours for carrier scan</li>
-                <li>Contact support if tracking stalls</li>
-              </ul>
+
+          <!-- Guest Lookup (visible when not logged in) -->
+          <div id="guest-lookup" style="display:none;">
+            <p style="text-align:center; margin-bottom:1.5rem; opacity:0.75; font-size:0.9rem;">
+              Enter your order number and email to look up your order.
+            </p>
+            <div class="guest-lookup-form">
+              <input type="text" id="lookup-order" placeholder="Order Number (e.g. SBB-...)" autocomplete="off" />
+              <input type="email" id="lookup-email" placeholder="Email Address" autocomplete="email" />
+              <p class="guest-lookup-error" id="lookup-error"></p>
+              <button type="button" class="btn btn-primary" id="lookup-btn">Track Order</button>
             </div>
-            <div class="card reveal">
-              <span class="label">Updates</span>
-              <p>Status updates are carrier provided.</p>
-              <ul>
-                <li>Carrier status is the source of truth</li>
-                <li>Address corrections may delay delivery</li>
-                <li>Documentation remains available after shipment</li>
-              </ul>
+            <div id="lookup-result"></div>
+            <div style="text-align:center; margin-top:2rem;">
+              <p style="font-size:0.85rem; opacity:0.6; margin-bottom:0.75rem;">Have an account?</p>
+              <a href="login.html?redirect=tracking" class="btn btn-outline">Sign In to View All Orders</a>
             </div>
+          </div>
+
+          <!-- Authenticated Dashboard -->
+          <div id="orders-dashboard" style="display:none;">
+            <div id="orders-list"></div>
+            <div id="order-detail" style="display:none;"></div>
+          </div>
+
+          <!-- Loading State -->
+          <div id="orders-loading" style="text-align:center; padding:3rem;">
+            <p style="opacity:0.5;">Loading...</p>
           </div>
         </div>
       </section>
@@ -130,10 +136,362 @@
           <a href="coa-verification.html" class="text-link">COA Verification</a>
           <a href="research-use.html" class="text-link">Research Use Only</a>
           <a href="compliance.html" class="text-link">Compliance</a>
+          <a href="#" class="text-link">PepTalk</a>
         </div>
       </div>
     </footer>
 
     <script src="scripts.js?v=20260213"></script>
+    <script>
+    (function() {
+      'use strict';
+
+      var API_BASE = window.location.hostname === 'localhost'
+        ? 'http://localhost:3001/api/v1'
+        : 'https://api.sbbpeptides.com/api/v1';
+
+      /* ── Helpers ── */
+      function authHeaders() {
+        var h = { 'Content-Type': 'application/json' };
+        var token = localStorage.getItem('accessToken');
+        if (token) h['Authorization'] = 'Bearer ' + token;
+        return h;
+      }
+
+      function isLoggedIn() {
+        return !!(localStorage.getItem('accessToken') && localStorage.getItem('sbb_user'));
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return '';
+        var d = new Date(dateStr);
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+
+      function formatCurrency(amount) {
+        return '$' + Number(amount).toFixed(2);
+      }
+
+      function statusBadgeClass(status) {
+        var map = {
+          'PENDING': 'pending', 'AWAITING_PAYMENT': 'awaiting',
+          'PAYMENT_RECEIVED': 'paid', 'PROCESSING': 'processing',
+          'SHIPPED': 'shipped', 'DELIVERED': 'delivered',
+          'CANCELLED': 'cancelled', 'REFUNDED': 'refunded'
+        };
+        return 'status-badge status-badge-' + (map[status] || 'pending');
+      }
+
+      function statusLabel(status) {
+        var map = {
+          'PENDING': 'Order Placed', 'AWAITING_PAYMENT': 'Awaiting Payment',
+          'PAYMENT_RECEIVED': 'Payment Verified', 'PROCESSING': 'Processing',
+          'SHIPPED': 'Shipped', 'DELIVERED': 'Delivered',
+          'CANCELLED': 'Cancelled', 'REFUNDED': 'Refunded'
+        };
+        return map[status] || status;
+      }
+
+      /* ── SVG Icons for tracker stages ── */
+      var trackerIcons = [
+        /* 1 — Order Placed (receipt) */
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>',
+        /* 2 — Payment Verified (check-circle) */
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+        /* 3 — Preparing (package) */
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+        /* 4 — Shipped (truck) */
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+        /* 5 — Delivered (home) */
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'
+      ];
+
+      /* ── Render the 5-stage tracker ── */
+      function renderTracker(timeline) {
+        var html = '<div class="order-tracker">';
+        for (var i = 0; i < timeline.length; i++) {
+          var s = timeline[i];
+          html += '<div class="tracker-step is-' + s.status + '">';
+          html += '<div class="tracker-circle">' + trackerIcons[i] + '</div>';
+          html += '<span class="tracker-label">' + s.label + '</span>';
+          if (s.date) {
+            html += '<span class="tracker-date">' + formatDate(s.date) + '</span>';
+          }
+          html += '</div>';
+          if (i < timeline.length - 1) {
+            var connClass = s.status === 'complete' ? ' is-complete' : '';
+            html += '<div class="tracker-connector' + connClass + '"></div>';
+          }
+        }
+        html += '</div>';
+        return html;
+      }
+
+      /* ── Render mini tracker for list cards ── */
+      function renderMiniTracker(timeline) {
+        var html = '<div class="mini-tracker">';
+        for (var i = 0; i < timeline.length; i++) {
+          var s = timeline[i];
+          html += '<div class="mini-tracker-dot is-' + s.status + '"></div>';
+          if (i < timeline.length - 1) {
+            var lineClass = s.status === 'complete' ? ' is-complete' : '';
+            html += '<div class="mini-tracker-line' + lineClass + '"></div>';
+          }
+        }
+        html += '</div>';
+        return html;
+      }
+
+      /* ── Render an order card for the list ── */
+      function renderOrderCard(order) {
+        var itemCount = order.items ? order.items.length : 0;
+        var itemLabel = itemCount === 1 ? '1 item' : itemCount + ' items';
+
+        var html = '<div class="order-card" data-order-id="' + order.id + '">';
+        html += '<div class="order-card-header">';
+        html += '<span class="order-card-number">' + order.orderNumber + '</span>';
+        html += '<span class="order-card-date">' + formatDate(order.createdAt) + '</span>';
+        html += '</div>';
+        html += '<div class="order-card-body">';
+        html += '<div class="order-card-info">';
+        html += '<span>' + itemLabel + '</span>';
+        html += '<span>' + formatCurrency(order.totalAmount) + '</span>';
+        html += '</div>';
+        html += '<span class="' + statusBadgeClass(order.status) + '">' + statusLabel(order.status) + '</span>';
+        html += '</div>';
+        if (order.statusTimeline) {
+          html += renderMiniTracker(order.statusTimeline);
+        }
+        html += '</div>';
+        return html;
+      }
+
+      /* ── Render full order detail ── */
+      function renderOrderDetail(order) {
+        var html = '';
+
+        /* Back button */
+        html += '<button class="order-detail-back" id="back-to-list">';
+        html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>';
+        html += 'Back to Orders';
+        html += '</button>';
+
+        html += '<div class="order-detail-panel">';
+
+        /* Header */
+        html += '<div class="order-detail-header">';
+        html += '<h2>' + order.orderNumber + '</h2>';
+        html += '<span class="' + statusBadgeClass(order.status) + '">' + statusLabel(order.status) + '</span>';
+        html += '</div>';
+
+        /* 5-stage tracker */
+        if (order.statusTimeline) {
+          html += renderTracker(order.statusTimeline);
+        }
+
+        /* Items */
+        html += '<div class="order-items-list">';
+        if (order.items) {
+          for (var i = 0; i < order.items.length; i++) {
+            var item = order.items[i];
+            var name = item.productName + (item.variantName ? ' — ' + item.variantName : '');
+            html += '<div class="order-item-row">';
+            html += '<span class="order-item-name">' + name + '</span>';
+            html += '<span class="order-item-qty">&times;' + item.quantity + '</span>';
+            html += '<span class="order-item-price">' + formatCurrency(item.totalPrice) + '</span>';
+            html += '</div>';
+          }
+        }
+        html += '</div>';
+
+        /* Totals */
+        html += '<div class="order-totals">';
+        html += '<div class="order-total-row"><span>Subtotal</span><span>' + formatCurrency(order.subtotal) + '</span></div>';
+        html += '<div class="order-total-row"><span>Shipping</span><span>' + formatCurrency(order.shippingCost) + '</span></div>';
+        if (Number(order.taxAmount) > 0) {
+          html += '<div class="order-total-row"><span>Tax</span><span>' + formatCurrency(order.taxAmount) + '</span></div>';
+        }
+        if (Number(order.discountAmount) > 0) {
+          html += '<div class="order-total-row"><span>Discount</span><span>-' + formatCurrency(order.discountAmount) + '</span></div>';
+        }
+        html += '<div class="order-total-row is-total"><span>Total</span><span>' + formatCurrency(order.totalAmount) + '</span></div>';
+        html += '</div>';
+
+        /* Shipping address */
+        if (order.shippingAddress) {
+          var addr = order.shippingAddress;
+          html += '<div class="order-detail-section">';
+          html += '<h3>Shipping Address</h3>';
+          html += '<div class="order-detail-grid">';
+          html += '<div class="order-detail-field"><label>Name</label><span>' + addr.firstName + ' ' + addr.lastName + '</span></div>';
+          html += '<div class="order-detail-field"><label>Address</label><span>' + addr.street1 + (addr.street2 ? ', ' + addr.street2 : '') + '</span></div>';
+          html += '<div class="order-detail-field"><label>City</label><span>' + addr.city + ', ' + addr.state + ' ' + addr.postalCode + '</span></div>';
+          html += '</div>';
+          html += '</div>';
+        }
+
+        /* Shipment / Tracking */
+        if (order.shipment) {
+          var ship = order.shipment;
+          html += '<div class="order-detail-section">';
+          html += '<h3>Shipment Details</h3>';
+          html += '<div class="order-detail-grid">';
+          if (ship.carrier) {
+            html += '<div class="order-detail-field"><label>Carrier</label><span>' + ship.carrier + '</span></div>';
+          }
+          if (ship.trackingNumber) {
+            html += '<div class="order-detail-field"><label>Tracking Number</label><span>' + ship.trackingNumber + '</span></div>';
+          }
+          if (ship.estimatedDelivery) {
+            html += '<div class="order-detail-field"><label>Est. Delivery</label><span>' + formatDate(ship.estimatedDelivery) + '</span></div>';
+          }
+          html += '</div>';
+          if (ship.trackingUrl) {
+            html += '<a href="' + ship.trackingUrl + '" target="_blank" rel="noopener" class="btn-track-carrier">';
+            html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+            html += 'Track with Carrier';
+            html += '</a>';
+          }
+          html += '</div>';
+        }
+
+        html += '</div>';
+        return html;
+      }
+
+      /* ── Load authenticated order list ── */
+      async function loadOrders() {
+        var listEl = document.getElementById('orders-list');
+        var detailEl = document.getElementById('order-detail');
+        listEl.style.display = '';
+        detailEl.style.display = 'none';
+
+        try {
+          var res = await fetch(API_BASE + '/orders?limit=50', { headers: authHeaders() });
+          if (!res.ok) throw new Error('Failed to load orders');
+          var data = await res.json();
+
+          if (!data.orders || data.orders.length === 0) {
+            listEl.innerHTML = '<div class="orders-empty">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>' +
+              '<p>No orders yet.</p>' +
+              '<a href="shop.html" class="btn btn-primary" style="margin-top:1rem;">Browse Products</a>' +
+              '</div>';
+            return;
+          }
+
+          var html = '<div class="order-cards">';
+          for (var i = 0; i < data.orders.length; i++) {
+            html += renderOrderCard(data.orders[i]);
+          }
+          html += '</div>';
+          listEl.innerHTML = html;
+
+          /* Attach click handlers */
+          var cards = listEl.querySelectorAll('.order-card');
+          cards.forEach(function(card) {
+            card.addEventListener('click', function() {
+              showOrderDetail(card.getAttribute('data-order-id'));
+            });
+          });
+        } catch (err) {
+          listEl.innerHTML = '<div class="orders-empty"><p>Unable to load orders. Please try again.</p></div>';
+        }
+      }
+
+      /* ── Show single order detail ── */
+      async function showOrderDetail(orderId) {
+        var listEl = document.getElementById('orders-list');
+        var detailEl = document.getElementById('order-detail');
+        listEl.style.display = 'none';
+        detailEl.style.display = '';
+        detailEl.innerHTML = '<div style="text-align:center; padding:2rem;"><p style="opacity:0.5;">Loading order...</p></div>';
+
+        try {
+          var res = await fetch(API_BASE + '/orders/' + orderId, { headers: authHeaders() });
+          if (!res.ok) throw new Error('Failed to load order');
+          var order = await res.json();
+
+          detailEl.innerHTML = renderOrderDetail(order);
+
+          /* Back button */
+          document.getElementById('back-to-list').addEventListener('click', function() {
+            detailEl.style.display = 'none';
+            listEl.style.display = '';
+          });
+        } catch (err) {
+          detailEl.innerHTML = '<div class="orders-empty"><p>Unable to load order details.</p>' +
+            '<button class="btn btn-outline" onclick="location.reload()">Try Again</button></div>';
+        }
+      }
+
+      /* ── Guest Lookup ── */
+      async function guestLookup() {
+        var orderNum = document.getElementById('lookup-order').value.trim();
+        var email = document.getElementById('lookup-email').value.trim();
+        var errorEl = document.getElementById('lookup-error');
+        var resultEl = document.getElementById('lookup-result');
+
+        errorEl.style.display = 'none';
+        resultEl.innerHTML = '';
+
+        if (!orderNum || !email) {
+          errorEl.textContent = 'Please enter both your order number and email address.';
+          errorEl.style.display = 'block';
+          return;
+        }
+
+        var btn = document.getElementById('lookup-btn');
+        btn.disabled = true;
+        btn.textContent = 'Looking up...';
+
+        try {
+          var url = API_BASE + '/orders/lookup?orderNumber=' + encodeURIComponent(orderNum) + '&email=' + encodeURIComponent(email);
+          var res = await fetch(url, { headers: { 'Content-Type': 'application/json' } });
+
+          if (!res.ok) {
+            var errData = await res.json().catch(function() { return {}; });
+            throw new Error(errData.message || 'Order not found');
+          }
+
+          var order = await res.json();
+          resultEl.innerHTML = '<div style="margin-top:2rem;">' + renderOrderDetail(order) + '</div>';
+
+          /* Hide "Back to Orders" button for guest lookup */
+          var backBtn = resultEl.querySelector('.order-detail-back');
+          if (backBtn) backBtn.style.display = 'none';
+        } catch (err) {
+          errorEl.textContent = err.message || 'No order found with that order number and email.';
+          errorEl.style.display = 'block';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Track Order';
+        }
+      }
+
+      /* ── Init ── */
+      var loadingEl = document.getElementById('orders-loading');
+      var guestEl = document.getElementById('guest-lookup');
+      var dashboardEl = document.getElementById('orders-dashboard');
+
+      if (isLoggedIn()) {
+        loadingEl.style.display = 'none';
+        dashboardEl.style.display = '';
+        loadOrders();
+      } else {
+        loadingEl.style.display = 'none';
+        guestEl.style.display = '';
+      }
+
+      /* Guest lookup event listeners */
+      document.getElementById('lookup-btn').addEventListener('click', guestLookup);
+      document.getElementById('lookup-email').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') guestLookup();
+      });
+      document.getElementById('lookup-order').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') guestLookup();
+      });
+    })();
+    </script>
   </body>
 </html>

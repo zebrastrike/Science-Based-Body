@@ -956,33 +956,33 @@ document.addEventListener("DOMContentLoaded", () => {
         if (bubble.isPopping) return;
 
         // Organic drift: layered sine waves at different frequencies
-        // Creates gentle figure-8 / orbital feel
+        // Creates bouncy figure-8 / orbital feel
         const t = time * 0.001; // seconds
         const s = bubble.seed;
-        const driftScale = mobile ? 0.015 : 0.025;
-        const driftX = (Math.sin(t * 0.12 + s) * 0.8 + Math.sin(t * 0.2 + s * 1.3) * 0.2) * driftScale;
-        const driftY = (Math.cos(t * 0.1 + s * 0.8) * 0.7 + Math.cos(t * 0.18 + s * 1.5) * 0.3) * driftScale;
+        const driftScale = mobile ? 0.03 : 0.05;
+        const driftX = (Math.sin(t * 0.15 + s) * 0.55 + Math.sin(t * 0.28 + s * 1.3) * 0.3 + Math.sin(t * 0.45 + s * 2.1) * 0.15) * driftScale;
+        const driftY = (Math.cos(t * 0.13 + s * 0.8) * 0.5 + Math.cos(t * 0.24 + s * 1.5) * 0.3 + Math.cos(t * 0.4 + s * 1.9) * 0.2) * driftScale;
 
         // Apply drift + velocity
         bubble.x += (bubble.vx + driftX) * dt;
         bubble.y += (bubble.vy + driftY) * dt;
 
-        // Gentle edge bouncing — all 4 walls, soft reversal
+        // Bouncy edge bouncing — all 4 walls, retain energy
         if (bubble.x <= 0) {
           bubble.x = 0;
-          bubble.vx = Math.abs(bubble.vx) * 0.8;
+          bubble.vx = Math.abs(bubble.vx) * 0.92;
         }
         if (bubble.x + bubble.size >= width) {
           bubble.x = width - bubble.size;
-          bubble.vx = -Math.abs(bubble.vx) * 0.8;
+          bubble.vx = -Math.abs(bubble.vx) * 0.92;
         }
         if (bubble.y <= 0) {
           bubble.y = 0;
-          bubble.vy = Math.abs(bubble.vy) * 0.8;
+          bubble.vy = Math.abs(bubble.vy) * 0.92;
         }
         if (bubble.y + bubble.size >= height) {
           bubble.y = height - bubble.size;
-          bubble.vy = -Math.abs(bubble.vy) * 0.8;
+          bubble.vy = -Math.abs(bubble.vy) * 0.92;
         }
 
         // Obstacle bounce — deflect off product cards, section headers, title cards
@@ -1006,7 +1006,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const minOverlap = Math.min(overlapL, overlapR, overlapT, overlapB);
 
             // Playful bounce — deflect with a random kick
-            const bounceFactor = 0.7;
+            const bounceFactor = 0.85;
             if (minOverlap === overlapL) {
               bubble.x = left - bubble.size;
               bubble.vx = -Math.abs(bubble.vx) * bounceFactor;
@@ -1022,8 +1022,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             // Double-bounce jitter — random perpendicular kick for playful deflection
-            bubble.vx += (Math.random() - 0.5) * 0.12;
-            bubble.vy += (Math.random() - 0.5) * 0.12;
+            bubble.vx += (Math.random() - 0.5) * 0.2;
+            bubble.vy += (Math.random() - 0.5) * 0.2;
           }
         }
 
@@ -1041,7 +1041,9 @@ document.addEventListener("DOMContentLoaded", () => {
           bubble.vy += Math.sin(nudgeAngle) * 0.05;
         }
 
-        bubble.el.style.transform = `translate3d(${bubble.x}px, ${bubble.y}px, 0)`;
+        // Gentle scale pulse — breathing / bouncing feel
+        const pulse = 1 + Math.sin(t * 0.35 + s * 2) * 0.035;
+        bubble.el.style.transform = `translate3d(${bubble.x}px, ${bubble.y}px, 0) scale(${pulse})`;
       });
 
       window.requestAnimationFrame(animateBubbles);

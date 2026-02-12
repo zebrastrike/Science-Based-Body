@@ -312,11 +312,17 @@ export class CheckoutService {
       .notifyAdminNewOrder(orderDetails, email)
       .catch((err) => console.error('Failed to send admin notification:', err));
 
-    // 9b. Send set-password email for new auto-created accounts (non-blocking)
+    // 9b. Send appropriate account email (non-blocking)
     if (isNewAccount) {
-      this.sendSetPasswordEmail(email, firstName).catch((err) =>
-        console.error('Failed to send set-password email:', err),
-      );
+      // Guest checkout — send friendly reminder to create account later
+      this.mailgunService
+        .sendAccountReminder(email, firstName)
+        .catch((err) => console.error('Failed to send account reminder email:', err));
+    } else if (dto.createAccount && dto.password) {
+      // Created account at checkout — send welcome email
+      this.mailgunService
+        .sendWelcomeEmail(email, firstName)
+        .catch((err) => console.error('Failed to send welcome email:', err));
     }
 
     // 10. Track affiliate referral (non-blocking)

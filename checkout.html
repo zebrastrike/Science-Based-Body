@@ -8,7 +8,7 @@
       href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400&family=Sora:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260213" />
+    <link rel="stylesheet" href="styles.css?v=20260212" />
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-5NLZQKVWBW"></script>
     <script>
@@ -60,6 +60,20 @@
           <div class="checkout-header">
             <span class="label">CHECKOUT</span>
             <h1>Complete Your Order</h1>
+          </div>
+
+          <!-- Thank-you & payment notice -->
+          <div class="card reveal" style="text-align:center;margin-bottom:var(--space-sm);padding:24px 32px;border-left:3px solid var(--rose);">
+            <p style="margin:0 0 8px;font-size:0.95rem;font-weight:500;color:var(--ink);">
+              Thank you for choosing Science Based Body.
+            </p>
+            <p style="margin:0 0 10px;font-size:0.85rem;color:var(--ink);opacity:0.8;">
+              We are currently accepting Zelle and Venmo while formal card processing is being finalized.
+              We appreciate your patience and are working to make your experience even more seamless.
+            </p>
+            <p style="margin:0;font-size:0.82rem;color:var(--rose);font-weight:500;">
+              First-time customer? Enter your discount code below for a welcome savings.
+            </p>
           </div>
 
           <!-- 3-Step Process -->
@@ -251,23 +265,48 @@
                   <p id="discount-feedback" style="font-size:0.85rem;margin-top:6px;"></p>
                 </div>
 
-                <!-- Create Account (Optional for guests) -->
+                <!-- Account Options (guests only) -->
                 <div id="create-account-section" class="card checkout-step" style="display:none;">
-                  <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:12px;">
-                    <input type="checkbox" id="create-account-check" style="width:18px;height:18px;accent-color:var(--rose,#e3a7a1);" />
-                    <span style="font-size:0.95rem;color:var(--ink,#1f2a36);font-weight:500;">Create an account for faster future ordering</span>
-                  </label>
-                  <div id="password-fields" style="display:none;">
-                    <div class="form-group" style="margin-bottom:0;">
-                      <label for="account-password">Set a Password</label>
+                  <h2>6. Account</h2>
+                  <p style="font-size:0.9rem;color:var(--ink,#1f2a36);opacity:0.75;margin-bottom:16px;">Track orders, view history, and unlock member perks.</p>
+
+                  <div style="display:flex;flex-direction:column;gap:10px;">
+                    <!-- Guest option (default) -->
+                    <label id="option-guest" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:10px;border:2px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);cursor:pointer;transition:border-color 0.2s;">
+                      <input type="radio" name="accountChoice" value="guest" checked style="width:18px;height:18px;accent-color:var(--rose,#e3a7a1);" />
+                      <div>
+                        <span style="font-size:0.95rem;font-weight:500;color:var(--ink,#1f2a36);">Continue as Guest</span>
+                        <span style="display:block;font-size:0.82rem;color:var(--ink,#1f2a36);opacity:0.6;margin-top:2px;">We'll send you a reminder to create your account later.</span>
+                      </div>
+                    </label>
+
+                    <!-- Create account option -->
+                    <label id="option-account" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:10px;border:2px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);cursor:pointer;transition:border-color 0.2s;">
+                      <input type="radio" name="accountChoice" value="create" style="width:18px;height:18px;accent-color:var(--rose,#e3a7a1);" />
+                      <div>
+                        <span style="font-size:0.95rem;font-weight:500;color:var(--ink,#1f2a36);">Create an Account</span>
+                        <span style="display:block;font-size:0.82rem;color:var(--ink,#1f2a36);opacity:0.6;margin-top:2px;">Set your password now for instant access to order tracking and rewards.</span>
+                      </div>
+                    </label>
+                  </div>
+
+                  <!-- Password fields (shown when "Create an Account" selected) -->
+                  <div id="password-fields" style="display:none;margin-top:16px;">
+                    <div class="form-group" style="margin-bottom:10px;">
+                      <label for="account-password">Password</label>
                       <input type="password" id="account-password" minlength="8" placeholder="Minimum 8 characters" style="width:100%;" />
                     </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label for="account-password-confirm">Confirm Password</label>
+                      <input type="password" id="account-password-confirm" minlength="8" placeholder="Re-enter your password" style="width:100%;" />
+                    </div>
+                    <p id="password-match-error" style="display:none;font-size:0.82rem;color:#dc2626;margin-top:6px;">Passwords do not match.</p>
                   </div>
                 </div>
 
                 <!-- Compliance Acknowledgments (REQUIRED) -->
                 <div class="card checkout-step compliance-section">
-                  <h2>6. Research Use Acknowledgment</h2>
+                  <h2>7. Research Use Acknowledgment</h2>
                   <p class="compliance-intro">
                     <strong>Important:</strong> All products are sold for research and educational purposes only.
                     You must acknowledge and agree to the following statements to complete your order.
@@ -870,17 +909,27 @@
 
         /* ── Create account toggle ─────────────────── */
         var createAccountSection = document.getElementById('create-account-section');
-        var createAccountCheck = document.getElementById('create-account-check');
         var passwordFields = document.getElementById('password-fields');
-        // Show create account section only for guests
+        var accountRadios = document.querySelectorAll('input[name="accountChoice"]');
+        var optionGuest = document.getElementById('option-guest');
+        var optionAccount = document.getElementById('option-account');
+        var passwordMatchError = document.getElementById('password-match-error');
+        // Show account section only for guests
         if (!localStorage.getItem('accessToken') && createAccountSection) {
           createAccountSection.style.display = 'block';
         }
-        if (createAccountCheck && passwordFields) {
-          createAccountCheck.addEventListener('change', function () {
-            passwordFields.style.display = this.checked ? 'block' : 'none';
+        // Radio toggle: show/hide password fields + highlight selected option
+        accountRadios.forEach(function(radio) {
+          radio.addEventListener('change', function () {
+            var isCreate = this.value === 'create';
+            if (passwordFields) passwordFields.style.display = isCreate ? 'block' : 'none';
+            if (passwordMatchError) passwordMatchError.style.display = 'none';
+            if (optionGuest) optionGuest.style.borderColor = !isCreate ? 'var(--rose,#e3a7a1)' : 'rgba(255,255,255,0.15)';
+            if (optionAccount) optionAccount.style.borderColor = isCreate ? 'var(--rose,#e3a7a1)' : 'rgba(255,255,255,0.15)';
           });
-        }
+        });
+        // Highlight default (guest) on load
+        if (optionGuest) optionGuest.style.borderColor = 'var(--rose,#e3a7a1)';
 
         /* ── Form submit → API ─────────────────────────── */
         checkoutForm.addEventListener('submit', async (e) => {
@@ -892,6 +941,26 @@
             var firstInvalid = document.querySelector('.field-invalid');
             if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
+          }
+
+          // Validate password if creating account
+          var createAccountRadio = document.querySelector('input[name="accountChoice"][value="create"]');
+          if (createAccountRadio && createAccountRadio.checked) {
+            var pw = document.getElementById('account-password');
+            var pwConfirm = document.getElementById('account-password-confirm');
+            if (!pw || !pw.value || pw.value.length < 8) {
+              checkoutError.textContent = 'Password must be at least 8 characters.';
+              checkoutError.style.display = 'block';
+              if (pw) pw.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              return;
+            }
+            if (!pwConfirm || pw.value !== pwConfirm.value) {
+              if (passwordMatchError) passwordMatchError.style.display = 'block';
+              checkoutError.textContent = 'Passwords do not match.';
+              checkoutError.style.display = 'block';
+              if (pwConfirm) pwConfirm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              return;
+            }
           }
 
           // Validate compliance
@@ -948,8 +1017,8 @@
             discountCode: appliedDiscount || undefined,
             taxAmount: taxAmount,
             affiliateReferralCode: (document.cookie.match(/sbb_ref=([^;]+)/) || [])[1] || undefined,
-            createAccount: !!(createAccountCheck && createAccountCheck.checked),
-            password: (createAccountCheck && createAccountCheck.checked && document.getElementById('account-password'))
+            createAccount: !!(document.querySelector('input[name="accountChoice"][value="create"]') && document.querySelector('input[name="accountChoice"][value="create"]').checked),
+            password: (document.querySelector('input[name="accountChoice"][value="create"]') && document.querySelector('input[name="accountChoice"][value="create"]').checked && document.getElementById('account-password'))
               ? document.getElementById('account-password').value : undefined
           };
 

@@ -3,6 +3,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagg
 import { Request } from 'express';
 import { OrdersService } from './orders.service';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Public } from '../auth/decorators/public.decorator';
 import { ReturnReason } from '@prisma/client';
 
 @ApiTags('orders')
@@ -33,10 +34,22 @@ export class OrdersController {
     return this.ordersService.findByUser(userId, page, limit);
   }
 
+  @Public()
+  @Get('lookup')
+  @ApiOperation({ summary: 'Guest order lookup by order number + email' })
+  @ApiResponse({ status: 200, description: 'Order found' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  guestLookup(
+    @Query('orderNumber') orderNumber: string,
+    @Query('email') email: string,
+  ) {
+    return this.ordersService.lookupByOrderNumberAndEmail(orderNumber, email);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get order by ID' })
   findOne(@Param('id') id: string, @CurrentUser('id') userId: string) {
-    return this.ordersService.findById(id, userId);
+    return this.ordersService.findByIdWithTimeline(id, userId);
   }
 
   // ===========================================================================

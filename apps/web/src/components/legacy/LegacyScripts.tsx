@@ -741,26 +741,29 @@ export default function LegacyScripts() {
         const pad = 10;
 
         bubbleState.forEach((bubble) => {
-          const driftX = Math.sin(time / 1400 + bubble.seed) * 0.3;
-          const driftY = Math.cos(time / 1600 + bubble.seed) * 0.3;
+          const t = time * 0.001;
+          const s = bubble.seed;
+          const driftScale = 0.05;
+          const driftX = (Math.sin(t * 0.15 + s) * 0.55 + Math.sin(t * 0.28 + s * 1.3) * 0.3 + Math.sin(t * 0.45 + s * 2.1) * 0.15) * driftScale;
+          const driftY = (Math.cos(t * 0.13 + s * 0.8) * 0.5 + Math.cos(t * 0.24 + s * 1.5) * 0.3 + Math.cos(t * 0.4 + s * 1.9) * 0.2) * driftScale;
           bubble.x += (bubble.vx + driftX) * dt;
           bubble.y += (bubble.vy + driftY) * dt;
 
           if (bubble.x <= 0) {
             bubble.x = 0;
-            bubble.vx = Math.abs(bubble.vx);
+            bubble.vx = Math.abs(bubble.vx) * 0.92;
           }
           if (bubble.x + bubble.size >= width) {
             bubble.x = width - bubble.size;
-            bubble.vx = -Math.abs(bubble.vx);
+            bubble.vx = -Math.abs(bubble.vx) * 0.92;
           }
           if (bubble.y <= 0) {
             bubble.y = 0;
-            bubble.vy = Math.abs(bubble.vy);
+            bubble.vy = Math.abs(bubble.vy) * 0.92;
           }
           if (bubble.y + bubble.size >= height) {
             bubble.y = height - bubble.size;
-            bubble.vy = -Math.abs(bubble.vy);
+            bubble.vy = -Math.abs(bubble.vy) * 0.92;
           }
 
           for (let i = 0; i < obstacles.length; i += 1) {
@@ -785,20 +788,21 @@ export default function LegacyScripts() {
                 bottom - bubble.y,
               );
 
+              const bounceFactor = 0.85;
               if (overlapX < overlapY) {
                 if (bubble.x + bubble.size / 2 < (left + right) / 2) {
                   bubble.x = left - bubble.size;
                 } else {
                   bubble.x = right;
                 }
-                bubble.vx *= -1;
+                bubble.vx *= -bounceFactor;
               } else {
                 if (bubble.y + bubble.size / 2 < (top + bottom) / 2) {
                   bubble.y = top - bubble.size;
                 } else {
                   bubble.y = bottom;
                 }
-                bubble.vy *= -1;
+                bubble.vy *= -bounceFactor;
               }
 
               bubble.vx += (Math.random() - 0.5) * 0.2;
@@ -806,7 +810,23 @@ export default function LegacyScripts() {
             }
           }
 
-          bubble.el.style.transform = `translate3d(${bubble.x}px, ${bubble.y}px, 0)`;
+          // Clamp speed
+          const speed = Math.sqrt(bubble.vx * bubble.vx + bubble.vy * bubble.vy);
+          const maxSpeed = 0.9;
+          if (speed > maxSpeed) {
+            const sc = maxSpeed / speed;
+            bubble.vx *= sc;
+            bubble.vy *= sc;
+          }
+          if (speed < 0.03) {
+            const nudgeAngle = Math.random() * Math.PI * 2;
+            bubble.vx += Math.cos(nudgeAngle) * 0.05;
+            bubble.vy += Math.sin(nudgeAngle) * 0.05;
+          }
+
+          // Gentle scale pulse — breathing / bouncing feel
+          const pulse = 1 + Math.sin(t * 0.35 + s * 2) * 0.035;
+          bubble.el.style.transform = `translate3d(${bubble.x}px, ${bubble.y}px, 0) scale(${pulse})`;
         });
 
         animationFrame = window.requestAnimationFrame(animateBubbles);

@@ -142,6 +142,13 @@ export class SmtpService {
     return this.sendEmail({ to, subject, html, text, tags: ['claim-account', 'verification'] });
   }
 
+  async sendAccountReminder(to: string, firstName: string) {
+    const baseUrl = this.config.get('FRONTEND_URL', 'https://sbbpeptides.com');
+    const loginUrl = `${baseUrl}/login`;
+    const { subject, html, text } = this.templates.accountReminder(firstName, loginUrl);
+    return this.sendEmail({ to, subject, html, text, tags: ['account-reminder', 'account'] });
+  }
+
   // ===========================================================================
   // ORDER EMAILS
   // ===========================================================================

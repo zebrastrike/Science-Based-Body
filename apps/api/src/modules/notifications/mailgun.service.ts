@@ -114,6 +114,12 @@ export class MailgunService {
     return this.sendEmail({ to, subject, html, text, tags: ['claim-account', 'verification'] });
   }
 
+  async sendAccountReminder(to: string, firstName: string) {
+    const loginUrl = `https://sbbpeptides.com/login`;
+    const { subject, html, text } = this.templates.accountReminder(firstName, loginUrl);
+    return this.sendEmail({ to, subject, html, text, tags: ['account-reminder', 'account'] });
+  }
+
   // ===========================================================================
   // ORDER EMAILS
   // ===========================================================================

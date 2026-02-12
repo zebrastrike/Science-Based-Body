@@ -269,6 +269,35 @@ export class EmailTemplatesService {
     return { subject, html, text };
   }
 
+  accountReminder(firstName: string, loginUrl: string): { subject: string; html: string; text: string } {
+    const subject = 'Your Order is Confirmed — Create Your Account Anytime';
+    const html = this.baseTemplate(`
+      <h1 style="margin:0 0 20px 0;font-size:28px;color:${this.ink};font-family:Georgia,'Times New Roman',Times,serif;font-weight:400;">Thank You for Your Order!</h1>
+      <p style="margin:0 0 20px 0;font-size:16px;color:${this.ink};line-height:1.6;">
+        Hi ${firstName}, your order is being processed and you'll receive tracking details soon.
+      </p>
+      <p style="margin:0 0 20px 0;font-size:16px;color:${this.ink};line-height:1.6;">
+        Did you know you can create a free Science Based Body account? With an account you can:
+      </p>
+      <ul style="margin:0 0 25px 0;padding-left:20px;font-size:16px;color:${this.ink};line-height:1.8;">
+        <li>Track your orders and view shipping updates</li>
+        <li>Access your full order history</li>
+        <li>Save addresses for faster checkout</li>
+        <li>Earn SBB Rewards points on every purchase</li>
+        <li>Unlock exclusive member discounts</li>
+      </ul>
+      <p style="margin:0 0 30px 0;text-align:center;">
+        ${this.button('Create Your Account', loginUrl)}
+      </p>
+      <p style="margin:0;font-size:14px;color:#6b7280;">
+        No rush — you can create your account anytime. Questions? Contact us at <a href="mailto:${this.supportEmail}" style="color:${this.rose};text-decoration:none;">${this.supportEmail}</a>
+      </p>
+    `, 'Create your free account to track orders and unlock member perks');
+
+    const text = `Hi ${firstName},\n\nThank you for your order! It's being processed and you'll receive tracking details soon.\n\nDid you know you can create a free Science Based Body account?\n\n• Track orders and shipping updates\n• Access order history\n• Save addresses for faster checkout\n• Earn SBB Rewards points\n• Unlock exclusive member discounts\n\nCreate your account: ${loginUrl}\n\nNo rush — you can create your account anytime.\n\nScience Based Body`;
+    return { subject, html, text };
+  }
+
   // ===========================================================================
   // ORDER EMAILS
   // ===========================================================================
