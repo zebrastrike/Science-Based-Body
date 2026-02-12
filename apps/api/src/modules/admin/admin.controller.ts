@@ -20,6 +20,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
+import { KpiService } from './kpi.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -35,7 +36,10 @@ interface AuthenticatedRequest {
 @Roles('ADMIN', 'SUPER_ADMIN')
 @ApiBearerAuth()
 export class AdminController {
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private kpiService: KpiService,
+  ) {}
 
   // ==========================================================================
   // DASHBOARD
@@ -61,6 +65,66 @@ export class AdminController {
   @ApiResponse({ status: 200, description: 'Recent orders' })
   getRecentOrders(@Query('limit') limit?: number) {
     return this.adminService.getRecentOrders(limit ? Number(limit) : undefined);
+  }
+
+  // ==========================================================================
+  // KPIs
+  // ==========================================================================
+
+  @Get('kpis')
+  @ApiOperation({ summary: 'Get KPI overview (all key metrics at a glance)' })
+  @ApiQuery({ name: 'period', required: false, description: '7d, 30d, 90d, 365d' })
+  @ApiResponse({ status: 200, description: 'KPI overview' })
+  getKpiOverview(@Query('period') period?: string) {
+    return this.kpiService.getKpiOverview(period);
+  }
+
+  @Get('kpis/financial')
+  @ApiOperation({ summary: 'Get financial KPIs (revenue, AOV, refunds, payment methods)' })
+  @ApiQuery({ name: 'period', required: false, description: '7d, 30d, 90d, 365d' })
+  @ApiResponse({ status: 200, description: 'Financial KPIs' })
+  getFinancialKpis(@Query('period') period?: string) {
+    return this.kpiService.getFinancialKpis(period);
+  }
+
+  @Get('kpis/customers')
+  @ApiOperation({ summary: 'Get customer KPIs (acquisition, LTV, retention, top customers)' })
+  @ApiQuery({ name: 'period', required: false, description: '7d, 30d, 90d, 365d' })
+  @ApiResponse({ status: 200, description: 'Customer KPIs' })
+  getCustomerKpis(@Query('period') period?: string) {
+    return this.kpiService.getCustomerKpis(period);
+  }
+
+  @Get('kpis/products')
+  @ApiOperation({ summary: 'Get product KPIs (top sellers, category performance, inventory)' })
+  @ApiQuery({ name: 'period', required: false, description: '7d, 30d, 90d, 365d' })
+  @ApiResponse({ status: 200, description: 'Product KPIs' })
+  getProductKpis(@Query('period') period?: string) {
+    return this.kpiService.getProductKpis(period);
+  }
+
+  @Get('kpis/operations')
+  @ApiOperation({ summary: 'Get operations KPIs (fulfillment speed, returns, order pipeline)' })
+  @ApiQuery({ name: 'period', required: false, description: '7d, 30d, 90d, 365d' })
+  @ApiResponse({ status: 200, description: 'Operations KPIs' })
+  getOperationsKpis(@Query('period') period?: string) {
+    return this.kpiService.getOperationsKpis(period);
+  }
+
+  @Get('kpis/affiliates')
+  @ApiOperation({ summary: 'Get affiliate KPIs (clicks, conversions, commissions, top affiliates)' })
+  @ApiQuery({ name: 'period', required: false, description: '7d, 30d, 90d, 365d' })
+  @ApiResponse({ status: 200, description: 'Affiliate KPIs' })
+  getAffiliateKpis(@Query('period') period?: string) {
+    return this.kpiService.getAffiliateKpis(period);
+  }
+
+  @Get('kpis/marketing')
+  @ApiOperation({ summary: 'Get marketing KPIs (popups, discount codes, email captures)' })
+  @ApiQuery({ name: 'period', required: false, description: '7d, 30d, 90d, 365d' })
+  @ApiResponse({ status: 200, description: 'Marketing KPIs' })
+  getMarketingKpis(@Query('period') period?: string) {
+    return this.kpiService.getMarketingKpis(period);
   }
 
   // ==========================================================================

@@ -181,6 +181,7 @@ services:
       - ./branded-for-science.html:/etc/nginx/site/branded-for-science.html:ro
       - ./affiliate-program.html:/etc/nginx/site/affiliate-program.html:ro
       - ./login.html:/etc/nginx/site/login.html:ro
+      - ./reset-password.html:/etc/nginx/site/reset-password.html:ro
       - ./styles.css:/etc/nginx/site/styles.css:ro
       - ./scripts.js:/etc/nginx/site/scripts.js:ro
       - ./images:/etc/nginx/site/images:ro

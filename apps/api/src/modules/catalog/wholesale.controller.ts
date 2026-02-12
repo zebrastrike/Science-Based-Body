@@ -33,6 +33,59 @@ export class WholesaleController {
     private prisma: PrismaService,
   ) {}
 
+  @Get('browse')
+  @Roles('BRAND_PARTNER', 'AFFILIATE', 'ADMIN', 'SUPER_ADMIN')
+  @ApiOperation({ summary: 'Browse full product catalog (no prices, broker-style)' })
+  @ApiQuery({ name: 'category', required: false, enum: ProductCategory })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiResponse({ status: 200, description: 'Full catalog without pricing' })
+  async browse(
+    @Query('category') category?: ProductCategory,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    const catalog = await this.catalogService.findAll({
+      category,
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : 200,
+      includeWholesaleOnly: true,
+    });
+
+    // Strip all price data — broker-style, sales agent handles pricing
+    const products = catalog.products.map((product: any) => ({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      sku: product.sku,
+      shortDescription: product.shortDescription,
+      category: product.category,
+      subcategory: product.subcategory,
+      comingSoon: product.comingSoon,
+      hasVariants: product.hasVariants,
+      variantCount: product.variantCount,
+      variants: (product.variants || []).map((v: any) => ({
+        id: v.id,
+        sku: v.sku,
+        name: v.name,
+        strength: v.strength,
+        wholesaleOnly: v.wholesaleOnly,
+      })),
+      primaryImage: product.primaryImage,
+      images: product.images,
+      inStock: product.inStock,
+      stockQuantity: product.stockQuantity,
+      leadTimeDays: product.leadTimeDays,
+      isFeatured: product.isFeatured,
+    }));
+
+    return {
+      products,
+      pagination: catalog.pagination,
+      filters: { category },
+    };
+  }
+
   @Get('catalog')
   @ApiOperation({ summary: 'Get wholesale product catalog with partner pricing' })
   @ApiQuery({ name: 'category', required: false, enum: ProductCategory })

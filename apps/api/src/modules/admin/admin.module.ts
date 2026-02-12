@@ -1,6 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
+import { KpiService } from './kpi.service';
 import { OrdersModule } from '../orders/orders.module';
 import { ShippingModule } from '../shipping/shipping.module';
 import { PaymentsModule } from '../payments/payments.module';
@@ -12,7 +13,7 @@ import { PaymentsModule } from '../payments/payments.module';
     PaymentsModule,
   ],
   controllers: [AdminController],
-  providers: [AdminService],
-  exports: [AdminService],
+  providers: [AdminService, KpiService],
+  exports: [AdminService, KpiService],
 })
 export class AdminModule {}
