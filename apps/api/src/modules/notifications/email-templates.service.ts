@@ -17,12 +17,17 @@ interface OrderDetails {
   discount: number;
   total: number;
   shippingAddress: {
-    name: string;
+    firstName: string;
+    lastName: string;
+    name?: string;
+    company?: string;
     street1: string;
     street2?: string;
     city: string;
     state: string;
     postalCode: string;
+    country?: string;
+    phone?: string;
   };
   paymentMethod?: string;
 }
@@ -515,6 +520,11 @@ export class EmailTemplatesService {
   adminNewOrder(order: OrderDetails, customerEmail: string): { subject: string; html: string; text: string } {
     const subject = `[SBB] New Order - #${order.orderNumber} - $${order.total.toFixed(2)}`;
 
+    const addr = order.shippingAddress;
+    const fullName = `${addr.firstName} ${addr.lastName}`.trim();
+    const street = addr.street2 ? `${addr.street1}, ${addr.street2}` : addr.street1;
+    const fullAddress = `${street}, ${addr.city}, ${addr.state} ${addr.postalCode}`;
+
     const itemsList = order.items.map(item =>
       `• ${item.name} x${item.quantity} - $${item.price.toFixed(2)}`
     ).join('\n');
@@ -524,11 +534,18 @@ export class EmailTemplatesService {
 
       <div style="background:${this.bone};border-left:4px solid ${this.sage};padding:15px;margin-bottom:20px;border-radius:0 8px 8px 0;">
         <strong style="color:${this.ink};">Order #${order.orderNumber}</strong><br>
-        <span style="color:${this.ink};">Total: $${order.total.toFixed(2)}</span>
+        <span style="color:${this.ink};">Total: $${order.total.toFixed(2)}</span><br>
+        <span style="color:#6b7280;font-size:13px;">Payment: ${order.paymentMethod || 'N/A'}</span>
       </div>
 
-      <p style="margin:0 0 10px 0;color:${this.ink};"><strong>Customer:</strong> ${customerEmail}</p>
-      <p style="margin:0 0 20px 0;color:${this.ink};"><strong>Ship To:</strong> ${order.shippingAddress.city}, ${order.shippingAddress.state}</p>
+      <h3 style="margin:0 0 10px 0;font-size:16px;color:${this.ink};">Customer Details:</h3>
+      <div style="background:${this.bone};padding:15px;border-radius:6px;margin-bottom:20px;border:1px solid ${this.sage};">
+        <p style="margin:0 0 6px 0;color:${this.ink};"><strong>Name:</strong> ${fullName}</p>
+        <p style="margin:0 0 6px 0;color:${this.ink};"><strong>Email:</strong> <a href="mailto:${customerEmail}" style="color:${this.rose};text-decoration:none;">${customerEmail}</a></p>
+        <p style="margin:0 0 6px 0;color:${this.ink};"><strong>Phone:</strong> ${addr.phone || 'Not provided'}</p>
+        ${addr.company ? `<p style="margin:0 0 6px 0;color:${this.ink};"><strong>Company:</strong> ${addr.company}</p>` : ''}
+        <p style="margin:0;color:${this.ink};"><strong>Ship To:</strong> ${fullAddress}</p>
+      </div>
 
       <h3 style="margin:0 0 10px 0;font-size:16px;color:${this.ink};">Items:</h3>
       <pre style="background:${this.bone};padding:15px;border-radius:6px;font-size:14px;overflow:auto;color:${this.ink};border:1px solid ${this.sage};">${itemsList}</pre>
@@ -538,7 +555,7 @@ export class EmailTemplatesService {
       </p>
     `);
 
-    const text = `New Order #${order.orderNumber}\nTotal: $${order.total.toFixed(2)}\nCustomer: ${customerEmail}\n\n${itemsList}`;
+    const text = `New Order #${order.orderNumber}\nTotal: $${order.total.toFixed(2)}\n\nCustomer: ${fullName}\nEmail: ${customerEmail}\nPhone: ${addr.phone || 'N/A'}\nShip To: ${fullAddress}\n\nItems:\n${itemsList}`;
     return { subject, html, text };
   }
 
