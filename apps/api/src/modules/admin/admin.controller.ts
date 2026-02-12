@@ -180,6 +180,22 @@ export class AdminController {
     return this.adminService.updateOrderStatus(id, body.status, req.user.id, body.notes);
   }
 
+  @Patch('orders/:id/status')
+  @ApiOperation({ summary: 'Update order status (PATCH)' })
+  @ApiParam({ name: 'id', description: 'Order ID' })
+  @ApiResponse({ status: 200, description: 'Status updated' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  patchOrderStatus(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() body: { status?: OrderStatus; paymentStatus?: string; adminNotes?: string },
+  ) {
+    if (body.status) {
+      return this.adminService.updateOrderStatus(id, body.status, req.user.id, body.adminNotes);
+    }
+    return { success: true };
+  }
+
   @Post('orders/:id/resend-confirmation')
   @ApiOperation({ summary: 'Resend order confirmation email to customer' })
   @ApiParam({ name: 'id', description: 'Order ID' })
@@ -356,6 +372,29 @@ export class AdminController {
       molecularWeight?: number;
       sequence?: string;
       casNumber?: string;
+      isActive?: boolean;
+      isFeatured?: boolean;
+    },
+  ) {
+    return this.adminService.updateProduct(id, body, req.user.id);
+  }
+
+  @Patch('products/:id')
+  @ApiOperation({ summary: 'Patch product fields (isActive, isFeatured, basePrice, etc.)' })
+  @ApiParam({ name: 'id', description: 'Product ID' })
+  @ApiResponse({ status: 200, description: 'Product patched' })
+  @ApiResponse({ status: 404, description: 'Product not found' })
+  patchProduct(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body()
+    body: {
+      name?: string;
+      slug?: string;
+      category?: ProductCategory;
+      basePrice?: number;
+      shortDescription?: string;
+      longDescription?: string;
       isActive?: boolean;
       isFeatured?: boolean;
     },
@@ -927,5 +966,49 @@ export class AdminController {
     @Param('id') id: string,
   ) {
     return this.adminService.togglePopup(id, req.user.id);
+  }
+
+  // ==========================================================================
+  // SHIPPING ROUTE ALIASES (frontend uses /admin/shipping/:orderId/...)
+  // ==========================================================================
+
+  @Post('shipping/:orderId/rates')
+  @ApiOperation({ summary: 'Get shipping rates (alias)' })
+  @ApiParam({ name: 'orderId', description: 'Order ID' })
+  getShippingRatesAlias(@Param('orderId') orderId: string) {
+    return this.adminService.getShippingRates(orderId);
+  }
+
+  @Post('shipping/:orderId/label')
+  @ApiOperation({ summary: 'Create shipping label (alias)' })
+  @ApiParam({ name: 'orderId', description: 'Order ID' })
+  createShippingLabelAlias(
+    @Request() req: AuthenticatedRequest,
+    @Param('orderId') orderId: string,
+    @Body() body: { rateId: string },
+  ) {
+    return this.adminService.createShippingLabel(orderId, body.rateId, req.user.id);
+  }
+
+  // ==========================================================================
+  // RETURNS PATCH ALIAS (frontend uses PATCH)
+  // ==========================================================================
+
+  @Patch('returns/:id')
+  @ApiOperation({ summary: 'Update return status (PATCH)' })
+  @ApiParam({ name: 'id', description: 'Return ID' })
+  patchReturn(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() body: { status: ReturnStatus; reason?: string },
+  ) {
+    if (body.status === ReturnStatus.APPROVED) {
+      return this.adminService.approveReturn(id, 0, req.user.id);
+    } else if (body.status === ReturnStatus.REJECTED) {
+      return this.adminService.rejectReturn(id, body.reason || 'Rejected by admin', req.user.id);
+    } else if (body.status === ReturnStatus.COMPLETED) {
+      return this.adminService.completeReturn(id, req.user.id);
+    }
+    return { success: true };
   }
 }

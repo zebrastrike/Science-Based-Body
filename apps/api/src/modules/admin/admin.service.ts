@@ -27,22 +27,23 @@ export class AdminService {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    weekStart.setHours(0, 0, 0, 0);
 
     const [
-      totalOrders,
       todayOrders,
+      weekOrders,
       pendingOrders,
-      totalRevenue,
-      monthRevenue,
-      totalUsers,
-      activeUsers,
+      todayRevenue,
+      weekRevenue,
       lowStockProducts,
     ] = await Promise.all([
-      this.prisma.order.count(),
       this.prisma.order.count({
         where: { createdAt: { gte: today } },
+      }),
+      this.prisma.order.count({
+        where: { createdAt: { gte: weekStart } },
       }),
       this.prisma.order.count({
         where: {
@@ -51,18 +52,17 @@ export class AdminService {
       }),
       this.prisma.order.aggregate({
         _sum: { totalAmount: true },
-        where: { status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REFUNDED] } },
+        where: {
+          createdAt: { gte: today },
+          status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REFUNDED] },
+        },
       }),
       this.prisma.order.aggregate({
         _sum: { totalAmount: true },
         where: {
-          createdAt: { gte: thirtyDaysAgo },
+          createdAt: { gte: weekStart },
           status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REFUNDED] },
         },
-      }),
-      this.prisma.user.count(),
-      this.prisma.user.count({
-        where: { status: UserStatus.ACTIVE },
       }),
       this.prisma.$queryRaw<[{ count: bigint }]>`
         SELECT COUNT(*) as count FROM "Inventory"
@@ -71,22 +71,12 @@ export class AdminService {
     ]);
 
     return {
-      orders: {
-        total: totalOrders,
-        today: todayOrders,
-        pending: pendingOrders,
-      },
-      revenue: {
-        total: Number(totalRevenue._sum.totalAmount || 0),
-        month: Number(monthRevenue._sum.totalAmount || 0),
-      },
-      users: {
-        total: totalUsers,
-        active: activeUsers,
-      },
-      inventory: {
-        lowStock: lowStockProducts,
-      },
+      ordersToday: todayOrders,
+      revenueToday: Number(todayRevenue._sum.totalAmount || 0),
+      pendingOrders,
+      lowStockProducts,
+      ordersThisWeek: weekOrders,
+      revenueThisWeek: Number(weekRevenue._sum.totalAmount || 0),
     };
   }
 
@@ -104,18 +94,18 @@ export class AdminService {
       },
     });
 
-    return orders.map((order) => ({
-      id: order.id,
-      orderNumber: order.orderNumber,
-      customer: {
-        name: `${order.user.firstName || ''} ${order.user.lastName || ''}`.trim() || order.user.email,
-        email: order.user.email,
-      },
-      status: order.status,
-      total: Number(order.totalAmount),
-      itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
-      createdAt: order.createdAt,
-    }));
+    return {
+      data: orders.map((order) => ({
+        id: order.id,
+        orderNumber: order.orderNumber,
+        customerName: `${order.user.firstName || ''} ${order.user.lastName || ''}`.trim() || order.user.email,
+        customerEmail: order.user.email,
+        status: order.status,
+        totalAmount: Number(order.totalAmount),
+        itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
+        createdAt: order.createdAt,
+      })),
+    };
   }
 
   // ==========================================================================
@@ -177,23 +167,21 @@ export class AdminService {
     ]);
 
     return {
-      orders: orders.map((order) => ({
+      data: orders.map((order) => ({
         id: order.id,
         orderNumber: order.orderNumber,
-        customer: {
-          name: `${order.user.firstName || ''} ${order.user.lastName || ''}`.trim() || order.user.email,
-          email: order.user.email,
-        },
+        customerName: `${order.user.firstName || ''} ${order.user.lastName || ''}`.trim() || order.user.email,
+        customerEmail: order.user.email,
         status: order.status,
         paymentStatus: order.payments[0]?.status || 'PENDING',
         paymentMethod: order.payments[0]?.method,
         shippingStatus: order.shipment?.status,
         trackingNumber: order.shipment?.trackingNumber,
         subtotal: Number(order.subtotal),
-        shipping: Number(order.shippingCost),
-        tax: Number(order.taxAmount),
-        discount: Number(order.discountAmount),
-        total: Number(order.totalAmount),
+        shippingCost: Number(order.shippingCost),
+        taxAmount: Number(order.taxAmount),
+        discountAmount: Number(order.discountAmount),
+        totalAmount: Number(order.totalAmount),
         itemCount: order.items.length,
         createdAt: order.createdAt,
       })),
@@ -201,7 +189,7 @@ export class AdminService {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit),
+        pages: Math.ceil(total / limit),
       },
     };
   }
@@ -222,7 +210,7 @@ export class AdminService {
         items: {
           include: {
             product: {
-              select: { slug: true },
+              select: { slug: true, images: { where: { isPrimary: true }, take: 1 } },
             },
           },
         },
@@ -238,7 +226,64 @@ export class AdminService {
       throw new NotFoundException('Order not found');
     }
 
-    return order;
+    const addr = order.shippingAddress;
+    const billAddr = order.billingAddress;
+
+    return {
+      id: order.id,
+      orderNumber: order.orderNumber,
+      status: order.status,
+      paymentStatus: order.payments[0]?.status || 'PENDING',
+      shippingStatus: order.shipment?.status || null,
+      customerName: `${order.user.firstName || ''} ${order.user.lastName || ''}`.trim() || order.user.email,
+      customerEmail: order.user.email,
+      customerPhone: order.user.phone || addr?.phone || null,
+      items: order.items.map((item) => ({
+        id: item.id,
+        productName: item.productName,
+        variantName: item.variantName || null,
+        sku: item.sku,
+        quantity: item.quantity,
+        unitPrice: Number(item.unitPrice),
+        totalPrice: Number(item.totalPrice),
+        imageUrl: (item.product as any)?.images?.[0]?.url || null,
+      })),
+      subtotal: Number(order.subtotal),
+      shippingCost: Number(order.shippingCost),
+      discountAmount: Number(order.discountAmount),
+      discountCode: order.discountCode || null,
+      totalAmount: Number(order.totalAmount),
+      shippingAddress: addr ? {
+        firstName: addr.firstName,
+        lastName: addr.lastName,
+        address1: addr.street1,
+        address2: addr.street2 || null,
+        city: addr.city,
+        state: addr.state,
+        postalCode: addr.postalCode,
+        country: addr.country,
+        phone: addr.phone || null,
+      } : null,
+      billingAddress: billAddr ? {
+        firstName: billAddr.firstName,
+        lastName: billAddr.lastName,
+        address1: billAddr.street1,
+        address2: billAddr.street2 || null,
+        city: billAddr.city,
+        state: billAddr.state,
+        postalCode: billAddr.postalCode,
+        country: billAddr.country,
+        phone: billAddr.phone || null,
+      } : null,
+      trackingNumber: order.shipment?.trackingNumber || null,
+      trackingUrl: order.shipment?.trackingUrl || null,
+      shippingCarrier: order.shipment?.carrier || null,
+      customerNotes: order.customerNotes || null,
+      adminNotes: order.adminNotes || null,
+      createdAt: order.createdAt,
+      paidAt: order.paidAt || null,
+      shippedAt: order.shippedAt || null,
+    };
   }
 
   async updateOrderStatus(orderId: string, status: OrderStatus, adminId: string, notes?: string) {
@@ -342,27 +387,37 @@ export class AdminService {
     ]);
 
     return {
-      products: products.map((product) => ({
+      data: products.map((product) => ({
         id: product.id,
-        sku: product.sku,
         name: product.name,
         slug: product.slug,
-        category: product.category,
+        sku: product.sku,
+        shortDescription: product.shortDescription || '',
         basePrice: Number(product.basePrice),
-        isActive: product.isActive,
+        compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null,
+        categoryName: product.category,
+        categorySlug: product.category?.toLowerCase().replace(/_/g, '-'),
+        variants: product.variants.map((v) => ({
+          id: v.id,
+          name: v.name,
+          sku: v.sku,
+          price: Number(v.price),
+          isActive: v.isActive,
+        })),
         isFeatured: product.isFeatured,
-        variantCount: product.variants.length,
+        isActive: product.isActive,
+        imageUrl: product.images[0]?.url || null,
         stock: product.inventory?.quantity || 0,
         lowStock: product.inventory
           ? product.inventory.quantity <= product.inventory.lowStockThreshold
           : false,
-        image: product.images[0]?.url,
+        createdAt: product.createdAt,
       })),
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit),
+        pages: Math.ceil(total / limit),
       },
     };
   }
@@ -557,6 +612,7 @@ export class AdminService {
           email: true,
           firstName: true,
           lastName: true,
+          phone: true,
           role: true,
           status: true,
           emailVerified: true,
@@ -567,30 +623,33 @@ export class AdminService {
           _count: {
             select: { orders: true },
           },
+          orders: {
+            select: { totalAmount: true },
+            where: { status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REFUNDED] } },
+          },
         },
       }),
       this.prisma.user.count({ where }),
     ]);
 
     return {
-      users: users.map((user) => ({
+      data: users.map((user) => ({
         id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
-        name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || null,
+        phone: user.phone,
         role: user.role,
         status: user.status,
-        emailVerified: user.emailVerified,
-        loyaltyPoints: user.loyaltyPoints,
-        lifetimeLoyaltyPoints: user.lifetimeLoyaltyPoints,
-        orderCount: user._count.orders,
-        lastLoginAt: user.lastLoginAt,
+        ordersCount: user._count.orders,
+        totalSpent: user.orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0),
         createdAt: user.createdAt,
       })),
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit),
+        pages: Math.ceil(total / limit),
       },
     };
   }
@@ -601,7 +660,6 @@ export class AdminService {
       include: {
         addresses: true,
         orders: {
-          take: 10,
           orderBy: { createdAt: 'desc' },
           select: {
             id: true,
@@ -620,10 +678,43 @@ export class AdminService {
       throw new NotFoundException('User not found');
     }
 
-    // Remove sensitive data
-    const { passwordHash, governmentId, ...safeUser } = user;
+    const validOrders = user.orders.filter(
+      (o) => o.status !== OrderStatus.CANCELLED && o.status !== OrderStatus.REFUNDED,
+    );
 
-    return safeUser;
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
+      createdAt: user.createdAt,
+      status: user.status,
+      role: user.role,
+      ordersCount: user.orders.length,
+      totalSpent: validOrders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0),
+      adminNotes: user.adminNotes,
+      addresses: user.addresses.map((a) => ({
+        id: a.id,
+        label: a.label || null,
+        firstName: a.firstName,
+        lastName: a.lastName,
+        address1: a.street1,
+        address2: a.street2 || null,
+        city: a.city,
+        state: a.state,
+        postalCode: a.postalCode,
+        country: a.country,
+        phone: a.phone || null,
+      })),
+      orders: user.orders.slice(0, 10).map((o) => ({
+        id: o.id,
+        orderNumber: o.orderNumber,
+        status: o.status,
+        totalAmount: Number(o.totalAmount),
+        createdAt: o.createdAt,
+      })),
+    };
   }
 
   async updateUserStatus(userId: string, status: UserStatus, adminId: string, reason?: string) {
@@ -870,16 +961,38 @@ export class AdminService {
     const currentRev = Number(totalRevenue._sum.totalAmount || 0);
     const previousRev = Number(previousPeriodRevenue._sum.totalAmount || 0);
     const revenueGrowth = previousRev > 0 ? ((currentRev - previousRev) / previousRev) * 100 : 0;
+    const avgOV = Number(avgOrderValue._avg.totalAmount || 0);
+
+    // Shape chart data into series the frontend expects
+    const chartRows = ordersByDay as any[];
+    const revenueSeries = chartRows.map((row: any) => ({
+      date: row.date,
+      value: Number(row.revenue || 0),
+    }));
+    const ordersSeries = chartRows.map((row: any) => ({
+      date: row.date,
+      value: Number(row.orders || 0),
+    }));
 
     return {
+      revenueSeries,
+      ordersSeries,
+      acquisitionSeries: [], // Placeholder - no acquisition tracking yet
+      topProducts: [], // Fetched separately via /analytics/top-products
+      stats: {
+        revenue: currentRev,
+        orders: totalOrders,
+        avgOrderValue: Math.round(avgOV * 100) / 100,
+        conversionRate: 0, // No visitor tracking yet
+      },
+      // Keep original data too for backward compat
       summary: {
         totalRevenue: currentRev,
         totalOrders,
-        averageOrderValue: Number(avgOrderValue._avg.totalAmount || 0),
+        averageOrderValue: avgOV,
         newCustomers,
         revenueGrowth: Math.round(revenueGrowth * 100) / 100,
       },
-      chartData: ordersByDay,
       period: { startDate, endDate },
     };
   }
@@ -994,7 +1107,7 @@ export class AdminService {
         minOrderAmount: d.minOrderAmount ? Number(d.minOrderAmount) : null,
         maxDiscountAmount: d.maxDiscountAmount ? Number(d.maxDiscountAmount) : null,
       })),
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     };
   }
 
@@ -1173,12 +1286,17 @@ export class AdminService {
     ]);
 
     return {
-      returns: returns.map((r) => ({
-        ...r,
-        subtotalAmount: Number(r.subtotalAmount),
+      data: returns.map((r) => ({
+        id: r.id,
+        orderNumber: r.orderNumber,
+        customerName: r.customerName,
+        reason: r.reason,
+        status: r.status,
+        requestedAt: r.createdAt,
         refundAmount: r.refundAmount ? Number(r.refundAmount) : null,
+        subtotalAmount: Number(r.subtotalAmount),
       })),
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     };
   }
 
@@ -1335,26 +1453,26 @@ export class AdminService {
     ]);
 
     return {
-      logs: logs.map((log) => ({
+      data: logs.map((log) => ({
         id: log.id,
-        action: log.action,
+        createdAt: log.createdAt,
+        userName: log.admin
+          ? `${log.admin.firstName || ''} ${log.admin.lastName || ''}`.trim() || log.admin.email
+          : 'System',
+        action: `${log.action} ${log.resourceType}`,
+        details: log.resourceId
+          ? `${log.resourceType} ${log.resourceId}`
+          : log.resourceType,
+        actionType: log.action,
         resourceType: log.resourceType,
         resourceId: log.resourceId,
-        admin: log.admin
-          ? {
-              email: log.admin.email,
-              name: `${log.admin.firstName || ''} ${log.admin.lastName || ''}`.trim(),
-            }
-          : null,
         changes: {
           previous: log.previousState,
           new: log.newState,
         },
         metadata: log.metadata,
-        ipAddress: log.ipAddress,
-        createdAt: log.createdAt,
       })),
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     };
   }
 
@@ -1481,10 +1599,7 @@ export class AdminService {
     return shipments.map((s) => ({
       id: s.id,
       orderNumber: s.order.orderNumber,
-      customer: {
-        name: `${s.order.user.firstName || ''} ${s.order.user.lastName || ''}`.trim() || s.order.user.email,
-        email: s.order.user.email,
-      },
+      customerName: `${s.order.user.firstName || ''} ${s.order.user.lastName || ''}`.trim() || s.order.user.email,
       carrier: s.carrier,
       trackingNumber: s.trackingNumber,
       status: s.status,
