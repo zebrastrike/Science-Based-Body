@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import '@/styles/globals.css';
 import { siteConfig, defaultMeta, generateOrganizationSchema, generateWebsiteSchema } from '@/lib/seo';
+import Providers from '@/contexts/Providers';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -114,7 +115,9 @@ export default function RootLayout({
           Skip to main content
         </a>
 
-        {children}
+        <Providers>
+          {children}
+        </Providers>
 
         {/* Analytics scripts loaded at end */}
         {process.env.NODE_ENV === 'production' && (
