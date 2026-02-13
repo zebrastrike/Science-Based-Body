@@ -4981,7 +4981,7 @@ body.page-home .variant-select option {
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 90;
+  z-index: 150;
   display: none;
   padding: 6px 0;
   max-height: 80vh;
@@ -5042,6 +5042,16 @@ body.page-home .variant-select option {
   background: rgba(227, 167, 161, 0.15);
   transform: translateX(3px);
   text-shadow: 0 0 8px rgba(227, 167, 161, 0.3);
+}
+
+/* ★ In Stock — always prominent */
+.shop-sidebar-link[data-section="in-stock-spotlight"] {
+  opacity: 0.95;
+  color: var(--rose);
+  font-weight: 700;
+  font-size: 0.7rem;
+  border-left: 3px solid var(--rose);
+  text-shadow: 0 0 6px rgba(227, 167, 161, 0.25);
 }
 
 /* ============================================
