@@ -2327,10 +2327,12 @@ export class AdminService {
     if (!order) throw new NotFoundException('Order not found');
     if (!order.shippingAddress) throw new BadRequestException('Order has no shipping address');
 
-    // Calculate total weight from items (default 0.5 lb per item if no weight)
-    const totalWeightLbs = order.items.reduce((sum, item) => {
-      return sum + (item.quantity * 0.5); // 0.5 lb per vial (peptide default)
-    }, 0);
+    // Weight: 3.6 oz base (box + bac water + 1 vial) + 0.5 oz per extra vial
+    const totalVials = order.items.reduce((sum, item) => sum + item.quantity, 0);
+    const BASE_WEIGHT_OZ = 3.6; // box + bac water + 1 vial
+    const EXTRA_VIAL_OZ = 0.5;  // each additional vial
+    const totalWeightOz = BASE_WEIGHT_OZ + Math.max(totalVials - 1, 0) * EXTRA_VIAL_OZ;
+    const totalWeightLbs = totalWeightOz / 16;
 
     const addr = order.shippingAddress;
     const result = await this.easypostService.createShipmentWithRates(
@@ -2344,7 +2346,7 @@ export class AdminService {
         country: addr.country || 'US',
         phone: addr.phone || undefined,
       },
-      Math.max(totalWeightLbs, 0.5), // Minimum 0.5 lb
+      totalWeightLbs,
     );
 
     // Cache the shipment ID on the order for later label creation
