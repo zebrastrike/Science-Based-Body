@@ -28,8 +28,9 @@ interface Pagination {
 
 const statusColors: Record<string, string> = {
   PENDING: 'bg-yellow-500/10 text-yellow-400',
+  AWAITING_PAYMENT: 'bg-orange-500/10 text-orange-400',
+  PAYMENT_RECEIVED: 'bg-emerald-500/10 text-emerald-400',
   PROCESSING: 'bg-blue-500/10 text-blue-400',
-  PAID: 'bg-green-500/10 text-green-400',
   SHIPPED: 'bg-purple-500/10 text-purple-400',
   DELIVERED: 'bg-green-500/10 text-green-400',
   CANCELLED: 'bg-red-500/10 text-red-400',
@@ -57,6 +58,7 @@ export default function OrdersPage() {
   const [updatingPaymentId, setUpdatingPaymentId] = useState<string | null>(null);
   const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [labelStatus, setLabelStatus] = useState<Record<string, string>>({});
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
@@ -109,11 +111,79 @@ export default function OrdersPage() {
         setOrders((prev) => prev.map((o) =>
           o.id === orderId ? { ...o, paymentStatus: nextStatus } : o,
         ));
+        if (nextStatus === 'PAID') {
+          autoCreateAndPrintLabel(orderId, token!);
+        }
       }
     } catch (error) {
       console.error('Failed to update payment status:', error);
     } finally {
       setUpdatingPaymentId(null);
+    }
+  };
+
+  const autoCreateAndPrintLabel = async (orderId: string, token: string) => {
+    setLabelStatus((prev) => ({ ...prev, [orderId]: 'Getting rates...' }));
+    try {
+      const ratesRes = await fetch(`${API_BASE_URL}/admin/shipping/${orderId}/rates`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      if (!ratesRes.ok) {
+        setLabelStatus((prev) => ({ ...prev, [orderId]: 'Rates failed' }));
+        return;
+      }
+      const ratesData = await ratesRes.json();
+      if (!ratesData.rates?.length) {
+        setLabelStatus((prev) => ({ ...prev, [orderId]: 'No rates available' }));
+        return;
+      }
+
+      const uspsRates = ratesData.rates.filter(
+        (r: any) => r.carrier?.toUpperCase().includes('USPS'),
+      );
+      const cheapest = (uspsRates.length > 0 ? uspsRates : ratesData.rates).reduce(
+        (best: any, r: any) => (r.amount < best.amount ? r : best),
+      );
+
+      setLabelStatus((prev) => ({
+        ...prev,
+        [orderId]: `Creating ${cheapest.carrier} label ($${cheapest.amount})...`,
+      }));
+
+      const labelRes = await fetch(`${API_BASE_URL}/admin/shipping/${orderId}/label`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rateId: cheapest.id || cheapest.rateId }),
+      });
+      if (!labelRes.ok) {
+        setLabelStatus((prev) => ({ ...prev, [orderId]: 'Label creation failed' }));
+        return;
+      }
+      const labelData = await labelRes.json();
+
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === orderId ? { ...o, shippingStatus: 'LABEL_CREATED', status: 'SHIPPED' } : o,
+        ),
+      );
+
+      if (labelData.labelUrl) {
+        setLabelStatus((prev) => ({ ...prev, [orderId]: 'Opening label...' }));
+        window.open(labelData.labelUrl, '_blank');
+      }
+
+      setTimeout(() => {
+        setLabelStatus((prev) => {
+          const next = { ...prev };
+          delete next[orderId];
+          return next;
+        });
+      }, 5000);
+    } catch (error) {
+      console.error('Auto-label failed:', error);
+      setLabelStatus((prev) => ({ ...prev, [orderId]: 'Label error' }));
     }
   };
 
@@ -214,8 +284,9 @@ export default function OrdersPage() {
           >
             <option value="all">All Statuses</option>
             <option value="PENDING">Pending</option>
+            <option value="AWAITING_PAYMENT">Awaiting Payment</option>
+            <option value="PAYMENT_RECEIVED">Payment Received</option>
             <option value="PROCESSING">Processing</option>
-            <option value="PAID">Paid</option>
             <option value="SHIPPED">Shipped</option>
             <option value="DELIVERED">Delivered</option>
             <option value="CANCELLED">Cancelled</option>
@@ -289,8 +360,9 @@ export default function OrdersPage() {
                           className={`text-xs font-medium rounded-full px-2 py-1 border-0 cursor-pointer ${statusColors[order.status] || 'bg-zinc-500/10 text-zinc-400'} ${updatingStatusId === order.id ? 'opacity-60' : ''}`}
                         >
                           <option value="PENDING">Pending</option>
+                          <option value="AWAITING_PAYMENT">Awaiting Payment</option>
+                          <option value="PAYMENT_RECEIVED">Payment Received</option>
                           <option value="PROCESSING">Processing</option>
-                          <option value="PAID">Paid</option>
                           <option value="SHIPPED">Shipped</option>
                           <option value="DELIVERED">Delivered</option>
                           <option value="CANCELLED">Cancelled</option>
@@ -325,15 +397,16 @@ export default function OrdersPage() {
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
                           {canCreateLabel && (
-                            <Link
-                              href={`/admin/shipping/${order.id}`}
-                              className="p-1.5 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
-                              title="Create shipping label"
+                            <button
+                              onClick={() => autoCreateAndPrintLabel(order.id, localStorage.getItem('accessToken')!)}
+                              disabled={!!labelStatus[order.id]}
+                              className="p-1.5 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors disabled:opacity-50"
+                              title="Auto-create label & print"
                             >
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                               </svg>
-                            </Link>
+                            </button>
                           )}
                           <Link
                             href={`/admin/orders/${order.id}`}
@@ -356,6 +429,11 @@ export default function OrdersPage() {
                             </svg>
                           </button>
                         </div>
+                        {labelStatus[order.id] && (
+                          <p className="text-[10px] text-blue-400 mt-1 max-w-[160px] truncate" title={labelStatus[order.id]}>
+                            {labelStatus[order.id]}
+                          </p>
+                        )}
                       </td>
                     </tr>
                   );
