@@ -1184,15 +1184,15 @@ a.product-card:focus-visible {
 
 .shop-search-inline {
   position: relative;
-  flex: 0 0 200px;
-  padding: 8px 12px 8px 24px;
+  flex: 0 0 160px;
+  padding: 8px 12px 8px 16px;
 }
 
 .shop-search-input {
   width: 100%;
-  padding: 7px 34px 7px 12px;
+  padding: 6px 30px 6px 10px;
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: 0.8rem;
   color: var(--ink);
   background: rgba(255, 255, 255, 0.55);
   border: 1px solid rgba(31, 42, 54, 0.1);
@@ -1316,9 +1316,6 @@ a.product-card:focus-visible {
     overflow-x: auto;
     flex-wrap: nowrap;
     -webkit-overflow-scrolling: touch;
-    /* Fade hint on right edge to show more content */
-    mask-image: linear-gradient(to right, black 85%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
   }
 
   .shop-nav-link {

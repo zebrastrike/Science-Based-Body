@@ -1096,17 +1096,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (shopNav) {
     const navLinks = shopNav.querySelectorAll(".shop-nav-link");
-    const sections = [];
+    const sidebarLinks = document.querySelectorAll(".shop-sidebar-link");
+    const sectionMap = {};
 
+    // Collect sections from top nav links
     navLinks.forEach((link) => {
       const href = link.getAttribute("href");
       if (href && href.startsWith("#")) {
         const section = document.querySelector(href);
         if (section) {
-          sections.push({ link, section, id: href.slice(1) });
+          sectionMap[href.slice(1)] = section;
         }
       }
     });
+
+    // Also collect sections from sidebar links (e.g. in-stock-spotlight)
+    sidebarLinks.forEach((link) => {
+      const id = link.getAttribute("data-section");
+      if (id && !sectionMap[id]) {
+        const section = document.getElementById(id);
+        if (section) {
+          sectionMap[id] = section;
+        }
+      }
+    });
+
+    // Build array sorted by actual page position (offsetTop)
+    const sections = Object.entries(sectionMap).map(([id, section]) => ({ id, section }));
+    sections.sort((a, b) => a.section.offsetTop - b.section.offsetTop);
 
     const updateActiveNav = () => {
       const scrollY = window.scrollY;
@@ -1114,16 +1131,15 @@ document.addEventListener("DOMContentLoaded", () => {
       let activeId = null;
 
       for (let i = sections.length - 1; i >= 0; i--) {
-        const { section, id } = sections[i];
-        if (section.offsetTop - offset <= scrollY) {
-          activeId = id;
+        if (sections[i].section.offsetTop - offset <= scrollY) {
+          activeId = sections[i].id;
           break;
         }
       }
 
       navLinks.forEach((link) => {
         const href = link.getAttribute("href");
-        const isActive = href === `#${activeId}`;
+        const isActive = href === "#" + activeId;
         link.classList.toggle("is-active", isActive);
       });
 
@@ -1142,10 +1158,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // Sync sidebar active state
-      const sidebarLinks = document.querySelectorAll(".shop-sidebar-link");
       sidebarLinks.forEach((link) => {
-        const section = link.getAttribute("data-section");
-        link.classList.toggle("is-active", section === activeId);
+        var sec = link.getAttribute("data-section");
+        link.classList.toggle("is-active", sec === activeId);
       });
     };
 
