@@ -16,6 +16,7 @@ export class ApplyAffiliateDto {
   primaryPlatform: string;
 
   @IsObject()
+  @Transform(({ value }) => typeof value === 'string' ? JSON.parse(value) : value)
   socialLinks: Record<string, string>;
 
   @IsOptional()
