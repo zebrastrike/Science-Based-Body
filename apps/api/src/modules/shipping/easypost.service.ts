@@ -22,11 +22,11 @@ export class EasyPostService {
   constructor(private config: ConfigService) {
     this.apiKey = this.config.get('EASYPOST_API_KEY', '');
     this.returnAddress = {
-      name: this.config.get('RETURN_ADDRESS_NAME', 'SBB Health'),
-      street1: this.config.get('RETURN_ADDRESS_STREET', '3646 E Bart St'),
-      city: this.config.get('RETURN_ADDRESS_CITY', 'Gilbert'),
-      state: this.config.get('RETURN_ADDRESS_STATE', 'AZ'),
-      zip: this.config.get('RETURN_ADDRESS_ZIP', '85295'),
+      name: this.config.get('RETURN_ADDRESS_NAME', 'Health SBB'),
+      street1: this.config.get('RETURN_ADDRESS_STREET', '1001 S Main St'),
+      city: this.config.get('RETURN_ADDRESS_CITY', 'Kalispell'),
+      state: this.config.get('RETURN_ADDRESS_STATE', 'MT'),
+      zip: this.config.get('RETURN_ADDRESS_ZIP', '59901'),
       country: this.config.get('RETURN_ADDRESS_COUNTRY', 'US'),
       phone: this.config.get('RETURN_ADDRESS_PHONE', '7026865343'),
     };
