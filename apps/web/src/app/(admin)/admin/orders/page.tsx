@@ -36,14 +36,6 @@ const statusColors: Record<string, string> = {
   REFUNDED: 'bg-zinc-500/10 text-zinc-400',
 };
 
-const paymentStatusColors: Record<string, string> = {
-  PENDING: 'bg-yellow-500/10 text-yellow-400',
-  AWAITING_PAYMENT: 'bg-orange-500/10 text-orange-400',
-  PAID: 'bg-green-500/10 text-green-400',
-  FAILED: 'bg-red-500/10 text-red-400',
-  REFUNDED: 'bg-zinc-500/10 text-zinc-400',
-};
-
 const shippingStatusColors: Record<string, string> = {
   NOT_SHIPPED: 'bg-zinc-500/10 text-zinc-400',
   PENDING: 'bg-yellow-500/10 text-yellow-400',
@@ -63,6 +55,10 @@ export default function OrdersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('all');
   const [updatingPaymentId, setUpdatingPaymentId] = useState<string | null>(null);
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
   useEffect(() => {
     fetchOrders();
@@ -71,7 +67,6 @@ export default function OrdersPage() {
   const fetchOrders = async () => {
     setIsLoading(true);
     const token = localStorage.getItem('accessToken');
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
     try {
       let url = `${API_BASE_URL}/admin/orders?page=${pagination.page}&limit=${pagination.limit}`;
@@ -90,54 +85,6 @@ export default function OrdersPage() {
       }
     } catch (error) {
       console.error('Failed to fetch orders:', error);
-      // Demo data
-      setOrders([
-        {
-          id: '1',
-          orderNumber: 'SBB-2024-0001',
-          customerName: 'Jane Smith',
-          customerEmail: 'jane@example.com',
-          totalAmount: 249.99,
-          subtotal: 249.99,
-          shippingCost: 0,
-          discountAmount: 0,
-          status: 'PENDING',
-          paymentStatus: 'AWAITING_PAYMENT',
-          shippingStatus: 'NOT_SHIPPED',
-          itemCount: 2,
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          orderNumber: 'SBB-2024-0002',
-          customerName: 'John Doe',
-          customerEmail: 'john@example.com',
-          totalAmount: 499.99,
-          subtotal: 499.99,
-          shippingCost: 0,
-          discountAmount: 0,
-          status: 'PAID',
-          paymentStatus: 'PAID',
-          shippingStatus: 'NOT_SHIPPED',
-          itemCount: 3,
-          createdAt: new Date(Date.now() - 3600000).toISOString(),
-        },
-        {
-          id: '3',
-          orderNumber: 'SBB-2024-0003',
-          customerName: 'Alice Johnson',
-          customerEmail: 'alice@example.com',
-          totalAmount: 189.99,
-          subtotal: 189.99,
-          shippingCost: 0,
-          discountAmount: 0,
-          status: 'SHIPPED',
-          paymentStatus: 'PAID',
-          shippingStatus: 'SHIPPED',
-          itemCount: 1,
-          createdAt: new Date(Date.now() - 7200000).toISOString(),
-        },
-      ]);
     } finally {
       setIsLoading(false);
     }
@@ -151,22 +98,16 @@ export default function OrdersPage() {
 
   const updatePaymentStatus = async (orderId: string, nextStatus: string) => {
     const token = localStorage.getItem('accessToken');
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
     setUpdatingPaymentId(orderId);
-
     try {
       const response = await fetch(`${API_BASE_URL}/admin/orders/${orderId}/status`, {
         method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentStatus: nextStatus }),
       });
-
       if (response.ok) {
-        setOrders((prev) => prev.map((order) =>
-          order.id === orderId ? { ...order, paymentStatus: nextStatus } : order,
+        setOrders((prev) => prev.map((o) =>
+          o.id === orderId ? { ...o, paymentStatus: nextStatus } : o,
         ));
       }
     } catch (error) {
@@ -176,19 +117,58 @@ export default function OrdersPage() {
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+    const token = localStorage.getItem('accessToken');
+    setUpdatingStatusId(orderId);
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/orders/${orderId}/status`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (response.ok) {
+        setOrders((prev) => prev.map((o) =>
+          o.id === orderId ? { ...o, status: newStatus } : o,
+        ));
+      }
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+    } finally {
+      setUpdatingStatusId(null);
+    }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Intl.DateTimeFormat('en-US', {
+  const deleteOrder = async (orderId: string, orderNumber: string) => {
+    if (!confirm(`Delete order ${orderNumber}? This will permanently remove it.`)) return;
+    const token = localStorage.getItem('accessToken');
+    setDeletingId(orderId);
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/orders/${orderId}?hard=true`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        setOrders((prev) => prev.filter((o) => o.id !== orderId));
+        setPagination((prev) => ({ ...prev, total: prev.total - 1 }));
+      }
+    } catch (error) {
+      console.error('Failed to delete order:', error);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+
+  const formatDate = (dateString: string) =>
+    new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: 'numeric',
       minute: 'numeric',
     }).format(new Date(dateString));
-  };
 
   return (
     <div className="space-y-6">
@@ -212,7 +192,6 @@ export default function OrdersPage() {
       {/* Filters */}
       <div className="bg-background-card rounded-xl border border-border p-4">
         <div className="flex flex-col lg:flex-row gap-4">
-          {/* Search */}
           <form onSubmit={handleSearch} className="flex-1">
             <div className="relative">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -228,7 +207,6 @@ export default function OrdersPage() {
             </div>
           </form>
 
-          {/* Status Filter */}
           <select
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setPagination({ ...pagination, page: 1 }); }}
@@ -243,7 +221,6 @@ export default function OrdersPage() {
             <option value="CANCELLED">Cancelled</option>
           </select>
 
-          {/* Date Filter */}
           <select
             value={dateFilter}
             onChange={(e) => { setDateFilter(e.target.value); setPagination({ ...pagination, page: 1 }); }}
@@ -279,48 +256,48 @@ export default function OrdersPage() {
                 <tr className="border-b border-border">
                   <th className="text-left text-sm font-medium text-zinc-400 px-4 py-3">Order</th>
                   <th className="text-left text-sm font-medium text-zinc-400 px-4 py-3">Customer</th>
-                  <th className="text-left text-sm font-medium text-zinc-400 px-4 py-3">Items</th>
                   <th className="text-left text-sm font-medium text-zinc-400 px-4 py-3">Total</th>
                   <th className="text-left text-sm font-medium text-zinc-400 px-4 py-3">Status</th>
+                  <th className="text-left text-sm font-medium text-zinc-400 px-4 py-3">Payment</th>
+                  <th className="text-left text-sm font-medium text-zinc-400 px-4 py-3">Shipping</th>
                   <th className="text-left text-sm font-medium text-zinc-400 px-4 py-3">Date</th>
                   <th className="text-right text-sm font-medium text-zinc-400 px-4 py-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {orders.map((order) => {
-                  const canCreateLabel = order.paymentStatus === 'PAID' && (!order.shippingStatus || order.shippingStatus === 'NOT_SHIPPED' || order.shippingStatus === 'PENDING');
+                  const canCreateLabel =
+                    order.paymentStatus === 'PAID' &&
+                    (!order.shippingStatus || order.shippingStatus === 'NOT_SHIPPED' || order.shippingStatus === 'PENDING');
                   return (
-                  <tr key={order.id} className="border-b border-border last:border-b-0 hover:bg-background-tertiary">
-                    <td className="px-4 py-3">
-                      <Link href={`/admin/orders/${order.id}`} className="font-medium text-white hover:text-brand-primary">
-                        {order.orderNumber}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap items-center gap-2 text-sm">
-                        <span className="text-white font-medium">{order.customerName}</span>
-                        <span className="text-zinc-600">&bull;</span>
-                        <span className="text-zinc-500">{order.customerEmail}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-zinc-400">{order.itemCount} items</td>
-                    <td className="px-4 py-3 font-medium text-white">{formatCurrency(order.totalAmount)}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${statusColors[order.status] || 'bg-zinc-500/10 text-zinc-400'}`}>
-                          Order: {order.status}
-                        </span>
-                        <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${paymentStatusColors[order.paymentStatus] || 'bg-zinc-500/10 text-zinc-400'}`}>
-                          Payment: {order.paymentStatus.replace(/_/g, ' ')}
-                        </span>
-                        <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${shippingStatusColors[order.shippingStatus] || 'bg-zinc-500/10 text-zinc-400'}`}>
-                          Shipping: {order.shippingStatus ? order.shippingStatus.replace(/_/g, ' ') : 'Not Shipped'}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-zinc-400 text-sm">{formatDate(order.createdAt)}</td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    <tr key={order.id} className="border-b border-border last:border-b-0 hover:bg-background-tertiary">
+                      <td className="px-4 py-3">
+                        <Link href={`/admin/orders/${order.id}`} className="font-medium text-white hover:text-brand-primary">
+                          {order.orderNumber}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-white text-sm font-medium">{order.customerName}</p>
+                        <p className="text-xs text-zinc-500">{order.customerEmail}</p>
+                      </td>
+                      <td className="px-4 py-3 font-medium text-white">{formatCurrency(order.totalAmount)}</td>
+                      <td className="px-4 py-3">
+                        <select
+                          value={order.status}
+                          onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                          disabled={updatingStatusId === order.id}
+                          className={`text-xs font-medium rounded-full px-2 py-1 border-0 cursor-pointer ${statusColors[order.status] || 'bg-zinc-500/10 text-zinc-400'} ${updatingStatusId === order.id ? 'opacity-60' : ''}`}
+                        >
+                          <option value="PENDING">Pending</option>
+                          <option value="PROCESSING">Processing</option>
+                          <option value="PAID">Paid</option>
+                          <option value="SHIPPED">Shipped</option>
+                          <option value="DELIVERED">Delivered</option>
+                          <option value="CANCELLED">Cancelled</option>
+                          <option value="REFUNDED">Refunded</option>
+                        </select>
+                      </td>
+                      <td className="px-4 py-3">
                         <button
                           type="button"
                           role="switch"
@@ -336,20 +313,51 @@ export default function OrdersPage() {
                             order.paymentStatus === 'PAID' ? 'translate-x-6' : 'translate-x-1'
                           }`} />
                         </button>
-                        {canCreateLabel && (
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                          shippingStatusColors[order.shippingStatus] || 'bg-zinc-500/10 text-zinc-400'
+                        }`}>
+                          {order.shippingStatus ? order.shippingStatus.replace(/_/g, ' ') : 'Not Shipped'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-zinc-400 text-sm">{formatDate(order.createdAt)}</td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          {canCreateLabel && (
+                            <Link
+                              href={`/admin/shipping/${order.id}`}
+                              className="p-1.5 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                              title="Create shipping label"
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                              </svg>
+                            </Link>
+                          )}
                           <Link
-                            href={`/admin/shipping/${order.id}`}
-                            className="p-2 text-brand-primary hover:bg-brand-primary/10 rounded-lg transition-colors"
-                            title="Create shipping label"
+                            href={`/admin/orders/${order.id}`}
+                            className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-lg transition-colors"
+                            title="View order"
                           >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
                           </Link>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+                          <button
+                            onClick={() => deleteOrder(order.id, order.orderNumber)}
+                            disabled={deletingId === order.id}
+                            className={`p-1.5 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors ${deletingId === order.id ? 'opacity-60 cursor-wait' : ''}`}
+                            title="Delete order"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
                   );
                 })}
               </tbody>
