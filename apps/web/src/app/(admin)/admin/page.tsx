@@ -226,7 +226,7 @@ export default function AdminDashboard() {
       // Step 4: Open label in new tab for printing
       if (labelData.labelUrl) {
         setLabelStatus((prev) => ({ ...prev, [orderId]: 'Label created! Opening...' }));
-        window.open(labelData.labelUrl, '_blank');
+        openLabelForPrint(labelData.labelUrl);
       } else {
         setLabelStatus((prev) => ({ ...prev, [orderId]: 'Label created (no URL returned)' }));
       }
@@ -243,6 +243,31 @@ export default function AdminDashboard() {
       console.error('Auto-label failed:', error);
       setLabelStatus((prev) => ({ ...prev, [orderId]: 'Label error — try manually' }));
     }
+  };
+
+  const openLabelForPrint = (labelUrl: string) => {
+    const win = window.open('', '_blank');
+    if (!win) return;
+    win.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Shipping Label</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f7f2ec; display: flex; flex-direction: column; align-items: center; padding: 24px; }
+    @media print { body { background: #fff; padding: 0; } .no-print { display: none !important; } }
+    .print-btn { background: #1f2a36; color: #fff; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; margin-bottom: 16px; }
+    .print-btn:hover { background: #e3a7a1; }
+    img { max-width: 4in; width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">Print Label</button>
+  <img src="${labelUrl}" alt="Shipping Label" onload="window.focus();" />
+</body>
+</html>`);
+    win.document.close();
   };
 
   const openPackingSlip = async (orderId: string) => {
@@ -509,11 +534,10 @@ export default function AdminDashboard() {
                             )}
                             {order.labelUrl && (
                               <a
-                                href={order.labelUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href="#"
+                                onClick={(e) => { e.preventDefault(); openLabelForPrint(order.labelUrl!); }}
                                 className="p-1.5 text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors"
-                                title="View shipping label"
+                                title="Print shipping label"
                               >
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
