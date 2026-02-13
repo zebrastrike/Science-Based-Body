@@ -191,15 +191,24 @@ export class AdminController {
   @ApiParam({ name: 'id', description: 'Order ID' })
   @ApiResponse({ status: 200, description: 'Status updated' })
   @ApiResponse({ status: 404, description: 'Order not found' })
-  patchOrderStatus(
+  async patchOrderStatus(
     @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() body: { status?: OrderStatus; paymentStatus?: string; adminNotes?: string },
   ) {
+    let updated: any = null;
     if (body.status) {
-      return this.adminService.updateOrderStatus(id, body.status, req.user.id, body.adminNotes);
+      updated = await this.adminService.updateOrderStatus(id, body.status, req.user.id, body.adminNotes);
     }
-    return { success: true };
+    if (body.paymentStatus) {
+      updated = await this.adminService.updatePaymentStatus(
+        id,
+        body.paymentStatus,
+        req.user.id,
+        body.status ? undefined : body.adminNotes,
+      );
+    }
+    return updated || { success: true };
   }
 
   @Post('orders/:id/resend-confirmation')

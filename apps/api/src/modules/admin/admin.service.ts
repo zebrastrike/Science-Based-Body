@@ -209,7 +209,7 @@ export class AdminService {
           status: order.status,
           paymentStatus: order.paymentStatus || order.payments[0]?.status || 'PENDING',
           paymentMethod: order.payments[0]?.method,
-          shippingStatus: order.shipment?.status || null,
+          shippingStatus: order.shipment?.status || 'NOT_SHIPPED',
           trackingNumber: order.shipment?.trackingNumber,
           subtotal: Number(order.subtotal),
           shippingCost: Number(order.shippingCost),
@@ -276,7 +276,7 @@ export class AdminService {
       orderNumber: order.orderNumber,
       status: order.status,
       paymentStatus: order.payments[0]?.status || 'PENDING',
-      shippingStatus: order.shipment?.status || null,
+      shippingStatus: order.shipment?.status || 'NOT_SHIPPED',
       customerName: `${order.user.firstName || ''} ${order.user.lastName || ''}`.trim() || order.user.email,
       customerEmail: order.user.email,
       customerPhone: order.user.phone || addr?.phone || null,
@@ -368,6 +368,49 @@ export class AdminService {
           previousState: { status: previousStatus },
           newState: { status },
           metadata: { notes },
+        },
+      }),
+    ]);
+
+    return updatedOrder;
+  }
+
+  async updatePaymentStatus(orderId: string, paymentStatus: string, adminId: string, notes?: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    const previousPaymentStatus = order.paymentStatus;
+    const updateData: any = { paymentStatus };
+
+    if (paymentStatus === 'PAID') {
+      updateData.paidAt = new Date();
+    } else if (order.paidAt) {
+      updateData.paidAt = null;
+    }
+
+    if (notes !== undefined) {
+      updateData.adminNotes = notes;
+    }
+
+    const [updatedOrder] = await this.prisma.$transaction([
+      this.prisma.order.update({
+        where: { id: orderId },
+        data: updateData,
+      }),
+      this.prisma.auditLog.create({
+        data: {
+          adminId,
+          action: 'UPDATE',
+          resourceType: 'Order',
+          resourceId: orderId,
+          previousState: { paymentStatus: previousPaymentStatus },
+          newState: { paymentStatus },
+          metadata: notes ? { notes } : undefined,
         },
       }),
     ]);

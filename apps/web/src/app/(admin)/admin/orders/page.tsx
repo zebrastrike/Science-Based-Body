@@ -44,6 +44,17 @@ const paymentStatusColors: Record<string, string> = {
   REFUNDED: 'bg-zinc-500/10 text-zinc-400',
 };
 
+const shippingStatusColors: Record<string, string> = {
+  NOT_SHIPPED: 'bg-zinc-500/10 text-zinc-400',
+  PENDING: 'bg-yellow-500/10 text-yellow-400',
+  LABEL_CREATED: 'bg-blue-500/10 text-blue-400',
+  IN_TRANSIT: 'bg-purple-500/10 text-purple-400',
+  OUT_FOR_DELIVERY: 'bg-purple-500/10 text-purple-400',
+  DELIVERED: 'bg-green-500/10 text-green-400',
+  EXCEPTION: 'bg-red-500/10 text-red-400',
+  RETURNED: 'bg-red-500/10 text-red-400',
+};
+
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, pages: 0 });
@@ -51,6 +62,7 @@ export default function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('all');
+  const [updatingPaymentId, setUpdatingPaymentId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchOrders();
@@ -135,6 +147,33 @@ export default function OrdersPage() {
     e.preventDefault();
     setPagination({ ...pagination, page: 1 });
     fetchOrders();
+  };
+
+  const updatePaymentStatus = async (orderId: string, nextStatus: string) => {
+    const token = localStorage.getItem('accessToken');
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+    setUpdatingPaymentId(orderId);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/orders/${orderId}/status`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ paymentStatus: nextStatus }),
+      });
+
+      if (response.ok) {
+        setOrders((prev) => prev.map((order) =>
+          order.id === orderId ? { ...order, paymentStatus: nextStatus } : order,
+        ));
+      }
+    } catch (error) {
+      console.error('Failed to update payment status:', error);
+    } finally {
+      setUpdatingPaymentId(null);
+    }
   };
 
   const formatCurrency = (amount: number) => {
@@ -243,13 +282,14 @@ export default function OrdersPage() {
                   <th className="text-left text-sm font-medium text-zinc-400 px-4 py-3">Items</th>
                   <th className="text-left text-sm font-medium text-zinc-400 px-4 py-3">Total</th>
                   <th className="text-left text-sm font-medium text-zinc-400 px-4 py-3">Status</th>
-                  <th className="text-left text-sm font-medium text-zinc-400 px-4 py-3">Payment</th>
                   <th className="text-left text-sm font-medium text-zinc-400 px-4 py-3">Date</th>
                   <th className="text-right text-sm font-medium text-zinc-400 px-4 py-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order) => (
+                {orders.map((order) => {
+                  const canCreateLabel = order.paymentStatus === 'PAID' && (!order.shippingStatus || order.shippingStatus === 'NOT_SHIPPED' || order.shippingStatus === 'PENDING');
+                  return (
                   <tr key={order.id} className="border-b border-border last:border-b-0 hover:bg-background-tertiary">
                     <td className="px-4 py-3">
                       <Link href={`/admin/orders/${order.id}`} className="font-medium text-white hover:text-brand-primary">
@@ -257,37 +297,46 @@ export default function OrdersPage() {
                       </Link>
                     </td>
                     <td className="px-4 py-3">
-                      <div>
-                        <p className="text-white">{order.customerName}</p>
-                        <p className="text-sm text-zinc-500">{order.customerEmail}</p>
+                      <div className="flex flex-wrap items-center gap-2 text-sm">
+                        <span className="text-white font-medium">{order.customerName}</span>
+                        <span className="text-zinc-600">&bull;</span>
+                        <span className="text-zinc-500">{order.customerEmail}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-zinc-400">{order.itemCount} items</td>
                     <td className="px-4 py-3 font-medium text-white">{formatCurrency(order.totalAmount)}</td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${statusColors[order.status] || 'bg-zinc-500/10 text-zinc-400'}`}>
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${paymentStatusColors[order.paymentStatus] || 'bg-zinc-500/10 text-zinc-400'}`}>
-                        {order.paymentStatus.replace(/_/g, ' ')}
-                      </span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${statusColors[order.status] || 'bg-zinc-500/10 text-zinc-400'}`}>
+                          Order: {order.status}
+                        </span>
+                        <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${paymentStatusColors[order.paymentStatus] || 'bg-zinc-500/10 text-zinc-400'}`}>
+                          Payment: {order.paymentStatus.replace(/_/g, ' ')}
+                        </span>
+                        <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${shippingStatusColors[order.shippingStatus] || 'bg-zinc-500/10 text-zinc-400'}`}>
+                          Shipping: {order.shippingStatus ? order.shippingStatus.replace(/_/g, ' ') : 'Not Shipped'}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-zinc-400 text-sm">{formatDate(order.createdAt)}</td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Link
-                          href={`/admin/orders/${order.id}`}
-                          className="p-2 text-zinc-400 hover:text-white hover:bg-background-tertiary rounded-lg transition-colors"
-                          title="View order"
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={order.paymentStatus === 'PAID'}
+                          onClick={() => updatePaymentStatus(order.id, order.paymentStatus === 'PAID' ? 'AWAITING_PAYMENT' : 'PAID')}
+                          disabled={updatingPaymentId === order.id}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+                            order.paymentStatus === 'PAID' ? 'bg-green-500' : 'bg-zinc-600'
+                          } ${updatingPaymentId === order.id ? 'opacity-60 cursor-wait' : ''}`}
+                          title={order.paymentStatus === 'PAID' ? 'Mark unpaid' : 'Mark paid'}
                         >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
-                        </Link>
-                        {order.paymentStatus === 'PAID' && order.shippingStatus === 'NOT_SHIPPED' && (
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                            order.paymentStatus === 'PAID' ? 'translate-x-6' : 'translate-x-1'
+                          }`} />
+                        </button>
+                        {canCreateLabel && (
                           <Link
                             href={`/admin/shipping/${order.id}`}
                             className="p-2 text-brand-primary hover:bg-brand-primary/10 rounded-lg transition-colors"
@@ -301,7 +350,8 @@ export default function OrdersPage() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

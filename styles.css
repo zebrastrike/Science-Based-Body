@@ -2119,56 +2119,79 @@ body.search-open {
 .library-az-view {
   overflow: hidden;
   margin-top: 32px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .library-az-view .az-peptide-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
 }
 .az-letter-nav {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
   justify-content: center;
+  padding: 20px 24px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--glass-bg);
+  background-image: var(--glass-surface);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  box-shadow: var(--glass-shadow), 0 0 16px rgba(255, 255, 255, 0.06);
 }
 .az-letter-nav button {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: 1px solid var(--glass-border);
-  background: var(--glass-bg);
+  background: rgba(255, 255, 255, 0.12);
   font-family: "Bodoni Moda", serif;
   font-size: 0.85rem;
   font-weight: 400;
   color: var(--ink);
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .az-letter-nav button:hover {
-  background: rgba(227, 167, 161, 0.15);
+  background: rgba(227, 167, 161, 0.18);
   border-color: var(--rose);
+  transform: scale(1.1);
 }
 .az-letter-nav button.is-active {
   background: var(--rose);
   color: #fff;
   border-color: var(--rose);
+  box-shadow: 0 4px 12px rgba(227, 167, 161, 0.35);
 }
 .az-letter-nav button:disabled {
-  opacity: 0.3;
+  opacity: 0.25;
   cursor: default;
+  transform: none;
 }
 .az-letter-group {
-  margin-bottom: 24px;
+  margin-bottom: 8px;
+  padding: 20px 24px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--glass-bg);
+  background-image: var(--glass-surface);
+  backdrop-filter: blur(16px) saturate(1.15);
+  -webkit-backdrop-filter: blur(16px) saturate(1.15);
+  box-shadow: var(--glass-shadow), 0 0 12px rgba(255, 255, 255, 0.05);
 }
 .az-letter-group h3 {
   font-size: 1.5rem;
-  margin: 0 0 12px;
-  padding-bottom: 8px;
+  margin: 0 0 16px;
+  padding-bottom: 10px;
   border-bottom: 1px solid var(--glass-border);
+  color: var(--rose);
 }
 
 .is-hidden {
@@ -4044,10 +4067,10 @@ body.page-policy .bubble-field { display: none; }
   .library-az-card { order: -1; }
 
   /* A-Z letter nav */
-  .az-letter-nav { gap: 3px; }
+  .az-letter-nav { gap: 3px; padding: 14px 12px; }
   .az-letter-nav button { width: 28px; height: 28px; font-size: 0.68rem; }
   .az-letter-group h3 { font-size: 1.2rem; }
-  .az-letter-group { overflow: hidden; }
+  .az-letter-group { overflow: hidden; padding: 14px 12px; }
   .library-az-view .az-peptide-list { gap: 12px; }
   .library-peptide-list { gap: 12px; }
 }
