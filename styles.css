@@ -1807,6 +1807,7 @@ body.search-open {
 
 .library-shell {
   margin-top: 32px;
+  overflow: hidden;
 }
 
 .library-category-grid {
@@ -1982,6 +1983,7 @@ body.search-open {
   flex-direction: column;
   gap: 18px;
   margin-top: 24px;
+  min-width: 0;
 }
 
 .peptide-card {
@@ -2118,7 +2120,8 @@ body.search-open {
 
 /* A-Z view (expands below categories) */
 .library-az-view {
-  /* uses is-hidden class to hide */
+  overflow: hidden;
+  margin-top: 32px;
 }
 .library-az-view .az-peptide-list {
   display: flex;
@@ -2798,6 +2801,9 @@ body.page-policy .bubble-field { display: none; }
   .library-category-header {
     grid-template-columns: auto 1fr;
   }
+
+  .peptide-card { max-width: 100%; min-width: 0; }
+  .peptide-title { min-width: 0; }
 
   .site-nav {
     justify-content: flex-start;
@@ -3970,14 +3976,15 @@ body.page-policy .bubble-field { display: none; }
   .category-desc { font-size: 0.78rem; }
   .library-category-count { font-size: 0.65rem; padding: 4px 10px; }
   .library-category-meta .label { font-size: 0.62rem; margin-bottom: 2px; }
-  .library-category-header { padding: 14px; gap: 10px; }
+  .library-category-header { padding: 14px; gap: 10px; grid-template-columns: auto 1fr; }
   .library-category-title h3 { font-size: 1.15rem; margin: 4px 0 2px; }
   .library-back { padding: 8px 14px; font-size: 0.75rem; }
-  .peptide-toggle { padding: 14px; gap: 10px; }
-  .peptide-card { border-radius: var(--radius-md); }
-  .peptide-title h3 { font-size: 1.05rem; margin: 0 0 4px; }
-  .peptide-tagline { font-size: 0.78rem; }
-  .peptide-category { font-size: 0.6rem; padding: 4px 8px; }
+  .peptide-toggle { padding: 14px; gap: 8px 10px; grid-template-columns: 1fr auto; }
+  .peptide-card { border-radius: var(--radius-md); max-width: 100%; min-width: 0; }
+  .peptide-category { font-size: 0.6rem; padding: 4px 8px; grid-column: 1 / -1; justify-self: start; white-space: normal; }
+  .peptide-title { min-width: 0; }
+  .peptide-title h3 { font-size: 1.05rem; margin: 0 0 4px; overflow-wrap: break-word; }
+  .peptide-tagline { font-size: 0.78rem; overflow-wrap: break-word; }
   .peptide-details { padding: 0 14px 14px; }
   .peptide-actions { flex-direction: column; }
   .peptide-actions .btn { width: 100%; text-align: center; }
@@ -4038,6 +4045,9 @@ body.page-policy .bubble-field { display: none; }
   .az-letter-nav { gap: 3px; }
   .az-letter-nav button { width: 28px; height: 28px; font-size: 0.68rem; }
   .az-letter-group h3 { font-size: 1.2rem; }
+  .az-letter-group { overflow: hidden; }
+  .library-az-view .az-peptide-list { gap: 12px; }
+  .library-peptide-list { gap: 12px; }
 }
 
 /* Policy page table styles */
