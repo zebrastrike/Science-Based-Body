@@ -1025,7 +1025,7 @@ export class AdminService {
         isActive: true,
         inventory: {
           quantity: {
-            lte: threshold || this.prisma.inventory.fields.lowStockThreshold,
+            lte: threshold || 10,
           },
         },
       },

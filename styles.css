@@ -2177,7 +2177,7 @@ body.search-open {
 }
 .az-letter-group {
   margin-bottom: 8px;
-  padding: 20px 24px;
+  padding: 12px 14px;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   background-color: var(--glass-bg);
@@ -2187,11 +2187,30 @@ body.search-open {
   box-shadow: var(--glass-shadow), 0 0 12px rgba(255, 255, 255, 0.05);
 }
 .az-letter-group h3 {
-  font-size: 1.5rem;
-  margin: 0 0 16px;
-  padding-bottom: 10px;
+  font-size: 1.35rem;
+  margin: 2px 0 10px;
+  padding: 0 6px 8px;
   border-bottom: 1px solid var(--glass-border);
   color: var(--rose);
+  letter-spacing: 0.04em;
+}
+.az-letter-group .peptide-card {
+  margin-bottom: 6px;
+}
+.az-letter-group .peptide-card:last-child {
+  margin-bottom: 0;
+}
+.az-letter-group .peptide-toggle {
+  padding: 14px 16px;
+  gap: 12px;
+}
+.az-letter-group .peptide-title h3 {
+  font-size: 1.15rem;
+  margin: 0 0 4px;
+}
+.az-letter-group .peptide-tagline {
+  font-size: 0.85rem;
+  margin: 0;
 }
 
 .is-hidden {
@@ -4069,8 +4088,10 @@ body.page-policy .bubble-field { display: none; }
   /* A-Z letter nav */
   .az-letter-nav { gap: 3px; padding: 14px 12px; }
   .az-letter-nav button { width: 28px; height: 28px; font-size: 0.68rem; }
-  .az-letter-group h3 { font-size: 1.2rem; }
-  .az-letter-group { overflow: hidden; padding: 14px 12px; }
+  .az-letter-group h3 { font-size: 1.1rem; }
+  .az-letter-group { overflow: hidden; padding: 10px 8px; }
+  .az-letter-group .peptide-toggle { padding: 10px 12px; gap: 10px; }
+  .az-letter-group .peptide-title h3 { font-size: 1rem; }
   .library-az-view .az-peptide-list { gap: 12px; }
   .library-peptide-list { gap: 12px; }
 }
