@@ -11,7 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
-import { MailgunService } from '../notifications/mailgun.service';
+import { SmtpService } from '../notifications/smtp.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
@@ -23,7 +23,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private config: ConfigService,
-    private mailgunService: MailgunService,
+    private mailService: SmtpService,
   ) {}
 
   async register(dto: RegisterDto, ipAddress: string) {
@@ -87,7 +87,7 @@ export class AuthService {
     });
 
     // Send welcome email (non-blocking)
-    this.mailgunService
+    this.mailService
       .sendWelcomeEmail(user.email, user.firstName || 'Researcher')
       .catch((err) => this.logger.error(`Failed to send welcome email: ${err.message}`));
 
@@ -258,7 +258,7 @@ export class AuthService {
     });
 
     // Send password reset email
-    this.mailgunService
+    this.mailService
       .sendPasswordReset(user.email, user.firstName || 'Customer', resetToken)
       .catch((err) => this.logger.error(`Failed to send password reset email: ${err.message}`));
 
@@ -463,7 +463,7 @@ export class AuthService {
 
     // Send verification code email
     const displayName = firstName || user.firstName || 'Researcher';
-    this.mailgunService
+    this.mailService
       .sendClaimAccountCode(user.email, displayName, code)
       .catch((err) =>
         this.logger.error(`Failed to send claim code email: ${err.message}`),

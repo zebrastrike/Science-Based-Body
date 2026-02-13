@@ -16,7 +16,7 @@ You are responsible for:
 - Payment processing integration (Epicor Propello)
 - Shipping integration (EasyPost)
 - File storage (Cloudflare R2)
-- Email notifications (Mailgun)
+- Email notifications (Google Workspace SMTP)
 - Compliance backend logic
 - Security and rate limiting
 - Deployment scripts and infrastructure
@@ -144,7 +144,7 @@ See `.env.example` for complete list. Critical variables:
 - `R2_*` - Cloudflare R2 credentials
 - `EPICOR_*` - Payment processor credentials
 - `EASYPOST_API_KEY` - Shipping integration
-- `MAILGUN_*` - Email service
+- `SMTP_*` - Email service (Google Workspace)
 
 ## Compliance Checkboxes (Required at Checkout)
 
@@ -160,4 +160,4 @@ See `.env.example` for complete list. Critical variables:
 2. **Cloudflare R2** - File storage (COAs, KYC documents)
 3. **Epicor Propello** - Payment processing
 4. **EasyPost** - Shipping labels and tracking
-5. **Mailgun** - Transactional emails
+5. **Google Workspace SMTP** - Transactional emails

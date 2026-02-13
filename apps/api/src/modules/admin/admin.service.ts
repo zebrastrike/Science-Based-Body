@@ -4,7 +4,7 @@ import { OrderStatus, UserStatus, ProductCategory, DiscountType, DiscountStatus,
 import { OrdersService } from '../orders/orders.service';
 import { ShippoService } from '../shipping/shippo.service';
 import { PaymentsService } from '../payments/payments.service';
-import { MailgunService } from '../notifications/mailgun.service';
+import { SmtpService } from '../notifications/smtp.service';
 
 @Injectable()
 export class AdminService {
@@ -16,7 +16,7 @@ export class AdminService {
     private ordersService: OrdersService,
     private shippoService: ShippoService,
     private paymentsService: PaymentsService,
-    private mailService: MailgunService,
+    private mailService: SmtpService,
   ) {}
 
   // ==========================================================================

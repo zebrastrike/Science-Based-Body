@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException, ForbiddenException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ComplianceService } from '../compliance/compliance.service';
-import { MailgunService } from '../notifications/mailgun.service';
+import { SmtpService } from '../notifications/smtp.service';
 import { v4 as uuidv4 } from 'uuid';
 import { ReturnReason, ReturnStatus, OrderStatus, ShipmentStatus } from '@prisma/client';
 
@@ -12,7 +12,7 @@ export class OrdersService {
   constructor(
     private prisma: PrismaService,
     private complianceService: ComplianceService,
-    private mailgunService: MailgunService,
+    private mailService: SmtpService,
   ) {}
 
   async create(
@@ -161,12 +161,12 @@ export class OrdersService {
       };
 
       // Send customer confirmation email
-      this.mailgunService
+      this.mailService
         .sendOrderConfirmation(user.email, user.firstName || 'Customer', orderDetails)
         .catch((err) => this.logger.error(`Failed to send order confirmation email: ${err.message}`));
 
       // Send admin notification
-      this.mailgunService
+      this.mailService
         .notifyAdminNewOrder(orderDetails, user.email)
         .catch((err) => this.logger.error(`Failed to send admin notification: ${err.message}`));
     }
@@ -404,7 +404,7 @@ export class OrdersService {
       const email = order.user.email;
 
       if (status === OrderStatus.DELIVERED) {
-        this.mailgunService
+        this.mailService
           .sendOrderDelivered(email, firstName, order.orderNumber)
           .catch((err) => this.logger.error(`Failed to send delivery email: ${err.message}`));
       }
@@ -526,7 +526,7 @@ export class OrdersService {
 
     // Send shipping notification email
     if (order.user?.email) {
-      this.mailgunService
+      this.mailService
         .sendOrderShipped(
           order.user.email,
           order.user.firstName || 'Customer',
@@ -701,7 +701,7 @@ export class OrdersService {
     this.logger.log(`Return request created: ${returnRequest.id} for order ${order.orderNumber}`);
 
     // Notify admin of new return request (non-blocking)
-    this.mailgunService
+    this.mailService
       .notifyAdminReturnRequest(
         order.orderNumber,
         order.user.email,
@@ -848,7 +848,7 @@ export class OrdersService {
           },
     };
 
-    await this.mailgunService.sendOrderConfirmation(
+    await this.mailService.sendOrderConfirmation(
       order.user.email,
       order.user.firstName || 'Customer',
       orderDetails,
@@ -883,7 +883,7 @@ export class OrdersService {
       throw new BadRequestException('No email address found for this order');
     }
 
-    await this.mailgunService.sendOrderShipped(
+    await this.mailService.sendOrderShipped(
       order.user.email,
       order.user.firstName || 'Customer',
       order.orderNumber,
@@ -931,7 +931,7 @@ export class OrdersService {
       throw new BadRequestException('No email address found for this order');
     }
 
-    await this.mailgunService.sendOrderDelivered(
+    await this.mailService.sendOrderDelivered(
       order.user.email,
       order.user.firstName || 'Customer',
       order.orderNumber,

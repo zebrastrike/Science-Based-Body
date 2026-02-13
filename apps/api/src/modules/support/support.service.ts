@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { MailgunService } from '../notifications/mailgun.service';
+import { SmtpService } from '../notifications/smtp.service';
 
 interface ContactFormDto {
   name: string;
@@ -20,7 +20,7 @@ interface NewsletterDto {
 export class SupportService {
   constructor(
     private prisma: PrismaService,
-    private mailgun: MailgunService,
+    private mailService: SmtpService,
   ) {}
 
   // ===========================================================================
@@ -42,7 +42,7 @@ export class SupportService {
     // For now, we'll just send emails
 
     // Send to admin
-    await this.mailgun.sendContactFormToAdmin(
+    await this.mailService.sendContactFormToAdmin(
       dto.name,
       dto.email,
       dto.subject,
@@ -52,7 +52,7 @@ export class SupportService {
 
     // Send confirmation to customer
     const firstName = dto.name.split(' ')[0];
-    await this.mailgun.sendContactFormConfirmation(dto.email, firstName);
+    await this.mailService.sendContactFormConfirmation(dto.email, firstName);
 
     return {
       success: true,
@@ -97,7 +97,7 @@ export class SupportService {
     });
 
     // Send welcome email
-    await this.mailgun.sendNewsletterWelcome(dto.email);
+    await this.mailService.sendNewsletterWelcome(dto.email);
 
     return {
       success: true,
@@ -359,7 +359,7 @@ export class SupportService {
     }
 
     // Send callback request email to admin
-    await this.mailgun.sendEmail({
+    await this.mailService.sendEmail({
       to: 'sales@sbbpeptides.com',
       subject: `Callback Request: ${data.name} — ${data.type || 'General'}`,
       html: `

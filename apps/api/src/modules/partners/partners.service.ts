@@ -1,7 +1,7 @@
 import { Injectable, Logger, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { LocalStorageService } from '../files/local-storage.service';
-import { MailgunService } from '../notifications/mailgun.service';
+import { SmtpService } from '../notifications/smtp.service';
 import { EmailTemplatesService } from '../notifications/email-templates.service';
 import { ApplyPartnerDto } from './dto/apply-partner.dto';
 import { v4 as uuidv4 } from 'uuid';
@@ -14,7 +14,7 @@ export class PartnersService {
   constructor(
     private prisma: PrismaService,
     private storage: LocalStorageService,
-    private mailService: MailgunService,
+    private mailService: SmtpService,
     private emailTemplates: EmailTemplatesService,
   ) {}
 

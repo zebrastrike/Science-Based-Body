@@ -8,7 +8,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CartService, Cart } from './cart.service';
 import { ComplianceService } from '../compliance/compliance.service';
 import { PaymentsService } from '../payments/payments.service';
-import { MailgunService } from '../notifications/mailgun.service';
+import { SmtpService } from '../notifications/smtp.service';
 import { TaxService } from '../tax/tax.service';
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
@@ -27,7 +27,7 @@ export class CheckoutService {
     private cartService: CartService,
     private complianceService: ComplianceService,
     private paymentsService: PaymentsService,
-    private mailgunService: MailgunService,
+    private mailService: SmtpService,
     private taxService: TaxService,
     private config: ConfigService,
   ) {
@@ -303,24 +303,24 @@ export class CheckoutService {
     const firstName = dto.shippingAddress.firstName || dto.shippingAddress.lastName || 'Customer';
 
     // Send customer confirmation (non-blocking)
-    this.mailgunService
+    this.mailService
       .sendOrderConfirmation(email, firstName, orderDetails)
       .catch((err) => console.error('Failed to send order confirmation email:', err));
 
     // 9. Notify admin of new order (non-blocking)
-    this.mailgunService
+    this.mailService
       .notifyAdminNewOrder(orderDetails, email)
       .catch((err) => console.error('Failed to send admin notification:', err));
 
     // 9b. Send appropriate account email (non-blocking)
     if (isNewAccount) {
       // Guest checkout — send friendly reminder to create account later
-      this.mailgunService
+      this.mailService
         .sendAccountReminder(email, firstName)
         .catch((err) => console.error('Failed to send account reminder email:', err));
     } else if (dto.createAccount && dto.password) {
       // Created account at checkout — send welcome email
-      this.mailgunService
+      this.mailService
         .sendWelcomeEmail(email, firstName)
         .catch((err) => console.error('Failed to send welcome email:', err));
     }
@@ -562,7 +562,7 @@ export class CheckoutService {
       },
     });
 
-    await this.mailgunService.sendPasswordReset(email, firstName || 'Customer', resetToken);
+    await this.mailService.sendPasswordReset(email, firstName || 'Customer', resetToken);
   }
 
   /**
