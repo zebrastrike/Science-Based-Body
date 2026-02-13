@@ -1,6 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("is-ready");
 
+  // Safari autoplay fix: explicitly play muted videos
+  document.querySelectorAll("video[autoplay][muted]").forEach(function(v) {
+    v.muted = true;
+    var p = v.play();
+    if (p && p.catch) p.catch(function() {});
+  });
+
   // ============================================
   // ACCOUNT / LOGIN NAV LINK (injected on all pages)
   // ============================================
