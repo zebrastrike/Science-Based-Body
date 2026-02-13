@@ -393,8 +393,10 @@
             <p style="margin-bottom:12px;">Your cart contains <strong>special-order item(s)</strong> that are not currently in stock:</p>
             <ul id="special-order-list" style="text-align:left;margin:0 auto 16px;max-width:360px;list-style:none;padding:0;"></ul>
             <p style="margin-bottom:20px;color:var(--rose,#e3a7a1);font-weight:600;">These items will be ordered from our supplier and may take additional time to ship.</p>
-            <button type="button" class="btn btn-primary" id="special-order-ok" style="margin-right:10px;">OK, Continue to Checkout</button>
-            <a href="shop.html" class="btn" style="background:transparent;border:1px solid var(--glass-border,rgba(255,255,255,0.2));color:var(--ink,#1f2a36);">Back to Shop</a>
+            <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+              <button type="button" class="btn btn-primary" id="special-order-ok" style="width:100%;max-width:300px;">OK, Continue to Checkout</button>
+              <a href="shop.html" class="btn" style="width:100%;max-width:300px;background:transparent;border:1px solid var(--glass-border,rgba(255,255,255,0.2));color:var(--ink,#1f2a36);text-align:center;">Back to Shop</a>
+            </div>
           </div>
         </div>
       </div>
@@ -840,9 +842,9 @@
             var soModal = document.getElementById('special-order-modal');
             var soList = document.getElementById('special-order-list');
             soList.innerHTML = specialItems.map(function (item) {
-              return '<li style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.08);">' +
+              return '<li style="padding:10px 14px;margin-bottom:6px;border-radius:8px;background:rgba(227,167,161,0.1);border:1px solid rgba(227,167,161,0.2);">' +
                 '<strong>' + item.productName + '</strong>' +
-                (item.variantName ? ' — ' + item.variantName : '') +
+                (item.variantName ? ' &mdash; ' + item.variantName : '') +
                 '</li>';
             }).join('');
             soModal.classList.add('is-open');
