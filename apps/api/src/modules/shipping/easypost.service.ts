@@ -58,6 +58,21 @@ export class EasyPostService {
             height: parcel.height,
             weight: weightOz,
           },
+          customs_info: {
+            contents_type: 'merchandise',
+            eel_pfc: 'NOEEI 30.37(a)',
+            customs_certify: true,
+            customs_signer: this.returnAddress.name,
+            customs_items: [
+              {
+                description: 'Research chemicals',
+                quantity: 1,
+                weight: weightOz,
+                value: 25,
+                origin_country: 'US',
+              },
+            ],
+          },
         },
       }),
     });
@@ -214,6 +229,21 @@ export class EasyPostService {
             width: parcel.width,
             height: parcel.height,
             weight: weightOz,
+          },
+          customs_info: {
+            contents_type: 'merchandise',
+            eel_pfc: 'NOEEI 30.37(a)',
+            customs_certify: true,
+            customs_signer: this.returnAddress.name,
+            customs_items: [
+              {
+                description: 'Research chemicals',
+                quantity: 1,
+                weight: weightOz,
+                value: 25,
+                origin_country: 'US',
+              },
+            ],
           },
         },
       }),
