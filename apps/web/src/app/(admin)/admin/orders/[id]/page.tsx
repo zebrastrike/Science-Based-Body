@@ -46,6 +46,7 @@ interface Order {
   billingAddress?: Address;
   trackingNumber?: string;
   trackingUrl?: string;
+  labelUrl?: string;
   shippingCarrier?: string;
   customerNotes?: string;
   adminNotes?: string;
@@ -229,6 +230,46 @@ export default function OrderDetailPage() {
     }
   };
 
+  const openLabelForPrint = (labelUrl: string) => {
+    const win = window.open('', '_blank');
+    if (!win) return;
+    win.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Shipping Label</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f7f2ec; display: flex; flex-direction: column; align-items: center; padding: 24px; }
+    @media print { body { background: #fff; padding: 0; } .no-print { display: none !important; } }
+    .print-btn { background: #1f2a36; color: #fff; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; margin-bottom: 16px; }
+    .print-btn:hover { background: #e3a7a1; }
+    img { max-width: 4in; width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">Print Label</button>
+  <img src="${labelUrl}" alt="Shipping Label" onload="window.focus();" />
+</body>
+</html>`);
+    win.document.close();
+  };
+
+  const openPackingSlip = async () => {
+    const token = localStorage.getItem('accessToken');
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/orders/${orderId}/packing-slip`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const html = await res.text();
+      const win = window.open('', '_blank');
+      if (win) { win.document.write(html); win.document.close(); }
+    } catch (error) {
+      console.error('Failed to open packing slip:', error);
+    }
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
   };
@@ -303,6 +344,26 @@ export default function OrderDetailPage() {
               Create Shipping Label
             </Link>
           )}
+          {order.labelUrl && (
+            <button
+              onClick={() => openLabelForPrint(order.labelUrl!)}
+              className="px-4 py-2 text-sm text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/10 transition-colors flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
+              Print Label
+            </button>
+          )}
+          <button
+            onClick={openPackingSlip}
+            className="px-4 py-2 text-sm text-amber-400 border border-amber-500/30 rounded-lg hover:bg-amber-500/10 transition-colors flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Print Packing Slip
+          </button>
         </div>
       </div>
 
