@@ -7,6 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { Request } from 'express';
 import { CheckoutService } from './checkout.service';
 import { CreateOrderDto, ResolveCartDto } from './dto/create-order.dto';
@@ -53,6 +54,7 @@ export class CheckoutController {
   }
 
   @Post('create-order')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Public() // Allow guest checkout, but validate in service
   @ApiOperation({ summary: 'Create order from checkout' })
   @ApiResponse({ status: 201, description: 'Order created' })

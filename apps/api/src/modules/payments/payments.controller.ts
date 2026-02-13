@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { Request } from 'express';
 import { PaymentsService } from './payments.service';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -33,6 +34,7 @@ export class PaymentsController {
   }
 
   @Post('create')
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @ApiOperation({ summary: 'Create a payment for an order' })
   async createPayment(
     @Body()
@@ -52,6 +54,7 @@ export class PaymentsController {
   }
 
   @Post(':id/proof')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Submit proof of payment' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('proof'))

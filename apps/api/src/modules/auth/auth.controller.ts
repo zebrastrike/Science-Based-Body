@@ -9,6 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -23,6 +24,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User registered successfully' })
   @ApiResponse({ status: 409, description: 'Email already exists' })
@@ -32,6 +34,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login with email and password' })
   @ApiResponse({ status: 200, description: 'Login successful' })
@@ -62,6 +65,7 @@ export class AuthController {
   }
 
   @Post('forgot-password')
+  @Throttle({ default: { limit: 2, ttl: 300000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Request password reset email' })
   @ApiResponse({ status: 200, description: 'Reset email sent if account exists' })
@@ -71,6 +75,7 @@ export class AuthController {
   }
 
   @Post('reset-password')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reset password with token' })
   @ApiResponse({ status: 200, description: 'Password reset successful' })
@@ -106,6 +111,7 @@ export class AuthController {
   }
 
   @Post('claim-account')
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Request verification code to claim a guest account' })
   @ApiResponse({ status: 200, description: 'Verification code sent' })
@@ -126,6 +132,7 @@ export class AuthController {
   }
 
   @Post('claim-account/verify')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Verify code and set password to claim guest account' })
   @ApiResponse({ status: 200, description: 'Account claimed successfully' })
