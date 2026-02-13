@@ -784,6 +784,128 @@ export class EmailTemplatesService {
   }
 
   // ===========================================================================
+  // PAYMENT LINK EMAILS
+  // ===========================================================================
+
+  paymentLinkEmail(data: {
+    customerName: string;
+    amount: string;
+    paymentUrl: string;
+    orderNumber?: string;
+    expiresFormatted: string;
+    paymentMethods: string[];
+    notes?: string;
+  }): { subject: string; html: string; text: string } {
+    const { customerName, amount, paymentUrl, orderNumber, expiresFormatted, paymentMethods, notes } = data;
+
+    const subject = orderNumber
+      ? `Payment Link for Order #${orderNumber} - ${amount}`
+      : `Your Payment Link - ${amount}`;
+
+    const html = this.baseTemplate(`
+      <h1 style="margin:0 0 10px 0;font-size:28px;color:${this.ink};font-family:Georgia,'Times New Roman',Times,serif;font-weight:400;">Payment Requested</h1>
+      <p style="margin:0 0 20px 0;font-size:16px;color:${this.ink};line-height:1.6;">
+        Hi ${customerName},
+      </p>
+      ${orderNumber ? `
+      <p style="margin:0 0 20px 0;font-size:16px;color:${this.ink};line-height:1.6;">
+        A payment is requested for your order <strong>#${orderNumber}</strong>.
+      </p>
+      ` : `
+      <p style="margin:0 0 20px 0;font-size:16px;color:${this.ink};line-height:1.6;">
+        A payment has been requested from Science Based Body.
+      </p>
+      `}
+
+      <div style="background:${this.bone};border-radius:8px;padding:24px;margin-bottom:25px;text-align:center;border:1px solid ${this.sage};">
+        <p style="margin:0 0 8px;font-size:14px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">Amount Due</p>
+        <p style="margin:0;font-size:36px;font-weight:700;color:${this.ink};">${amount}</p>
+      </div>
+
+      <p style="margin:0 0 30px 0;text-align:center;">
+        ${this.button('Complete Payment', paymentUrl)}
+      </p>
+
+      ${notes ? `
+      <div style="background:${this.bone};border-left:4px solid ${this.powder};padding:16px 20px;margin-bottom:25px;border-radius:0 8px 8px 0;">
+        <p style="margin:0 0 8px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">Note</p>
+        <p style="margin:0;font-size:14px;color:${this.ink};line-height:1.5;">${notes}</p>
+      </div>
+      ` : ''}
+
+      <p style="margin:0 0 12px;color:#6b7280;font-size:14px;">Accepted Payment Methods:</p>
+      <p style="margin:0 0 25px;color:${this.ink};font-size:14px;font-weight:600;">${paymentMethods.join(' &middot; ')}</p>
+
+      <div style="background:${this.bone};border-left:4px solid ${this.rose};padding:12px 16px;margin-bottom:25px;border-radius:0 8px 8px 0;">
+        <p style="margin:0;color:${this.ink};font-size:14px;">
+          This link expires on ${expiresFormatted}
+        </p>
+      </div>
+
+      <p style="margin:0;font-size:14px;color:#6b7280;">
+        If you didn't expect this email, please contact us at <a href="mailto:${this.supportEmail}" style="color:${this.rose};text-decoration:none;">${this.supportEmail}</a>
+      </p>
+    `, orderNumber ? `Payment requested for order #${orderNumber}` : `Payment of ${amount} requested`);
+
+    let text = `Hi ${customerName},\n\n`;
+    if (orderNumber) {
+      text += `A payment is requested for your order #${orderNumber}.\n\n`;
+    } else {
+      text += `A payment has been requested from Science Based Body.\n\n`;
+    }
+    text += `AMOUNT DUE: ${amount}\n\n`;
+    text += `Complete your payment here:\n${paymentUrl}\n\n`;
+    if (notes) text += `Note: ${notes}\n\n`;
+    text += `Accepted Payment Methods: ${paymentMethods.join(', ')}\n\n`;
+    text += `This link expires on ${expiresFormatted}\n\n`;
+    text += `Questions? Contact us at ${this.supportEmail}`;
+
+    return { subject, html, text };
+  }
+
+  paymentLinkConfirmation(data: {
+    customerName: string;
+    amount: string;
+    orderNumber?: string;
+    paymentMethod?: string;
+  }): { subject: string; html: string; text: string } {
+    const { customerName, amount, orderNumber, paymentMethod } = data;
+
+    const subject = orderNumber
+      ? `Payment Received - Order #${orderNumber}`
+      : `Payment Received - ${amount}`;
+
+    const html = this.baseTemplate(`
+      <h1 style="margin:0 0 10px 0;font-size:28px;color:${this.ink};font-family:Georgia,'Times New Roman',Times,serif;font-weight:400;">Payment Received!</h1>
+      <p style="margin:0 0 25px 0;font-size:16px;color:${this.ink};">
+        Thank you, ${customerName}. Your payment of <strong>${amount}</strong> has been received.
+      </p>
+
+      <div style="background:${this.bone};border-radius:8px;padding:20px;margin-bottom:25px;border:1px solid ${this.sage};">
+        <table role="presentation" style="width:100%;">
+          ${orderNumber ? `<tr><td style="padding:5px 0;"><span style="color:#6b7280;font-size:14px;">Order</span><br><strong style="color:${this.ink};">#${orderNumber}</strong></td></tr>` : ''}
+          <tr><td style="padding:5px 0;"><span style="color:#6b7280;font-size:14px;">Amount</span><br><strong style="color:${this.ink};font-size:18px;">${amount}</strong></td></tr>
+          ${paymentMethod ? `<tr><td style="padding:5px 0;"><span style="color:#6b7280;font-size:14px;">Paid via</span><br><strong style="color:${this.ink};">${paymentMethod}</strong></td></tr>` : ''}
+        </table>
+      </div>
+
+      <div style="background:${this.bone};border-left:4px solid ${this.sage};padding:20px;margin-bottom:25px;border-radius:0 8px 8px 0;">
+        <p style="margin:0;font-size:16px;color:${this.ink};line-height:1.6;">
+          Your order will be processed shortly. You'll receive tracking information once it ships.
+        </p>
+      </div>
+
+      <p style="margin:0;font-size:14px;color:#6b7280;">
+        Questions? Contact us at <a href="mailto:${this.supportEmail}" style="color:${this.rose};text-decoration:none;">${this.supportEmail}</a>
+      </p>
+    `, `Payment of ${amount} received`);
+
+    const text = `Payment Received!\n\nThank you, ${customerName}. Your payment of ${amount} has been received.${orderNumber ? `\nOrder: #${orderNumber}` : ''}${paymentMethod ? `\nPaid via: ${paymentMethod}` : ''}\n\nYour order will be processed shortly.`;
+
+    return { subject, html, text };
+  }
+
+  // ===========================================================================
   // NEWSLETTER
   // ===========================================================================
 

@@ -268,6 +268,81 @@ export class SmtpService {
   }
 
   // ===========================================================================
+  // PAYMENT LINK EMAILS
+  // ===========================================================================
+
+  async sendPaymentLinkEmail(data: {
+    customerName?: string;
+    customerEmail: string;
+    amount: number;
+    paymentUrl: string;
+    orderNumber?: string;
+    expiresAt: Date;
+    paymentMethods: string[];
+    notes?: string;
+  }) {
+    const formattedAmount = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(data.amount);
+
+    const expiresFormatted = new Intl.DateTimeFormat('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      timeZoneName: 'short',
+    }).format(data.expiresAt);
+
+    const { subject, html, text } = this.templates.paymentLinkEmail({
+      customerName: data.customerName || 'Valued Customer',
+      amount: formattedAmount,
+      paymentUrl: data.paymentUrl,
+      orderNumber: data.orderNumber,
+      expiresFormatted,
+      paymentMethods: data.paymentMethods,
+      notes: data.notes,
+    });
+
+    return this.sendEmail({
+      to: data.customerEmail,
+      subject,
+      html,
+      text,
+      tags: ['payment-link'],
+    });
+  }
+
+  async sendPaymentLinkConfirmation(
+    customerEmail: string,
+    customerName: string,
+    amount: number,
+    orderNumber?: string,
+    paymentMethod?: string,
+  ) {
+    const formattedAmount = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+
+    const { subject, html, text } = this.templates.paymentLinkConfirmation({
+      customerName,
+      amount: formattedAmount,
+      orderNumber,
+      paymentMethod,
+    });
+
+    return this.sendEmail({
+      to: customerEmail,
+      subject,
+      html,
+      text,
+      tags: ['payment-confirmation'],
+    });
+  }
+
+  // ===========================================================================
   // ADMIN NOTIFICATIONS
   // ===========================================================================
 

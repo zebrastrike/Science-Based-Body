@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma/prisma.service';
-import { ResendService } from '../notifications/resend.service';
+import { SmtpService } from '../notifications/smtp.service';
 import { AuditService } from '../../audit/audit.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -47,7 +47,7 @@ export class PaymentLinksService {
   constructor(
     private prisma: PrismaService,
     private config: ConfigService,
-    private resend: ResendService,
+    private smtp: SmtpService,
     private audit: AuditService,
   ) {
     this.baseUrl = this.config.get('FRONTEND_URL', 'https://sciencebasedbody.com');
@@ -63,7 +63,6 @@ export class PaymentLinksService {
   ): Promise<PaymentLinkResponse & { url: string }> {
     const {
       orderId,
-      customerEmail,
       customerName,
       amount,
       expiresInHours = 48,
@@ -71,6 +70,8 @@ export class PaymentLinksService {
       notes,
       sendEmail = true,
     } = data;
+
+    let customerEmail = data.customerEmail;
 
     // Validate amount
     if (amount <= 0) {
@@ -82,11 +83,19 @@ export class PaymentLinksService {
     if (orderId) {
       order = await this.prisma.order.findUnique({
         where: { id: orderId },
-        select: { id: true, orderNumber: true, totalAmount: true },
+        select: { id: true, orderNumber: true, totalAmount: true, user: { select: { email: true, firstName: true } } },
       });
       if (!order) {
         throw new NotFoundException(`Order ${orderId} not found`);
       }
+      // Auto-fill customerEmail from order's user if not provided
+      if (!customerEmail && order.user?.email) {
+        customerEmail = order.user.email;
+      }
+    }
+
+    if (!customerEmail) {
+      throw new BadRequestException('customerEmail is required (either provide it directly or via an orderId linked to a user)');
     }
 
     // Generate unique token
@@ -118,7 +127,7 @@ export class PaymentLinksService {
 
     // Send email if requested
     if (sendEmail) {
-      await this.resend.sendPaymentLinkEmail({
+      await this.smtp.sendPaymentLinkEmail({
         customerName,
         customerEmail,
         amount,
@@ -295,7 +304,7 @@ export class PaymentLinksService {
 
     const paymentUrl = `${this.baseUrl}/pay/${link.token}`;
 
-    await this.resend.sendPaymentLinkEmail({
+    await this.smtp.sendPaymentLinkEmail({
       customerName: link.customerName ?? undefined,
       customerEmail: link.customerEmail,
       amount: Number(link.amount),
@@ -404,7 +413,7 @@ export class PaymentLinksService {
     }
 
     // Send confirmation email
-    await this.resend.sendPaymentConfirmationEmail(
+    await this.smtp.sendPaymentLinkConfirmation(
       link.customerEmail,
       link.customerName || 'Customer',
       Number(link.amount),
