@@ -91,6 +91,9 @@ export class AdminService {
         items: {
           select: { productName: true, quantity: true },
         },
+        shipment: {
+          select: { status: true, trackingNumber: true, labelUrl: true, carrier: true },
+        },
       },
     });
 
@@ -101,6 +104,11 @@ export class AdminService {
         customerName: `${order.user.firstName || ''} ${order.user.lastName || ''}`.trim() || order.user.email,
         customerEmail: order.user.email,
         status: order.status,
+        paymentStatus: order.paymentStatus || 'PENDING',
+        shippingStatus: order.shipment?.status || 'NOT_SHIPPED',
+        trackingNumber: order.shipment?.trackingNumber || null,
+        labelUrl: order.shipment?.labelUrl || null,
+        carrier: order.shipment?.carrier || null,
         totalAmount: Number(order.totalAmount),
         itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
         createdAt: order.createdAt,
@@ -190,7 +198,7 @@ export class AdminService {
             select: { status: true, method: true },
           },
           shipment: {
-            select: { status: true, trackingNumber: true },
+            select: { status: true, trackingNumber: true, labelUrl: true, carrier: true },
           },
           shippingAddress: true,
         },
@@ -211,6 +219,8 @@ export class AdminService {
           paymentMethod: order.payments[0]?.method,
           shippingStatus: order.shipment?.status || 'NOT_SHIPPED',
           trackingNumber: order.shipment?.trackingNumber,
+          labelUrl: order.shipment?.labelUrl || null,
+          carrier: order.shipment?.carrier || null,
           subtotal: Number(order.subtotal),
           shippingCost: Number(order.shippingCost),
           taxAmount: Number(order.taxAmount),
@@ -319,6 +329,7 @@ export class AdminService {
       } : null,
       trackingNumber: order.shipment?.trackingNumber || null,
       trackingUrl: order.shipment?.trackingUrl || null,
+      labelUrl: order.shipment?.labelUrl || null,
       shippingCarrier: order.shipment?.carrier || null,
       customerNotes: order.customerNotes || null,
       adminNotes: order.adminNotes || null,
@@ -2529,6 +2540,146 @@ export class AdminService {
         service: selectedRate.serviceName,
         cost: selectedRate.amount,
       },
+    };
+  }
+
+  // ==========================================================================
+  // PACKING SLIP
+  // ==========================================================================
+
+  async getPackingSlipHtml(orderId: string): Promise<string> {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        user: { select: { firstName: true, lastName: true, email: true } },
+        items: true,
+        shippingAddress: true,
+        shipment: { select: { trackingNumber: true, carrier: true } },
+      },
+    });
+
+    if (!order) throw new NotFoundException('Order not found');
+
+    const addr = order.shippingAddress;
+    const shipTo = addr
+      ? `${addr.firstName || ''} ${addr.lastName || ''}<br>${addr.street1}${addr.street2 ? '<br>' + addr.street2 : ''}<br>${addr.city}, ${addr.state} ${addr.postalCode}`
+      : 'No address on file';
+
+    const itemRows = order.items
+      .map(
+        (item) =>
+          `<tr>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;">${item.productName}${item.variantName ? ' — ' + item.variantName : ''}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;text-align:center;">${item.sku || '—'}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;text-align:center;">${item.quantity}</td>
+          </tr>`,
+      )
+      .join('');
+
+    const tracking = order.shipment?.trackingNumber
+      ? `<p style="margin:4px 0;"><strong>Tracking:</strong> ${order.shipment.carrier || 'USPS'} ${order.shipment.trackingNumber}</p>`
+      : '';
+
+    return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Packing Slip — ${order.orderNumber}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #1f2a36; padding: 24px; }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none !important; }
+    }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; border-bottom: 2px solid #1f2a36; padding-bottom: 16px; }
+    .logo { font-size: 20px; font-weight: 700; color: #1f2a36; }
+    .logo span { color: #e3a7a1; }
+    .order-info { text-align: right; font-size: 12px; }
+    .addresses { display: flex; gap: 48px; margin-bottom: 24px; }
+    .address-block h3 { font-size: 11px; text-transform: uppercase; color: #888; margin-bottom: 6px; letter-spacing: 0.5px; }
+    .address-block p { line-height: 1.5; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+    th { background: #f7f2ec; padding: 8px 12px; text-align: left; font-size: 11px; text-transform: uppercase; color: #666; letter-spacing: 0.5px; }
+    th:nth-child(2), th:nth-child(3) { text-align: center; }
+    .totals { text-align: right; margin-bottom: 24px; }
+    .totals p { margin: 2px 0; }
+    .totals .total-line { font-size: 15px; font-weight: 700; }
+    .disclaimer { font-size: 10px; color: #888; border-top: 1px solid #ddd; padding-top: 12px; text-align: center; }
+    .print-btn { position: fixed; top: 12px; right: 12px; background: #1f2a36; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .print-btn:hover { background: #e3a7a1; }
+  </style>
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">Print Packing Slip</button>
+
+  <div class="header">
+    <div>
+      <div class="logo">SBB <span>Peptides</span></div>
+      <p style="font-size:11px;color:#888;margin-top:4px;">Science Based Body — Research Use Only</p>
+    </div>
+    <div class="order-info">
+      <p><strong>Order:</strong> ${order.orderNumber}</p>
+      <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+      ${tracking}
+    </div>
+  </div>
+
+  <div class="addresses">
+    <div class="address-block">
+      <h3>Ship From</h3>
+      <p>Health SBB<br>1001 S Main St<br>Kalispell, MT 59901</p>
+    </div>
+    <div class="address-block">
+      <h3>Ship To</h3>
+      <p>${shipTo}</p>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>SKU</th>
+        <th>Qty</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${itemRows}
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <p>Subtotal: $${Number(order.subtotal).toFixed(2)}</p>
+    <p>Shipping: $${Number(order.shippingCost).toFixed(2)}</p>
+    ${Number(order.taxAmount) > 0 ? `<p>Tax: $${Number(order.taxAmount).toFixed(2)}</p>` : ''}
+    ${Number(order.discountAmount) > 0 ? `<p>Discount: -$${Number(order.discountAmount).toFixed(2)}</p>` : ''}
+    <p class="total-line">Total: $${Number(order.totalAmount).toFixed(2)}</p>
+  </div>
+
+  <div class="disclaimer">
+    <p>All products are intended for research and laboratory use only. Not for human consumption.</p>
+    <p style="margin-top:4px;">Thank you for your order! Questions? Contact sales@sbbpeptides.com</p>
+  </div>
+</body>
+</html>`;
+  }
+
+  async getOrderLabelUrl(orderId: string) {
+    const shipment = await this.prisma.shipment.findUnique({
+      where: { orderId },
+      select: { labelUrl: true, trackingNumber: true, carrier: true, status: true },
+    });
+
+    if (!shipment || !shipment.labelUrl) {
+      throw new NotFoundException('No label found for this order');
+    }
+
+    return {
+      labelUrl: shipment.labelUrl,
+      trackingNumber: shipment.trackingNumber,
+      carrier: shipment.carrier,
+      status: shipment.status,
     };
   }
 }

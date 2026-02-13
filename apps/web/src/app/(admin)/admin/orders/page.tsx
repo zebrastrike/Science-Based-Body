@@ -15,6 +15,9 @@ interface Order {
   status: string;
   paymentStatus: string;
   shippingStatus: string;
+  labelUrl: string | null;
+  trackingNumber: string | null;
+  carrier: string | null;
   itemCount: number;
   createdAt: string;
 }
@@ -184,6 +187,20 @@ export default function OrdersPage() {
     } catch (error) {
       console.error('Auto-label failed:', error);
       setLabelStatus((prev) => ({ ...prev, [orderId]: 'Label error' }));
+    }
+  };
+
+  const openPackingSlip = async (orderId: string) => {
+    const token = localStorage.getItem('accessToken');
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/orders/${orderId}/packing-slip`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const html = await res.text();
+      const win = window.open('', '_blank');
+      if (win) { win.document.write(html); win.document.close(); }
+    } catch (error) {
+      console.error('Failed to open packing slip:', error);
     }
   };
 
@@ -408,6 +425,29 @@ export default function OrdersPage() {
                               </svg>
                             </button>
                           )}
+                          {order.labelUrl && (
+                            <a
+                              href={order.labelUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors"
+                              title="View shipping label"
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                              </svg>
+                            </a>
+                          )}
+                          <a
+                            href="#"
+                            onClick={(e) => { e.preventDefault(); openPackingSlip(order.id); }}
+                            className="p-1.5 text-amber-400 hover:bg-amber-500/10 rounded-lg transition-colors"
+                            title="Print packing slip"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </a>
                           <Link
                             href={`/admin/orders/${order.id}`}
                             className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-lg transition-colors"

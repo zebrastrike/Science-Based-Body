@@ -8,9 +8,12 @@ import {
   Param,
   Query,
   Body,
+  Res,
+  Header,
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { Response } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -171,6 +174,25 @@ export class AdminController {
   @ApiResponse({ status: 404, description: 'Order not found' })
   getOrderById(@Param('id') id: string) {
     return this.adminService.getOrderById(id);
+  }
+
+  @Get('orders/:id/packing-slip')
+  @ApiOperation({ summary: 'Get printable packing slip HTML' })
+  @ApiParam({ name: 'id', description: 'Order ID' })
+  @ApiResponse({ status: 200, description: 'Packing slip HTML' })
+  @Header('Content-Type', 'text/html')
+  async getPackingSlip(@Param('id') id: string, @Res() res: Response) {
+    const html = await this.adminService.getPackingSlipHtml(id);
+    res.send(html);
+  }
+
+  @Get('orders/:id/label')
+  @ApiOperation({ summary: 'Get shipping label URL for an order' })
+  @ApiParam({ name: 'id', description: 'Order ID' })
+  @ApiResponse({ status: 200, description: 'Label info' })
+  @ApiResponse({ status: 404, description: 'No label found' })
+  getOrderLabel(@Param('id') id: string) {
+    return this.adminService.getOrderLabelUrl(id);
   }
 
   @Put('orders/:id/status')
