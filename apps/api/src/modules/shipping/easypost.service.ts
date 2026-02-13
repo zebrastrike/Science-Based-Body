@@ -74,7 +74,7 @@ export class EasyPostService {
       this.rateToShipmentMap.set(rate.id, data.id);
     }
 
-    // Transform to Shippo-compatible shape
+    // Transform EasyPost rates to standard shape
     return (data.rates || []).map((rate: any) => ({
       object_id: rate.id,
       provider: rate.carrier,
@@ -121,7 +121,7 @@ export class EasyPostService {
       };
     }
 
-    // Transform to Shippo transaction-compatible shape
+    // Transform EasyPost buy response to standard label shape
     return {
       status: 'SUCCESS',
       object_id: data.id,
@@ -231,7 +231,7 @@ export class EasyPostService {
       this.rateToShipmentMap.set(rate.id, data.id);
     }
 
-    // Transform rates to Shippo-compatible shape
+    // Transform EasyPost rates to standard shape
     const rates = (data.rates || []).map((rate: any) => ({
       object_id: rate.id,
       provider: rate.carrier,

@@ -283,7 +283,7 @@ export class AdminController {
   }
 
   // ==========================================================================
-  // ORDER FULFILLMENT (Shippo + Manual Payment Approval)
+  // ORDER FULFILLMENT (EasyPost + Manual Payment Approval)
   // ==========================================================================
 
   @Post('orders/:id/approve-payment')
@@ -302,9 +302,9 @@ export class AdminController {
   }
 
   @Get('orders/:id/shipping-rates')
-  @ApiOperation({ summary: 'Get live Shippo shipping rates for an order' })
+  @ApiOperation({ summary: 'Get live EasyPost shipping rates for an order' })
   @ApiParam({ name: 'id', description: 'Order ID' })
-  @ApiResponse({ status: 200, description: 'Shipping rates from Shippo' })
+  @ApiResponse({ status: 200, description: 'Shipping rates from EasyPost' })
   @ApiResponse({ status: 400, description: 'Order has no shipping address' })
   @ApiResponse({ status: 404, description: 'Order not found' })
   getShippingRates(@Param('id') id: string) {
@@ -312,7 +312,7 @@ export class AdminController {
   }
 
   @Post('orders/:id/create-label')
-  @ApiOperation({ summary: 'Create Shippo shipping label for a selected rate' })
+  @ApiOperation({ summary: 'Create EasyPost shipping label for a selected rate' })
   @ApiParam({ name: 'id', description: 'Order ID' })
   @ApiResponse({ status: 200, description: 'Label created with tracking info' })
   @ApiResponse({ status: 400, description: 'Label creation failed' })

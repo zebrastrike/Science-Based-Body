@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, BadRequestException, Inject, forwardRef,
 import { PrismaService } from '../../prisma/prisma.service';
 import { OrderStatus, UserStatus, ProductCategory, DiscountType, DiscountStatus, ReturnStatus, ShipmentStatus } from '@prisma/client';
 import { OrdersService } from '../orders/orders.service';
-import { ShippoService } from '../shipping/shippo.service';
+import { EasyPostService } from '../shipping/easypost.service';
 import { PaymentsService } from '../payments/payments.service';
 import { SmtpService } from '../notifications/smtp.service';
 
@@ -14,7 +14,7 @@ export class AdminService {
     private prisma: PrismaService,
     @Inject(forwardRef(() => OrdersService))
     private ordersService: OrdersService,
-    private shippoService: ShippoService,
+    private easypostService: EasyPostService,
     private paymentsService: PaymentsService,
     private mailService: SmtpService,
   ) {}
@@ -2333,7 +2333,7 @@ export class AdminService {
     }, 0);
 
     const addr = order.shippingAddress;
-    const result = await this.shippoService.createShipmentWithRates(
+    const result = await this.easypostService.createShipmentWithRates(
       {
         name: `${addr.firstName || ''} ${addr.lastName || ''}`.trim(),
         street1: addr.street1,
@@ -2395,7 +2395,7 @@ export class AdminService {
 
     // Create label via EasyPost (pass cached shipment ID for resilience)
     const shipmentId = order.shipment?.externalShipmentId || undefined;
-    const transaction = await this.shippoService.createLabel(rateId, shipmentId);
+    const transaction = await this.easypostService.createLabel(rateId, shipmentId);
 
     if (transaction.status !== 'SUCCESS') {
       throw new BadRequestException(

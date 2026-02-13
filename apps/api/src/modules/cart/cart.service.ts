@@ -23,7 +23,7 @@ export interface CartItem {
   };
   unitPrice: number;
   lineTotal: number;
-  weightGrams?: number; // Weight per unit for Shippo integration
+  weightGrams?: number; // Weight per unit for shipping calculation
 }
 
 export interface Cart {
@@ -35,7 +35,7 @@ export interface Cart {
   estimatedShipping: number;
   estimatedTax: number;
   total: number;
-  // Weight tracking for Shippo shipment creation
+  // Weight tracking for EasyPost shipment creation
   totalWeightGrams: number;
   totalWeightLbs: number;
 }
@@ -205,7 +205,7 @@ export class CartService {
 
     const total = subtotal - discountAmount + estimatedShipping + estimatedTax;
 
-    // Convert grams to pounds for Shippo (1 lb = 453.592 grams)
+    // Convert grams to pounds for EasyPost (1 lb = 453.592 grams)
     const totalWeightLbs = Math.round((totalWeightGrams / 453.592) * 100) / 100;
 
     return {

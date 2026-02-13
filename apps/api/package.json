@@ -50,7 +50,6 @@
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.1",
     "rxjs": "^7.8.1",
-    "shippo": "^1.7.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { ShippoService } from './shippo.service';
+import { EasyPostService } from './easypost.service';
 
 @Injectable()
 export class ShippingService {
   constructor(
     private prisma: PrismaService,
-    private shippo: ShippoService,
+    private easypost: EasyPostService,
   ) {}
 
   async getShippingRates(orderId: string) {
@@ -26,7 +26,7 @@ export class ShippingService {
       mass_unit: 'lb',
     };
 
-    return this.shippo.getRates(
+    return this.easypost.getRates(
       {
         name: `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`,
         street1: order.shippingAddress.street1,
@@ -40,7 +40,7 @@ export class ShippingService {
   }
 
   async createShipment(orderId: string, rateId: string, adminId: string) {
-    const label = await this.shippo.createLabel(rateId);
+    const label = await this.easypost.createLabel(rateId);
 
     const shipment = await this.prisma.shipment.create({
       data: {
@@ -74,6 +74,6 @@ export class ShippingService {
   }
 
   async trackShipment(trackingNumber: string, carrier: string) {
-    return this.shippo.trackShipment(carrier, trackingNumber);
+    return this.easypost.trackShipment(carrier, trackingNumber);
   }
 }
