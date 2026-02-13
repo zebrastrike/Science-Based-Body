@@ -4984,10 +4984,11 @@ body.page-home .variant-select option {
   z-index: 90;
   display: none;
   padding: 6px 0;
+  max-height: 80vh;
 }
 
-/* Only show on desktop (1200px+) */
-@media (min-width: 1200px) {
+/* Show on desktop (1024px+) */
+@media (min-width: 1024px) {
   .shop-sidebar {
     display: block;
   }
@@ -5005,7 +5006,10 @@ body.page-home .variant-select option {
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   box-shadow: 2px 4px 20px rgba(31, 42, 54, 0.08);
   padding: 8px 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 78vh;
+  scrollbar-width: thin;
 }
 
 .shop-sidebar-link {
