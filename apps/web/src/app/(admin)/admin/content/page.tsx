@@ -33,14 +33,24 @@ export default function ContentPage() {
   const fetchContent = async () => {
     setIsLoading(true);
     try {
-      const faqData = await adminRequest<FAQ[]>('/support/faq');
-      setFaqs(faqData || []);
+      const faqData = await adminRequest<{ categories: string[]; faqs: Record<string, Array<{ id?: string; question: string; answer: string }>> }>('/support/faq');
+      // Flatten grouped FAQ response into a flat array
+      const flatFaqs: FAQ[] = [];
+      if (faqData?.faqs && typeof faqData.faqs === 'object') {
+        for (const [, items] of Object.entries(faqData.faqs)) {
+          for (const item of items) {
+            flatFaqs.push({
+              id: item.id || `faq-${flatFaqs.length}`,
+              question: item.question,
+              answer: item.answer,
+            });
+          }
+        }
+      }
+      setFaqs(flatFaqs);
     } catch (err) {
       console.error('Failed to fetch FAQs:', err);
-      setFaqs([
-        { id: 'faq-1', question: 'What is the lead time?', answer: 'Most orders ship within 1-2 business days.' },
-        { id: 'faq-2', question: 'Do you provide COAs?', answer: 'Yes, COAs are available for every batch.' },
-      ]);
+      setFaqs([]);
     } finally {
       setIsLoading(false);
     }
